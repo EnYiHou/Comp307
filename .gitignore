@@ -1,0 +1,9 @@
+# MacOS
+.DS_Store
+.history
+
+# Node modules
+*/node_modules
+
+*.log
+*/dist
