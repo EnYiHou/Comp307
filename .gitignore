@@ -1,6 +1,7 @@
 # MacOS
 .DS_Store
 .history
+.vscode
 
 # Node modules
 */node_modules

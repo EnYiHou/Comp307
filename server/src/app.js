@@ -1,4 +1,5 @@
 import express from 'express';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 
@@ -39,6 +40,15 @@ app.get('/page1', (req, res) => {
 
 app.get('/page2', (req, res) => {
   res.send('Express route: /page2');
+});
+
+app.use('/api/users', userRoutes);
+
+app.use((err, req, res, next) => {
+  const statusCode = err.name === 'ValidationError' ? 400 : 500;
+  res.status(statusCode).json({
+    message: err.message || 'Internal server error',
+  });
 });
 
 export default app;
