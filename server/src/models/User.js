@@ -14,10 +14,14 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    passwordHash: {
+      type: String,
+      default: "",
+    },
     role: {
       type: String,
-      default: "student",
-      trim: true,
+      enum: ["USER", "OWNER", "BOTH"],
+      default: "USER",
     },
   },
   {

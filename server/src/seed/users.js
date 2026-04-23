@@ -2,8 +2,8 @@ import User from '../models/User.js';
 
 const sampleUser = {
   name: 'Sample User',
-  email: 'sample.user@example.com',
-  role: 'student',
+  email: 'sample.user@mail.mcgill.ca',
+  role: 'USER',
 };
 
 export const seedUsers = async () => {

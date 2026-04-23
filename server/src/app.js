@@ -1,54 +1,51 @@
-import express from 'express';
-import userRoutes from './routes/userRoutes.js';
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
+import morgan from "morgan";
+import { env } from "./config/env.js";
+import errorMiddleware from "./middleware/errorMiddleware.js";
+import authRoutes from "./routes/authRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import calendarRoutes from "./routes/calendarRoutes.js";
+import groupMeetingRoutes from "./routes/groupMeetingRoutes.js";
+import inviteRoutes from "./routes/inviteRoutes.js";
+import meetingRequestRoutes from "./routes/meetingRequestRoutes.js";
+import ownerRoutes from "./routes/ownerRoutes.js";
+import slotRoutes from "./routes/slotRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
-const allowedOrigins = new Set([
-  'http://localhost:3001',
-  'http://127.0.0.1:3001',
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-]);
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  if (origin && allowedOrigins.has(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-
-  res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-
-  next();
-});
-
+app.use(
+  cors({
+    origin: [
+      env.clientUrl,
+      "http://127.0.0.1:3001",
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+    ],
+    credentials: true,
+  }),
+);
 app.use(express.json());
+app.use(cookieParser());
+app.use(morgan("dev"));
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
+app.get("/", (req, res) => {
+  res.json({ message: "COMP 307 booking API is running" });
 });
 
-app.get('/page1', (req, res) => {
-  res.send('Express route: /page1');
-});
 
-app.get('/page2', (req, res) => {
-  res.send('Express route: /page2');
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/owners", ownerRoutes);
+app.use("/api/slots", slotRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/meeting-requests", meetingRequestRoutes);
+app.use("/api/invites", inviteRoutes);
+app.use("/api/group-meetings", groupMeetingRoutes);
+app.use("/api/calendar", calendarRoutes);
 
-app.use('/api/users', userRoutes);
-
-app.use((err, req, res, next) => {
-  const statusCode = err.name === 'ValidationError' ? 400 : 500;
-  res.status(statusCode).json({
-    message: err.message || 'Internal server error',
-  });
-});
+app.use(errorMiddleware);
 
 export default app;
