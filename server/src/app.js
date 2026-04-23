@@ -1,5 +1,6 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js'
 
 const app = express();
 
@@ -42,6 +43,8 @@ app.get('/page2', (req, res) => {
   res.send('Express route: /page2');
 });
 
+
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 
 app.use((err, req, res, next) => {
