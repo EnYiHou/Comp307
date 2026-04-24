@@ -6,7 +6,7 @@ export default function SearchBar({
   placeholder = "Search something",
 }) {
   const [inputValue, setInputValue] = useState(value);
-  const DELAY = 1000;
+  const DELAY = 300;
 
   useEffect(() => {
     setInputValue(value);
