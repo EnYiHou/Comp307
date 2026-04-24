@@ -17,8 +17,7 @@ import ViewBookingsPage from "../../pages/owner/ViewBookingsPage";
 import AuthPage from "../../pages/public/AuthPage";
 import InstructionsPage from "../../pages/public/InstructionsPage";
 import LandingPage from "../../pages/public/LandingPage";
-import OwnerPublicSlotsPage from "../../pages/public/OwnerPublicSlotsPage";
-import OwnersDirectoryPage from "../../pages/public/OwnersDirectoryPage";
+import OwnersDirectoryPage from "../../pages/dashboard/OwnersDirectoryPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRouter() {
@@ -37,8 +36,6 @@ export default function AppRouter() {
       <Route element={<PublicShell />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/instructions" element={<InstructionsPage />} />
-        <Route path="/owners" element={<OwnersDirectoryPage />} />
-        <Route path="/owners/:ownerId" element={<OwnerPublicSlotsPage />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
@@ -54,6 +51,8 @@ export default function AppRouter() {
             path="/dashboard/request-meeting"
             element={<RequestMeetingPage />}
           />
+          <Route path="/owners" element={<OwnersDirectoryPage />} />
+
           <Route path="/dashboard/settings" element={<SettingsPage />} />
           <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
           <Route path="/owner/slots" element={<ManageSlotsPage />} />

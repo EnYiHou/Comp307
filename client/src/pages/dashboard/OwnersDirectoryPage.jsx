@@ -1,23 +1,13 @@
 import { useEffect, useState } from "react";
 import SearchBar from "../../features/search/components/SearchBar";
 import { getOwners } from "../../features/search/services/searchService";
-
-function OwnerTable({ owners = [] }) {
-  return (
-    <ul className="owners-list">
-      {owners.map((owner) => (
-        <li key={owner.id} className="owner-list-item">
-          <div className="owner-name">{owner.name}</div>
-          <div className="owner-email">{owner.email}</div>
-        </li>
-      ))}
-    </ul>
-  );
-}
+import OwnerGrid from "../../features/owners/components/OwnerGrid";
+import OwnerModal from "../../features/owners/components/OwnerModal";
 
 export default function OwnersDirectoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [owners, setOwners] = useState([]);
+  const [selectedOwner, setSelectedOwner] = useState(null);
 
   useEffect(() => {
     console.log("Fetching owners with search term:", searchTerm);
@@ -54,7 +44,17 @@ export default function OwnersDirectoryPage() {
       {owners.length === 0 ? (
         <p>No owners found.</p>
       ) : (
-        <OwnerTable owners={owners} />
+        <OwnerGrid
+          owners={owners}
+          onSelectOwner={(owner) => setSelectedOwner(owner)}
+        />
+      )}
+
+      {selectedOwner && (
+        <OwnerModal
+          owner={selectedOwner}
+          onClose={() => setSelectedOwner(null)}
+        />
       )}
     </section>
   );
