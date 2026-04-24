@@ -1,5 +1,5 @@
-import React from "react";
 import { useMemo, useState } from "react";
+import api from "../services/api";
 import "./BookingSlotCreation.css";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -51,12 +51,16 @@ function BookingSlotCreation() {
   });
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [activeDate, setActiveDate] = useState(formatDate(new Date()));
+  const [submitState, setSubmitState] = useState({
+    status: "idle",
+    message: "",
+  });
 
   function handleChange(event) {
-    const { name, value } = event.target;
+    const { name, type, value } = event.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "number" ? Number(value) : value,
     }));
   }
 
@@ -67,33 +71,32 @@ function BookingSlotCreation() {
     }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const payload = {
       ...formData,
       selectedSlots,
     };
 
-    fetch("http://localhost:3000/api/dashboard/createBookingSlot", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to create booking slot.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data.message);
-      })
-      .catch((error) => {
-        console.error("Create booking slot error:", error);
+    setSubmitState({
+      status: "submitting",
+      message: "Creating booking slot...",
+    });
+
+    try {
+      const { data } = await api.post("/dashboard/createBookingSlot", payload);
+      setSubmitState({
+        status: "success",
+        message: data.message || "Booking slot created successfully.",
       });
+    } catch (error) {
+      console.error("Create booking slot error:", error);
+      setSubmitState({
+        status: "error",
+        message:
+          error.response?.data?.message || "Failed to create booking slot.",
+      });
+    }
   }
 
   const showCalendarSlotSelector =
@@ -103,7 +106,7 @@ function BookingSlotCreation() {
     formData.bookingMode === "group" && formData.pollMethod === "heatmap";
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="booking-slot-form" onSubmit={handleSubmit}>
       <BookingFields formData={formData} handleChange={handleChange} />
 
       {showCalendarSlotSelector && (
@@ -124,7 +127,25 @@ function BookingSlotCreation() {
         />
       )}
 
-      <button type="submit">Submit</button>
+      <div className="booking-slot-actions">
+        <button
+          className="button"
+          type="submit"
+          disabled={submitState.status === "submitting"}
+        >
+          {submitState.status === "submitting"
+            ? "Creating..."
+            : "Create Booking Slot"}
+        </button>
+        {submitState.message && (
+          <p
+            className={`booking-slot-feedback is-${submitState.status}`}
+            role="status"
+          >
+            {submitState.message}
+          </p>
+        )}
+      </div>
     </form>
   );
 }
@@ -176,8 +197,11 @@ function HeatmapSelector({ formData, handleChange, onRangeChange }) {
   }, [formData.rangeStart, formData.rangeEnd]);
 
   return (
-    <section>
-      <div>Calendar</div>
+    <section className="booking-slot-card">
+      <div className="booking-slot-card_header">
+        <h3>Date Range</h3>
+        <p>Select a date interval for the heatmap-style group poll.</p>
+      </div>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
@@ -247,10 +271,12 @@ function TwoPanelSelector({
   }, [activeDate, selectedSlots]);
 
   return (
-    <section>
-      {/* Left panel */}
-      <div>
-        <div>Dates</div>
+    <section className="booking-slot-selector">
+      <div className="booking-slot-card">
+        <div className="booking-slot-card_header">
+          <h3>Dates</h3>
+          <p>Pick a day on the month calendar to focus the detailed view.</p>
+        </div>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
@@ -268,9 +294,11 @@ function TwoPanelSelector({
         />
       </div>
 
-      {/* Right panel */}
-      <div>
-        <div>Selected Day: </div>
+      <div className="booking-slot-card">
+        <div className="booking-slot-card_header">
+          <h3>Selected Day</h3>
+          <p>{activeDate}</p>
+        </div>
         <FullCalendar
           key={activeDate}
           plugins={[timeGridPlugin, interactionPlugin]}
@@ -296,22 +324,54 @@ function TwoPanelSelector({
 
 function BookingFields({ formData, handleChange }) {
   return (
-    <section>
-      <label>
-        Title
-        <input name="title" value={formData.title} onChange={handleChange} />
-      </label>
+    <section className="booking-slot-card">
+      <div className="booking-slot-card_header">
+        <h3>Booking Details</h3>
+        <p>Configure the slot basics before choosing dates and times.</p>
+      </div>
 
-      <label>
-        Description
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-        />
-      </label>
+      <div className="booking-slot-fields">
+        <label className="booking-slot-field">
+          <span>Title</span>
+          <input name="title" value={formData.title} onChange={handleChange} />
+        </label>
 
-      <fieldset>
+        <label className="booking-slot-field booking-slot-field-full">
+          <span>Description</span>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="4"
+          />
+        </label>
+
+        <label className="booking-slot-field">
+          <span>Capacity</span>
+          <input
+            type="number"
+            min="1"
+            name="capacity"
+            value={formData.capacity}
+            onChange={handleChange}
+          />
+        </label>
+
+        {formData.bookingMode === "slot" && (
+          <label className="booking-slot-field">
+            <span>Recurrence Count</span>
+            <input
+              type="number"
+              min="1"
+              name="recurrenceCount"
+              value={formData.recurrenceCount}
+              onChange={handleChange}
+            />
+          </label>
+        )}
+      </div>
+
+      <fieldset className="booking-slot-choice-group">
         <legend>Booking Mode</legend>
         <label>
           Slot
@@ -335,18 +395,7 @@ function BookingFields({ formData, handleChange }) {
         </label>
       </fieldset>
 
-      <label>
-        Capacity
-        <input
-          type="number"
-          min="1"
-          name="capacity"
-          value={formData.capacity}
-          onChange={handleChange}
-        />
-      </label>
-
-      <fieldset>
+      <fieldset className="booking-slot-choice-group">
         <legend>Visibility</legend>
         <label>
           Public
@@ -370,23 +419,8 @@ function BookingFields({ formData, handleChange }) {
         </label>
       </fieldset>
 
-      {formData.bookingMode === "slot" && (
-        <section>
-          <label>
-            Recurrence Count
-            <input
-              type="number"
-              min="1"
-              name="recurrenceCount"
-              value={formData.recurrenceCount}
-              onChange={handleChange}
-            />
-          </label>
-        </section>
-      )}
-
       {formData.bookingMode === "group" && (
-        <fieldset>
+        <fieldset className="booking-slot-choice-group">
           <legend>Polling Method</legend>
           <label>
             Calendar

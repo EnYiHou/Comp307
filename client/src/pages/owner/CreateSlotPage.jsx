@@ -1,8 +1,14 @@
+import BookingSlotCreation from "../../Components/BookingSlotCreation";
+
 export default function CreateSlotPage() {
   return (
     <section className="page-stack">
-      <h2>Create Slot</h2>
-      <p>This page is ready for a slot creation form.</p>
+      <h2>Create Booking Slot</h2>
+      <p>
+        Build a one-on-one slot or a group availability poll directly from the
+        owner dashboard.
+      </p>
+      <BookingSlotCreation />
     </section>
   );
 }
