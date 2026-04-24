@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import api from "../services/api";
+import api from "../../../shared/api/api";
 import "./BookingSlotCreation.css";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -111,7 +111,6 @@ function BookingSlotCreation() {
 
       {showCalendarSlotSelector && (
         <TwoPanelSelector
-          formData={formData}
           selectedSlots={selectedSlots}
           setSelectedSlots={setSelectedSlots}
           activeDate={activeDate}
@@ -122,7 +121,6 @@ function BookingSlotCreation() {
       {showHeatmapRangeSelector && (
         <HeatmapSelector
           formData={formData}
-          handleChange={handleChange}
           onRangeChange={handleHeatmapRangeChange}
         />
       )}
@@ -150,7 +148,7 @@ function BookingSlotCreation() {
   );
 }
 
-function HeatmapSelector({ formData, handleChange, onRangeChange }) {
+function HeatmapSelector({ formData, onRangeChange }) {
   function handleMonthDateClick(info) {
     const clickedDate = info.dateStr;
 
@@ -220,7 +218,6 @@ function HeatmapSelector({ formData, handleChange, onRangeChange }) {
 }
 
 function TwoPanelSelector({
-  formData,
   selectedSlots,
   setSelectedSlots,
   activeDate,

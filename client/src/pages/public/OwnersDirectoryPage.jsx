@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import SearchBar from "../../components/ui/SearchBar";
-import { getOwners } from "../../services/SearchService";
+import SearchBar from "../../features/search/components/SearchBar";
+import { getOwners } from "../../features/search/services/searchService";
 
 function OwnerTable({ owners = [] }) {
   return (

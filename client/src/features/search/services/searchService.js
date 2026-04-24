@@ -1,4 +1,4 @@
-import api from "./api.js";
+import api from "../../../shared/api/api.js";
 
 export async function getAll(searchTerm) {
     const response = await api.get("/dashboard/searchAll", {
