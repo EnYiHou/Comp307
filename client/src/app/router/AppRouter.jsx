@@ -43,6 +43,7 @@ export default function AppRouter() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardShell />}>
+          <Route path="/dashboard-owners" element={<OwnersDirectoryPage />} />
           <Route path="/dashboard" element={<UserDashboardPage />} />
           <Route
             path="/dashboard/appointments"

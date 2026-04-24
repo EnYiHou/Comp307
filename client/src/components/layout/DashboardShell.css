@@ -1,0 +1,10 @@
+@import "../../index.css";
+
+.dashboard-shell {
+  display: flex;
+  flex-direction: row;
+}
+
+.dashboard-shell_content {
+  flex: 1;
+}
