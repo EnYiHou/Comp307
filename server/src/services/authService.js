@@ -1,69 +1,78 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
-import { generateToken } from "../utils/generateToken.js";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 
-const isAllowedEmail = email =>
-  email.endsWith("@mcgill.ca") || email.endsWith("@mail.mcgill.ca");
+const generateToken = (user) => {
+    return jwt.sign({
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+    }, env.jwtSecret, { expiresIn: "7d" });
+};
 
-const getRoleForEmail = email => (email.endsWith("@mcgill.ca") ? "BOTH" : "USER");
 
-export async function registerUser({ name, email, password }) {
-  const normalizedEmail = email.toLowerCase().trim();
+export async function loginUser(formData) {
+    const { email, password } = formData;
 
-  if (!isAllowedEmail(normalizedEmail)) {
-    const error = new Error("Only McGill emails can register");
-    error.status = 400;
-    throw error;
-  }
+    const nEmail = email.toLowerCase().trim();
 
-  const existingUser = await User.findOne({ email: normalizedEmail });
-  if (existingUser) {
-    const error = new Error("Email already registered");
-    error.status = 409;
-    throw error;
-  }
+    // Find the user by email
+    const user = await User.findOne({ email: nEmail });
+    if (!user) {
+        const error = new Error("Invalid email or password");
+        error.status = 401;
+        throw error;
+    }
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = await User.create({
-    name,
-    email: normalizedEmail,
-    passwordHash,
-    role: getRoleForEmail(normalizedEmail),
-  });
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+        const error = new Error("Invalid email or password");
+        error.status = 401;
+        throw error;
+    }
 
-  const token = generateToken({
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  });
+    // Generate JWT token
+    const token = generateToken(user);
+    return { user, token };
 
-  return { user, token };
 }
 
-export async function loginUser({ email, password }) {
-  const normalizedEmail = email.toLowerCase().trim();
-  const user = await User.findOne({ email: normalizedEmail });
 
-  if (!user || !user.passwordHash) {
-    const error = new Error("Invalid credentials");
-    error.status = 400;
-    throw error;
-  }
+export async function registerUser(formData) {
+    const { username, email, password } = formData;
+    const nEmail = email.toLowerCase().trim();
 
-  const passwordMatches = await bcrypt.compare(password, user.passwordHash);
-  if (!passwordMatches) {
-    const error = new Error("Invalid credentials");
-    error.status = 400;
-    throw error;
-  }
+    // Check if email is a valid McGill email
+    const validEmail = email.endsWith("@mcgill.ca") || email.endsWith("@mail.mcgill.ca");
+    if (!validEmail) {
+        const error = new Error("Only McGill email addresses are allowed");
+        error.status = 400;
+        throw error;
+    }
 
-  const token = generateToken({
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  });
+    // Check if email is already in use
+    const existingUser = await User.findOne({ email: nEmail });
+    if (existingUser) {
+        const error = new Error("Email already in use");
+        error.status = 400;
+        throw error;
+    }
 
-  return { user, token };
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user
+    const user = new User({
+        name: username,
+        email: nEmail,
+        passwordHash: hashedPassword,
+        role: email.endsWith("@mcgill.ca") ? "OWNER" : "USER",
+    });
+    await user.save();
+
+    const token = generateToken(user);
+    return { user, token };
 }

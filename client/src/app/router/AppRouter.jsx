@@ -1,5 +1,6 @@
-import { Route, Routes } from "react-router-dom";
-import AppShell from "../../components/layout/AppShell";
+import { Navigate, Route, Routes } from "react-router-dom";
+import DashboardShell from "../../components/layout/DashboardShell";
+import PublicShell from "../../components/layout/PublicShell";
 import MyAppointmentsPage from "../../pages/dashboard/MyAppointmentsPage";
 import BookAppointmentPage from "../../pages/dashboard/BookAppointmentPage";
 import RequestMeetingPage from "../../pages/dashboard/RequestMeetingPage";
@@ -13,45 +14,61 @@ import ManageSlotsPage from "../../pages/owner/ManageSlotsPage";
 import OwnerDashboardPage from "../../pages/owner/OwnerDashboardPage";
 import RecurringOfficeHoursPage from "../../pages/owner/RecurringOfficeHoursPage";
 import ViewBookingsPage from "../../pages/owner/ViewBookingsPage";
+import AuthPage from "../../pages/public/AuthPage";
 import InstructionsPage from "../../pages/public/InstructionsPage";
 import LandingPage from "../../pages/public/LandingPage";
-import LoginPage from "../../pages/public/LoginPage";
 import OwnerPublicSlotsPage from "../../pages/public/OwnerPublicSlotsPage";
 import OwnersDirectoryPage from "../../pages/public/OwnersDirectoryPage";
-import RegisterPage from "../../pages/public/RegisterPage";
+import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRouter() {
   return (
     <Routes>
-      <Route element={<AppShell />}>
+      <Route path="/auth" element={<AuthPage />} />
+      <Route
+        path="/login"
+        element={<Navigate to="/auth?mode=login" replace />}
+      />
+      <Route
+        path="/register"
+        element={<Navigate to="/auth?mode=signup" replace />}
+      />
+
+      <Route element={<PublicShell />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/instructions" element={<InstructionsPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
         <Route path="/owners" element={<OwnersDirectoryPage />} />
         <Route path="/owners/:ownerId" element={<OwnerPublicSlotsPage />} />
-        <Route path="/dashboard" element={<UserDashboardPage />} />
-        <Route path="/dashboard/appointments" element={<MyAppointmentsPage />} />
-        <Route path="/dashboard/book" element={<BookAppointmentPage />} />
-        <Route
-          path="/dashboard/request-meeting"
-          element={<RequestMeetingPage />}
-        />
-        <Route path="/dashboard/settings" element={<SettingsPage />} />
-        <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
-        <Route path="/owner/slots" element={<ManageSlotsPage />} />
-        <Route path="/owner/slots/new" element={<CreateSlotPage />} />
-        <Route
-          path="/owner/recurring-office-hours"
-          element={<RecurringOfficeHoursPage />}
-        />
-        <Route path="/owner/requests" element={<BookingRequestsPage />} />
-        <Route
-          path="/owner/group-meetings/new"
-          element={<GroupMeetingSetupPage />}
-        />
-        <Route path="/owner/bookings" element={<ViewBookingsPage />} />
-        <Route path="/owner/invite-links" element={<InviteLinksPage />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardShell />}>
+          <Route path="/dashboard" element={<UserDashboardPage />} />
+          <Route
+            path="/dashboard/appointments"
+            element={<MyAppointmentsPage />}
+          />
+          <Route path="/dashboard/book" element={<BookAppointmentPage />} />
+          <Route
+            path="/dashboard/request-meeting"
+            element={<RequestMeetingPage />}
+          />
+          <Route path="/dashboard/settings" element={<SettingsPage />} />
+          <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
+          <Route path="/owner/slots" element={<ManageSlotsPage />} />
+          <Route path="/owner/slots/new" element={<CreateSlotPage />} />
+          <Route
+            path="/owner/recurring-office-hours"
+            element={<RecurringOfficeHoursPage />}
+          />
+          <Route path="/owner/requests" element={<BookingRequestsPage />} />
+          <Route
+            path="/owner/group-meetings/new"
+            element={<GroupMeetingSetupPage />}
+          />
+          <Route path="/owner/bookings" element={<ViewBookingsPage />} />
+          <Route path="/owner/invite-links" element={<InviteLinksPage />} />
+        </Route>
       </Route>
     </Routes>
   );

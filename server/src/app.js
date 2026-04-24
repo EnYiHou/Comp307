@@ -1,7 +1,7 @@
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -13,6 +13,7 @@ import meetingRequestRoutes from "./routes/meetingRequestRoutes.js";
 import ownerRoutes from "./routes/ownerRoutes.js";
 import slotRoutes from "./routes/slotRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser())
 app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
@@ -46,6 +47,7 @@ app.use("/api/invites", inviteRoutes);
 app.use("/api/group-meetings", groupMeetingRoutes);
 app.use("/api/calendar", calendarRoutes);
 
+// Fallback error handler
 app.use(errorMiddleware);
 
 export default app;
