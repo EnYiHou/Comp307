@@ -1,4 +1,6 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import "./AppShell.css";
 
 const links = [
   { to: "/", label: "Home" },
@@ -10,32 +12,11 @@ const links = [
 
 export default function AppShell() {
   return (
-    <div className="shell">
-      <header className="hero">
-        <p className="eyebrow">COMP 307 Project Skeleton</p>
-        <h1>McGill Booking App</h1>
-        <p className="hero-copy">
-          A MERN-based appointment system for students, professors, and TAs.
-        </p>
-      </header>
-
-      <nav className="main-nav" aria-label="Primary">
-        {links.map(link => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) =>
-              isActive ? "nav-link nav-link-active" : "nav-link"
-            }
-          >
-            {link.label}
-          </NavLink>
-        ))}
-      </nav>
-
-      <main className="content-card">
+    <div className="app-shell">
+      <Sidebar links={links} />
+      <div className="main-content">
         <Outlet />
-      </main>
+      </div>
     </div>
   );
 }

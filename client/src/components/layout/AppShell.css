@@ -1,0 +1,10 @@
+@import "../../Style.css";
+
+.app-shell {
+  display: flex;
+  flex-direction: row;
+}
+
+.main-content {
+  flex: 1;
+}
