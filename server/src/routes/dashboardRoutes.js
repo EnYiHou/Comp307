@@ -145,9 +145,9 @@ function makeUserSearchHandler(roles) {
     };
 }
 
-function searchAllUsers(id, query, roles) {
+async function searchAllUsers(id, query, roles) {
 
-    const escapedQuery = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(escapedQuery, "i");
 
     const users = await User.find({
