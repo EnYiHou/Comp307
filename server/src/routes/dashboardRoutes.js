@@ -1,5 +1,7 @@
 import express from 'express';
 import { Booking, BookingRequest, BookingPoll } from "../models/Booking.js";
+import User from "../models/User.js";
+import requireAuth from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -9,8 +11,7 @@ router.get('/appointments', async (req, res) => {
 });
 
 
-// requireAuth
-router.post('/createBookingSlot', async (req, res) => {
+router.post('/createBookingSlot', requireAuth, async (req, res) => {
     console.log("YOYOYOYOYOY");
     try {
         const userId = req.user.id;
@@ -24,7 +25,7 @@ router.post('/createBookingSlot', async (req, res) => {
         }
 
         else if (bookingData.bookingMode === "group") {
-            const createdSlots = await createBookingSlot(userId, bookingData);
+            const createdSlots = await createBookingGroup(userId, bookingData);
 
             return res.status(201).json({
                 message: "Booking polls created successfully.",
@@ -53,12 +54,12 @@ async function createBookingSlot(userId, bookingData) {
         participants: [],
     }))
 
-    const createdSlots = await Booking.insertMany(slotsToCreate);
-    return createdSlots;
+    return await Booking.insertMany(slotsToCreate);
 };
 
-async function createBookingGroup(userId, bookingData, method) {
+async function createBookingGroup(userId, bookingData) {
     let candidateSlots = [];
+    const method = bookingData.pollMethod;
 
     if (method === "calendar") {
         candidateSlots = bookingData.selectedSlots.map((slot) => ({
@@ -83,12 +84,14 @@ async function createBookingGroup(userId, bookingData, method) {
         rangeEnd: bookingData.rangeEnd ? new Date(bookingData.rangeEnd) : null,
         status: "collectingVotes",
     }
+
+    return await BookingPoll.create(pollsToCreate)
 };
 
 function generateHeatmapCandidates(rangeStart, rangeEnd) {
     const SLOTS_MINUTES_INTERVAL = 30;
     const DAYS_HOUR_START = 8;
-    const DAYS_HOUR_END = 8;
+    const DAYS_HOUR_END = 18;
 
     const slots = [];
 
@@ -112,6 +115,7 @@ function generateHeatmapCandidates(rangeStart, rangeEnd) {
             })
             currentSlotStart = currentSlotEnd;
         }
+        currentDay.setDate(currentDay.getDate() + 1);
     }
     return slots;
 }
