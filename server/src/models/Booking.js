@@ -1,29 +1,185 @@
 import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema(
-  {
-    slotId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Slot",
-      required: true,
+
+    {
+        ownerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        title: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        description: {
+            type: String,
+            trim: true,
+        },
+        startTime: {
+            type: Date,
+            required: true,
+        },
+        endTime: {
+            type: Date,
+            required: true,
+        },
+        visibility: {
+            type: String,
+            enum: ["private", "public"],
+            default: "private",
+        },
+        status: {
+            type: String,
+            enum: ["open", "reserved"],
+            default: "open",
+        },
+        participants: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        capacity: {
+            type: Number,
+            default: 1,
+            min: 1,
+        },
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    {
+        timestamps: true,
     },
-    notes: {
-      type: String,
-      default: "",
-      trim: true,
-    },
-    status: {
-      type: String,
-      enum: ["CONFIRMED", "CANCELLED"],
-      default: "CONFIRMED",
-    },
-  },
-  { timestamps: true },
 );
 
-export default mongoose.model("Booking", bookingSchema);
+
+const bookingRequestSchema = new mongoose.Schema(
+    {
+        ownerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        requesterId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        message: {
+            type: String,
+            trim: true,
+        },
+        status: {
+            type: String,
+            enum: ["pending", "accepted", "declined"],
+            default: "pending",
+        },
+        proposedTitle: {
+            type: String,
+            trim: true,
+        },
+        proposedDescription: {
+            type: String,
+            trim: true,
+        },
+        createdBookingId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Booking",
+            default: null,
+        },
+    },
+    {
+        timestamps: true,
+    },
+);
+
+const bookingPollsSchema = new mongoose.Schema(
+    {
+        ownerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        title: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        description: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        invitedUsers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        method: {
+            type: String,
+            enum: ["calendar", "heatmap"],
+            required: true,
+        },
+        candidateSlots: [
+            {
+                startTime: {
+                    type: Date,
+                    required: true,
+                },
+                endTime: {
+                    type: Date,
+                    required: true,
+                },
+                selectedByUsers: [
+                    {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: "User",
+                    },
+                ],
+            }
+        ],
+        rangeStart: {
+            type: Date,
+            default: null,
+        },
+        rangeEnd: {
+            type: Date,
+            default: null,
+        },
+        status: {
+            type: String,
+            enum: ["collectingVotes", "finalized", "cancelled"],
+            default: "collectingVotes",
+        },
+        finalSelection: {
+            startTime: {
+                type: Date,
+                default: null,
+            },
+            endTime: {
+                type: Date,
+                default: null,
+            },
+        },
+        recurrence: {
+            type: String,
+            default: null,
+        },
+        createdBookingIds: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Booking",
+            },
+        ],
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const Booking = mongoose.model("Booking", bookingSchema);
+const BookingRequest = mongoose.model("BookingRequest", bookingRequestSchema);
+const BookingPoll = mongoose.model("BookingPoll", bookingPollsSchema);
+
+export { Booking, BookingRequest, BookingPoll };

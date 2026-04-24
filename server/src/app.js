@@ -1,3 +1,4 @@
+
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
@@ -13,6 +14,7 @@ import meetingRequestRoutes from "./routes/meetingRequestRoutes.js";
 import ownerRoutes from "./routes/ownerRoutes.js";
 import slotRoutes from "./routes/slotRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import dashboardRoutes from './routes/dashboardRoutes.js'
 
 
 const app = express();
@@ -47,7 +49,11 @@ app.use("/api/invites", inviteRoutes);
 app.use("/api/group-meetings", groupMeetingRoutes);
 app.use("/api/calendar", calendarRoutes);
 
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', userRoutes);
+
 // Fallback error handler
 app.use(errorMiddleware);
+
 
 export default app;
