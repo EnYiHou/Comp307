@@ -32,7 +32,7 @@ const bookingSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: ["open", "reserved"],
-            default: "draft",
+            default: "open",
         },
         participants: [
             {
@@ -90,26 +90,6 @@ const bookingRequestSchema = new mongoose.Schema(
     {
         timestamps: true,
     },
-);
-
-const pollSlotSchema = new mongoose.Schema(
-    {
-        startTime: {
-            type: Date,
-            required: true,
-        },
-        endTime: {
-            type: Date,
-            required: true,
-        },
-        selectedByUsers: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
-    },
-    { _id: false }
 );
 
 const bookingPollsSchema = new mongoose.Schema(
@@ -198,11 +178,7 @@ const bookingPollsSchema = new mongoose.Schema(
 );
 
 const Booking = mongoose.model("Booking", bookingSchema);
-const Request = mongoose.model("Request", bookingRequestSchema);
+const BookingRequest = mongoose.model("BookingRequest", bookingRequestSchema);
 const BookingPoll = mongoose.model("BookingPoll", bookingPollsSchema);
 
-
-export default Booking;
-export default Request;
-export default BookingPoll;
-
+export { Booking, BookingRequest, BookingPoll };

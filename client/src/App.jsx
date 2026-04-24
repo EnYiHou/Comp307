@@ -14,9 +14,11 @@ function App() {
 
       <Routes>
         <Route path="/Dashboard" element={<Dashboard />} />
-      </Routes>·
+      </Routes>
     </main>
   )
 }
 
 export default App
+
+

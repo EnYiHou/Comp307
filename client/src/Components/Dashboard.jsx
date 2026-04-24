@@ -1,8 +1,12 @@
 import React from 'react';
 import { useEffect, useState } from "react";
 import "./dashboard.css";
+import BookingSlotCreation from './BookingSlotCreation';
+//import BookingSlotCreation from './gpt_booking';
 
 
+
+import { Emitter } from '@fullcalendar/core/internal';
 
 function AppointmentSection() {
     const [appointments, setAppointments] = useState([]);
@@ -44,13 +48,22 @@ function AppointmentSection() {
 }
 
 
+// function BookingSlotCreation() {
+
+// }
+
+function BookingRequest() {
+
+}
+
 
 
 function Dashboard() {
     return (
         <div>
             <AppointmentSection />
-        </div>
+            <BookingSlotCreation />
+        </div >
     )
 }
 
