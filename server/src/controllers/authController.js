@@ -34,6 +34,7 @@ export async function login(req, res, next) {
 
 export function logout(req, res) {
   res.clearCookie("token");
+  
   res.json({ message: "Logged out" });
 }
 

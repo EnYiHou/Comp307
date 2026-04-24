@@ -46,6 +46,7 @@ app.use("/api/invites", inviteRoutes);
 app.use("/api/group-meetings", groupMeetingRoutes);
 app.use("/api/calendar", calendarRoutes);
 
+// Fallback error handler
 app.use(errorMiddleware);
 
 export default app;

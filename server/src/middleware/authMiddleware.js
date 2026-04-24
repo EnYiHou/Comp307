@@ -3,10 +3,7 @@ import { env } from "../config/env.js";
 
 export default function authMiddleware(req, res, next) {
   try {
-    const bearerToken = req.headers.authorization?.startsWith("Bearer ")
-      ? req.headers.authorization.slice(7)
-      : null;
-    const token = req.cookies?.token || bearerToken;
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({ message: "Not authenticated" });
