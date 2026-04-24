@@ -1,21 +1,22 @@
-import api from "./api";
-
-export async function registerUser(payload) {
-  const response = await api.post("/auth/register", payload);
-  return response.data;
-}
-
-export async function loginUser(payload) {
-  const response = await api.post("/auth/login", payload);
-  return response.data;
-}
-
-export async function logoutUser() {
-  const response = await api.post("/auth/logout");
-  return response.data;
-}
+import api from "./api.js";
 
 export async function getCurrentUser() {
   const response = await api.get("/auth/me");
+  return response.data;
+}
+
+
+export async function login(formData) {
+  const response = await api.post("/auth/login", formData);
+  return response.data;
+}
+
+export async function register(formData) {
+  const response = await api.post("/auth/register", formData);
+  return response.data;
+}
+
+export async function logout() {
+  const response = await api.post("/auth/logout");
   return response.data;
 }

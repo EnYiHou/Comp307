@@ -19,12 +19,16 @@ import InstructionsPage from "../../pages/public/InstructionsPage";
 import LandingPage from "../../pages/public/LandingPage";
 import OwnerPublicSlotsPage from "../../pages/public/OwnerPublicSlotsPage";
 import OwnersDirectoryPage from "../../pages/public/OwnersDirectoryPage";
+import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRouter() {
   return (
     <Routes>
       <Route path="/auth" element={<AuthPage />} />
-      <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
+      <Route
+        path="/login"
+        element={<Navigate to="/auth?mode=login" replace />}
+      />
       <Route
         path="/register"
         element={<Navigate to="/auth?mode=signup" replace />}
@@ -37,29 +41,34 @@ export default function AppRouter() {
         <Route path="/owners/:ownerId" element={<OwnerPublicSlotsPage />} />
       </Route>
 
-      <Route element={<DashboardShell />}>
-        <Route path="/dashboard" element={<UserDashboardPage />} />
-        <Route path="/dashboard/appointments" element={<MyAppointmentsPage />} />
-        <Route path="/dashboard/book" element={<BookAppointmentPage />} />
-        <Route
-          path="/dashboard/request-meeting"
-          element={<RequestMeetingPage />}
-        />
-        <Route path="/dashboard/settings" element={<SettingsPage />} />
-        <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
-        <Route path="/owner/slots" element={<ManageSlotsPage />} />
-        <Route path="/owner/slots/new" element={<CreateSlotPage />} />
-        <Route
-          path="/owner/recurring-office-hours"
-          element={<RecurringOfficeHoursPage />}
-        />
-        <Route path="/owner/requests" element={<BookingRequestsPage />} />
-        <Route
-          path="/owner/group-meetings/new"
-          element={<GroupMeetingSetupPage />}
-        />
-        <Route path="/owner/bookings" element={<ViewBookingsPage />} />
-        <Route path="/owner/invite-links" element={<InviteLinksPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardShell />}>
+          <Route path="/dashboard" element={<UserDashboardPage />} />
+          <Route
+            path="/dashboard/appointments"
+            element={<MyAppointmentsPage />}
+          />
+          <Route path="/dashboard/book" element={<BookAppointmentPage />} />
+          <Route
+            path="/dashboard/request-meeting"
+            element={<RequestMeetingPage />}
+          />
+          <Route path="/dashboard/settings" element={<SettingsPage />} />
+          <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
+          <Route path="/owner/slots" element={<ManageSlotsPage />} />
+          <Route path="/owner/slots/new" element={<CreateSlotPage />} />
+          <Route
+            path="/owner/recurring-office-hours"
+            element={<RecurringOfficeHoursPage />}
+          />
+          <Route path="/owner/requests" element={<BookingRequestsPage />} />
+          <Route
+            path="/owner/group-meetings/new"
+            element={<GroupMeetingSetupPage />}
+          />
+          <Route path="/owner/bookings" element={<ViewBookingsPage />} />
+          <Route path="/owner/invite-links" element={<InviteLinksPage />} />
+        </Route>
       </Route>
     </Routes>
   );

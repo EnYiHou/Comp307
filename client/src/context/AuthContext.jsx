@@ -1,10 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import {
-  getCurrentUser,
-  loginUser,
-  logoutUser,
-  registerUser,
-} from "../services/authService";
+  getCurrentUser as getCurrentUserService,
+  login as loginService,
+  logout as logoutService,
+  register as registerService,
+} from "../services/authService.js";
 
 const AuthContext = createContext(null);
 
@@ -13,35 +13,39 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadUser() {
+    async function fetchCurrentUser() {
       try {
-        const data = await getCurrentUser();
-        setUser(data.user ?? null);
+        const response = await getCurrentUserService();
+        setUser(response.user ?? null);
       } catch (error) {
-        setUser(null);
+        console.error("Error fetching current user:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    loadUser();
+    fetchCurrentUser();
   }, []);
 
   async function login(formData) {
-    const data = await loginUser(formData);
-    setUser(data.user);
-    return data;
+    const response = await loginService(formData);
+    const user = response.user;
+    setUser(user);
+
+    return response;
   }
 
   async function register(formData) {
-    const data = await registerUser(formData);
-    setUser(data.user);
-    return data;
+    const response = await registerService(formData);
+    const user = response.user;
+    setUser(user);
+
+    return response;
   }
 
   async function logout() {
-    await logoutUser();
     setUser(null);
+    await logoutService();
   }
 
   return (
@@ -51,6 +55,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
+export const useAuth = () => {
   return useContext(AuthContext);
-}
+};

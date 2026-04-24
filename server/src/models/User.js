@@ -16,11 +16,11 @@ const userSchema = new mongoose.Schema(
     },
     passwordHash: {
       type: String,
-      default: "",
+      required: true,
     },
     role: {
       type: String,
-      enum: ["USER", "OWNER", "BOTH"],
+      enum: ["USER", "OWNER"],
       default: "USER",
     },
   },
