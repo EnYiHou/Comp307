@@ -7,7 +7,9 @@ export default function SearchBar({
     <input
       type="search"
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => {
+        onChange(e.target.value);
+      }}
       placeholder={placeholder}
       className="search-bar"
     />

@@ -1,7 +1,7 @@
 import api from "./api.js";
 
 export async function getAll(searchTerm) {
-    const response = await api.get("/searchAll", {
+    const response = await api.get("/dashboard/searchAll", {
         params: {
             q: searchTerm
         }
@@ -11,7 +11,7 @@ export async function getAll(searchTerm) {
 
 
 export async function getOwners(searchTerm) {
-    const response = await api.get("/searchOwners", {
+    const response = await api.get("/dashboard/searchOwners", {
         params: {
             q: searchTerm
         }
