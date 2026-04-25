@@ -22,10 +22,6 @@ export default function LandingPage() {
             <Link className="button button-primary" to="/auth?mode=signup">
               Get started
             </Link>
-
-            <Link className="button button-secondary" to="/owners">
-              Browse availability
-            </Link>
           </div>
 
           <div className="trust-row">
@@ -90,7 +86,7 @@ export default function LandingPage() {
           <span className="feature-icon">01</span>
           <h3>Book faster</h3>
           <p>
-            Students can browse available office-hour slots and reserve a time
+            Students can find available office-hour slots and reserve a time
             without sending extra emails.
           </p>
         </article>

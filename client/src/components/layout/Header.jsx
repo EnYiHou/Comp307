@@ -9,9 +9,6 @@ export default function Header() {
       </NavLink>
 
       <nav className="app-header_nav">
-        <NavLink className="app-header_browse" to="/owners">
-          Browse
-        </NavLink>
         <Link className="app-header_login" to="/auth?mode=login">
           Login
         </Link>
