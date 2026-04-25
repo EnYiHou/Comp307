@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import "./OwnerDashboardPage.css";
 
@@ -16,12 +17,22 @@ function formatDateTime(dateValue) {
   });
 }
 
+function getTodayBookings(bookings) {
+  const today = new Date();
+  return bookings.filter((booking) => {
+    const bookingDate = new Date(booking.startTime);
+    return bookingDate.toDateString() === today.toDateString();
+  });
+}
+
 export default function OwnerDashboardPage() {
   const [requests, setRequests] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [updatingRequestId, setUpdatingRequestId] = useState(null);
+
+  const todayBookings = useMemo(() => getTodayBookings(bookings), [bookings]);
 
   async function loadDashboard() {
     setLoading(true);
@@ -50,6 +61,13 @@ export default function OwnerDashboardPage() {
   }, []);
 
   async function updateRequestStatus(requestId, status) {
+    if (status === "DECLINED") {
+      const confirmed = window.confirm("Decline this meeting request?");
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setUpdatingRequestId(requestId);
     setMessage("");
 
@@ -68,93 +86,170 @@ export default function OwnerDashboardPage() {
 
   return (
     <section className="owner-dashboard">
-      <div className="owner-dashboard-header">
+      <div className="owner-dashboard-hero">
         <div>
+          <p className="owner-dashboard-eyebrow">Owner workspace</p>
           <h1>Owner Dashboard</h1>
-          <p>Review meeting requests and keep track of upcoming bookings.</p>
+          <p>
+            Review student requests first, then keep an eye on upcoming booked
+            appointments.
+          </p>
         </div>
-        <Link className="create-meeting-button" to="/owner/slots/new">
-          Create meeting
+        <Link className="owner-primary-action" to="/owner/slots/new">
+          Create Availability
         </Link>
       </div>
 
       {message && <p className="dashboard-message">{message}</p>}
 
+      <div className="owner-dashboard-summary" aria-label="Owner dashboard summary">
+        <article>
+          <span>{loading ? "-" : requests.length}</span>
+          <p>Pending requests</p>
+        </article>
+        <article>
+          <span>{loading ? "-" : todayBookings.length}</span>
+          <p>Today</p>
+        </article>
+        <article>
+          <span>{loading ? "-" : bookings.length}</span>
+          <p>Upcoming bookings</p>
+        </article>
+      </div>
+
       <div className="owner-dashboard-grid">
-        <section className="dashboard-panel">
-          <h2>Requests</h2>
+        <section className="owner-dashboard-panel owner-dashboard-panel--requests">
+          <PanelHeader
+            title="Request Queue"
+            subtitle="Accept or decline custom meeting requests."
+            count={requests.length}
+            loading={loading}
+          />
+
           {loading ? (
-            <p className="empty-text">Loading requests...</p>
+            <LoadingState label="Loading requests..." variant="panel" />
           ) : requests.length === 0 ? (
-            <p className="empty-text">No pending requests.</p>
+            <EmptyState
+              title="No pending requests"
+              message="New student requests will appear here for quick review."
+            />
           ) : (
-            <div className="dashboard-list">
+            <div className="owner-request-list">
               {requests.map((request) => (
-                <article className="dashboard-list-item" key={request._id}>
-                  <div>
-                    <h3>{request.requesterId?.name || "Unknown requester"}</h3>
-                    <p>{request.topic}</p>
-                    {request.message && <p>{request.message}</p>}
-                  </div>
-                  <div className="request-actions">
-                    <span>{formatDateTime(request.preferredStart)}</span>
-                    <button
-                      type="button"
-                      disabled={updatingRequestId === request._id}
-                      onClick={() =>
-                        updateRequestStatus(request._id, "ACCEPTED")
-                      }
-                    >
-                      Accept
-                    </button>
-                    <button
-                      type="button"
-                      className="decline-button"
-                      disabled={updatingRequestId === request._id}
-                      onClick={() =>
-                        updateRequestStatus(request._id, "DECLINED")
-                      }
-                    >
-                      Decline
-                    </button>
-                  </div>
-                </article>
+                <RequestRow
+                  key={request._id}
+                  request={request}
+                  updating={updatingRequestId === request._id}
+                  onUpdate={updateRequestStatus}
+                />
               ))}
             </div>
           )}
         </section>
 
-        <section className="dashboard-panel">
-          <h2>Upcoming Bookings</h2>
-          {loading ? (
-            <p className="empty-text">Loading bookings...</p>
-          ) : bookings.length === 0 ? (
-            <p className="empty-text">No upcoming bookings.</p>
-          ) : (
-            <div className="dashboard-list">
-              {bookings.map((booking) => (
-                <article className="dashboard-list-item" key={booking._id}>
-                  <div>
-                    <h3>{booking.title}</h3>
-                    <span className="booking-status">{booking.status}</span>
-                    <p>
-                      {booking.participants?.length
-                        ? booking.participants
-                            .map((participant) => participant.name)
-                            .join(", ")
-                        : "No participants listed"}
-                    </p>
-                  </div>
-                  <div className="booking-actions">
-                    <span>{formatDateTime(booking.startTime)}</span>
-                    <Link to={`/owner/bookings/${booking._id}/edit`}>Edit</Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
+        <aside className="owner-side-stack">
+          <section className="owner-dashboard-panel">
+            <PanelHeader
+              title="Upcoming Bookings"
+              subtitle="Confirmed appointments on your calendar."
+              count={bookings.length}
+              loading={loading}
+            />
+
+            {loading ? (
+              <LoadingState label="Loading bookings..." variant="panel" />
+            ) : bookings.length === 0 ? (
+              <EmptyState
+                title="No upcoming bookings"
+                message="Create availability so students can reserve a time."
+                action={<Link to="/owner/slots/new">Create Availability</Link>}
+              />
+            ) : (
+              <div className="owner-booking-list-compact">
+                {bookings.map((booking) => (
+                  <BookingRow key={booking._id} booking={booking} />
+                ))}
+              </div>
+            )}
+          </section>
+        </aside>
       </div>
     </section>
+  );
+}
+
+function PanelHeader({ title, subtitle, count, loading }) {
+  return (
+    <div className="owner-dashboard-panel-header">
+      <div>
+        <h2>{title}</h2>
+        <p>{subtitle}</p>
+      </div>
+      {!loading && <span>{count}</span>}
+    </div>
+  );
+}
+
+function EmptyState({ title, message, action }) {
+  return (
+    <div className="owner-empty-state">
+      <h3>{title}</h3>
+      <p>{message}</p>
+      {action}
+    </div>
+  );
+}
+
+function RequestRow({ request, updating, onUpdate }) {
+  return (
+    <article className="owner-request-card">
+      <div className="owner-request-time">
+        <span>Preferred</span>
+        <strong>{formatDateTime(request.preferredStart)}</strong>
+      </div>
+
+      <div className="owner-request-main">
+        <div>
+          <h3>{request.requesterId?.name || "Unknown requester"}</h3>
+          <p>{request.topic}</p>
+        </div>
+        {request.message && <p className="owner-request-message">{request.message}</p>}
+      </div>
+
+      <div className="owner-request-actions">
+        <button
+          type="button"
+          disabled={updating}
+          onClick={() => onUpdate(request._id, "ACCEPTED")}
+        >
+          {updating ? "Saving..." : "Accept"}
+        </button>
+        <button
+          type="button"
+          className="decline-button"
+          disabled={updating}
+          onClick={() => onUpdate(request._id, "DECLINED")}
+        >
+          Decline
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function BookingRow({ booking }) {
+  return (
+    <article className="owner-booking-card">
+      <div>
+        <span>{formatDateTime(booking.startTime)}</span>
+        <h3>{booking.title}</h3>
+        <p>
+          {booking.participants?.length
+            ? booking.participants.map((participant) => participant.name).join(", ")
+            : "No participants listed"}
+        </p>
+      </div>
+      <Link to={`/owner/bookings/${booking._id}/edit`}>Edit</Link>
+    </article>
   );
 }

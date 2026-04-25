@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <header className="app-header">
       <NavLink className="app-header_brand" to="/">
-        Booking App
+        BERK
       </NavLink>
 
       <nav className="app-header_nav">

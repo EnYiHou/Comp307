@@ -38,7 +38,7 @@ export default function NewMeetingRequestModal({
       const data = await getMcGillOwners(teacherSearch);
       setTeachers(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Teacher search error:", error);
+      console.error("Appointment host search error:", error);
       setTeachers([]);
     }
   }, [teacherSearch]);
@@ -95,7 +95,7 @@ export default function NewMeetingRequestModal({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="request-modal-header">
-          <h2 id="request-modal-title">Make a Request</h2>
+          <h2 id="request-modal-title">Request a Time</h2>
           <button type="button" onClick={onClose}>
             Close
           </button>
@@ -103,7 +103,7 @@ export default function NewMeetingRequestModal({
 
         {!selectedTeacher && (
           <label>
-            Search teacher
+            Search appointment host
             <input
               type="search"
               value={teacherSearch}
@@ -111,7 +111,7 @@ export default function NewMeetingRequestModal({
                 setTeacherSearch(event.target.value);
                 setSelectedTeacher(null);
               }}
-              placeholder="Type a teacher name..."
+              placeholder="Type a name..."
             />
           </label>
         )}
@@ -119,7 +119,7 @@ export default function NewMeetingRequestModal({
         {!selectedTeacher && (
           <div className="teacher-search-results">
             {teachers.length === 0 ? (
-              <p>No teachers found.</p>
+              <p>No appointment hosts found.</p>
             ) : (
               teachers.map((teacher) => (
                 <button

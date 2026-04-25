@@ -26,14 +26,14 @@ export default function OwnerCard({ owner, onSelect, onRequest }) {
           type="button"
           onClick={() => onSelect(owner)}
         >
-          View slots
+          View times
         </button>
         <button
           className="owner-card__action owner-card__action--primary"
           type="button"
           onClick={() => onRequest(owner)}
         >
-          Make a request
+          Request time
         </button>
       </div>
     </article>

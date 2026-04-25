@@ -1,18 +1,19 @@
-import { useMemo, useState, useEffect } from "react";
-import api from "../../../shared/api/api";
-import "./BookingSlotCreation.css";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import SearchBar from "../../search/components/SearchBar";
 import { getAll } from "../../search/services/searchService";
+import api from "../../../shared/api/api";
 import {
   addDays,
   formatDate,
   formatTimeRange,
   getDateOnly,
 } from "../utils/bookingCalendarUtils.js";
+import "./BookingSlotCreation.css";
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -25,6 +26,7 @@ function addWeeks(dateLike, weekOffset) {
 }
 
 function BookingSlotCreation() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -38,11 +40,10 @@ function BookingSlotCreation() {
   });
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [activeDate, setActiveDate] = useState(formatDate(new Date()));
-
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
-
+  const [validationMessage, setValidationMessage] = useState("");
   const [submitState, setSubmitState] = useState({
     status: "idle",
     message: "",
@@ -51,174 +52,568 @@ function BookingSlotCreation() {
   const visibleSearchResults =
     searchQuery.trim().length >= 3 ? searchResults : [];
 
-  function handleChange(event) {
-    const { name, type, value } = event.target;
+  const showCalendarSlotSelector =
+    formData.bookingMode === "slot" ||
+    (formData.bookingMode === "group" && formData.pollMethod === "calendar");
+  const showHeatmapRangeSelector =
+    formData.bookingMode === "group" && formData.pollMethod === "heatmap";
+  const basicsReady = formData.title.trim() && Number(formData.capacity) >= 1;
+  const accessReady =
+    formData.bookingMode !== "group" || selectedUsers.length > 0;
+  const timesReady =
+    (showCalendarSlotSelector && selectedSlots.length > 0) ||
+    (showHeatmapRangeSelector && formData.rangeStart && formData.rangeEnd);
+  const canSubmit =
+    basicsReady &&
+    accessReady &&
+    timesReady &&
+    submitState.status !== "submitting";
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (searchQuery.trim().length < 3) {
+      return undefined;
+    }
+
+    getAll(searchQuery)
+      .then((users) => {
+        if (isMounted) {
+          setSearchResults(Array.isArray(users) ? users : []);
+        }
+      })
+      .catch((error) => {
+        console.error("Search failed:", error);
+        if (isMounted) {
+          setSearchResults([]);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [searchQuery]);
+
+  function updateFormField(name, value) {
+    setValidationMessage("");
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "number" ? Number(value) : value,
+      [name]: value,
     }));
   }
 
+  function handleChange(event) {
+    const { name, type, value } = event.target;
+    updateFormField(name, type === "number" ? Number(value) : value);
+  }
+
+  function handleModeChange(mode) {
+    setValidationMessage("");
+    setFormData((prev) => ({
+      ...prev,
+      bookingMode: mode,
+      visibility: mode === "group" ? "private" : prev.visibility,
+      recurrenceCount: mode === "group" ? 1 : prev.recurrenceCount,
+    }));
+  }
+
+  function handleSelectedUsers(user) {
+    setSelectedUsers((prev) =>
+      prev.some((selectedUser) => selectedUser._id === user._id)
+        ? prev
+        : [...prev, user],
+    );
+    setSearchResults([]);
+    setSearchQuery("");
+    setValidationMessage("");
+  }
+
+  function handleRemoveUser(userId) {
+    setSelectedUsers((prev) => prev.filter((user) => user._id !== userId));
+  }
+
   function handleHeatmapRangeChange(nextRange) {
+    setValidationMessage("");
     setFormData((prev) => ({
       ...prev,
       ...nextRange,
     }));
   }
 
-  function handleSelectedUsers(user) {
-    setSelectedUsers((prev) => {
-      return (prev.some((u) => u._id === user._id)) ? prev : [...prev, user];
-    })
-
-    setSearchResults([]);
-    setSearchQuery("");
-  }
-
-  function handleRemoveUser(user_id) {
-    setSelectedUsers((prev) =>
-      prev.filter((user) => user._id !== user_id)
-    );
-  }
-
-  useEffect(() => {
-    if (searchQuery.trim().length < 3) {
-      return;
+  function validateForm() {
+    if (!formData.title.trim()) {
+      return "Add a title before creating availability.";
     }
-    getAll(searchQuery)
-      .then((users) => {
-        setSearchResults(users);
-      })
-      .catch((error) => {
-        console.error("Search failed:", error);
-        setSearchResults([]);
-      });
-  }, [searchQuery]);
+    if (Number(formData.capacity) < 1) {
+      return "Capacity must be at least 1.";
+    }
+    if (formData.bookingMode === "group" && selectedUsers.length === 0) {
+      return "Invite at least one user for a group poll.";
+    }
+    if (showCalendarSlotSelector && selectedSlots.length === 0) {
+      return "Select at least one time.";
+    }
+    if (showHeatmapRangeSelector && (!formData.rangeStart || !formData.rangeEnd)) {
+      return "Select a start and end date for the poll.";
+    }
+
+    return "";
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    const message = validateForm();
+    if (message) {
+      setValidationMessage(message);
+      return;
+    }
+
     const payload = {
       ...formData,
       selectedSlots,
-      invitedUsers: selectedUsers.map((user) => user._id)
+      invitedUsers: selectedUsers.map((user) => user._id),
     };
 
     setSubmitState({
       status: "submitting",
-      message: "Creating booking slot...",
+      message: "Creating availability...",
     });
 
     try {
       const { data } = await api.post("/dashboard/createBookingSlot", payload);
       setSubmitState({
         status: "success",
-        message: data.message || "Booking slot created successfully.",
+        message: data.message || "Availability created successfully.",
       });
+      navigate("/owner/dashboard", { replace: true });
     } catch (error) {
       console.error("Create booking slot error:", error);
       setSubmitState({
         status: "error",
         message:
-          error.response?.data?.message || "Failed to create booking slot.",
+          error.response?.data?.message || "Failed to create availability.",
       });
     }
   }
 
-  const showCalendarSlotSelector =
-    formData.bookingMode === "slot" ||
-    (formData.bookingMode === "group" && formData.pollMethod === "calendar");
-  const showHeatmapRangeSelector =
-    formData.bookingMode === "group" && formData.pollMethod === "heatmap";
-
   return (
-    <form className="booking-slot-form" onSubmit={handleSubmit}>
-      <BookingFields formData={formData} handleChange={handleChange} />
+    <form className="availability-form" onSubmit={handleSubmit}>
+      <ProgressSection
+        number="1"
+        title="Basics"
+        description="Name what students will book and set the capacity."
+        complete={Boolean(basicsReady)}
+      >
+        <BasicsStep formData={formData} onChange={handleChange} />
+      </ProgressSection>
+
+      {basicsReady && (
+        <ProgressSection
+          number="2"
+          title="Booking Type"
+          description="Choose direct booking or a group poll."
+          complete={Boolean(formData.bookingMode)}
+        >
+          <TypeStep
+            formData={formData}
+            onModeChange={handleModeChange}
+            onChange={handleChange}
+          />
+        </ProgressSection>
+      )}
+
+      {basicsReady && (
+        <ProgressSection
+          number="3"
+          title="Access"
+          description={
+            formData.bookingMode === "group"
+              ? "Invite the people who should vote."
+              : "Choose whether this appears in Book Appointments."
+          }
+          complete={accessReady}
+        >
+          <AccessStep
+            formData={formData}
+            onChange={handleChange}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            visibleSearchResults={visibleSearchResults}
+            selectedUsers={selectedUsers}
+            onSelectUser={handleSelectedUsers}
+            onRemoveUser={handleRemoveUser}
+          />
+        </ProgressSection>
+      )}
+
+      {basicsReady && accessReady && (
+        <ProgressSection
+          number="4"
+          title="Times"
+          description="Select the exact times students can book or vote on."
+          complete={Boolean(timesReady)}
+        >
+          <TimesStep
+            formData={formData}
+            selectedSlots={selectedSlots}
+            setSelectedSlots={setSelectedSlots}
+            activeDate={activeDate}
+            setActiveDate={setActiveDate}
+            showCalendarSlotSelector={showCalendarSlotSelector}
+            showHeatmapRangeSelector={showHeatmapRangeSelector}
+            onRangeChange={handleHeatmapRangeChange}
+          />
+        </ProgressSection>
+      )}
+
+      {basicsReady && accessReady && timesReady && (
+        <ProgressSection
+          number="5"
+          title="Review"
+          description="Check the summary, then create it."
+          complete={false}
+        >
+          <ReviewStep
+            formData={formData}
+            selectedSlots={selectedSlots}
+            selectedUsers={selectedUsers}
+          />
+          <div className="availability-actions">
+            <button className="button" type="submit" disabled={!canSubmit}>
+              {submitState.status === "submitting"
+                ? "Creating..."
+                : "Create Availability"}
+            </button>
+          </div>
+        </ProgressSection>
+      )}
+
+      {!basicsReady && (
+        <p className="availability-next-hint">
+          Add a title and capacity to continue.
+        </p>
+      )}
+
+      {basicsReady && formData.bookingMode === "group" && !accessReady && (
+        <p className="availability-next-hint">
+          Invite at least one user to unlock time selection.
+        </p>
+      )}
+
+      {basicsReady && accessReady && !timesReady && (
+        <p className="availability-next-hint">
+          Select a time or date range to review and publish.
+        </p>
+      )}
+
+      {validationMessage && (
+        <p className="availability-feedback is-error">{validationMessage}</p>
+      )}
+      {submitState.message && submitState.status !== "success" && (
+        <p className={`availability-feedback is-${submitState.status}`} role="status">
+          {submitState.message}
+        </p>
+      )}
+    </form>
+  );
+}
+
+function ProgressSection({ number, title, description, complete, children }) {
+  return (
+    <section className="availability-section">
+      <div className="availability-section-marker">
+        <span>{complete ? "OK" : number}</span>
+      </div>
+      <div className="availability-card">
+        <StepHeader title={title} description={description} />
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function StepHeader({ title, description }) {
+  return (
+    <div className="availability-step-header">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+}
+
+function BasicsStep({ formData, onChange }) {
+  return (
+    <div className="availability-fields">
+      <label className="availability-field">
+        <span>Title</span>
+        <input
+          name="title"
+          value={formData.title}
+          onChange={onChange}
+          placeholder="Office hours, project check-in, review session"
+        />
+      </label>
+      <label className="availability-field availability-field-full">
+        <span>Description</span>
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={onChange}
+          rows="4"
+          placeholder="Optional context students should see before booking."
+        />
+      </label>
+      <label className="availability-field">
+        <span>Capacity per time</span>
+        <input
+          type="number"
+          min="1"
+          name="capacity"
+          value={formData.capacity}
+          onChange={onChange}
+        />
+      </label>
+    </div>
+  );
+}
+
+function TypeStep({ formData, onModeChange, onChange }) {
+  return (
+    <>
+      <div className="availability-choice-grid">
+        <ChoiceTile
+          title="Bookable slots"
+          description="Publish times students can reserve directly."
+          active={formData.bookingMode === "slot"}
+          onClick={() => onModeChange("slot")}
+        />
+        <ChoiceTile
+          title="Group poll"
+          description="Invite users to vote on candidate times."
+          active={formData.bookingMode === "group"}
+          onClick={() => onModeChange("group")}
+        />
+      </div>
 
       {formData.bookingMode === "group" && (
-        <section>
-          <label>Invite users
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search users by name or email"
+        <div className="availability-subsection">
+          <h4>Poll style</h4>
+          <div className="availability-choice-grid is-compact">
+            <ChoiceTile
+              title="Candidate times"
+              description="Pick exact times for people to vote on."
+              active={formData.pollMethod === "calendar"}
+              onClick={() =>
+                onChange({ target: { name: "pollMethod", value: "calendar" } })
+              }
+            />
+            <ChoiceTile
+              title="Date range heatmap"
+              description="Let invitees mark 30-minute availability blocks."
+              active={formData.pollMethod === "heatmap"}
+              onClick={() =>
+                onChange({ target: { name: "pollMethod", value: "heatmap" } })
+              }
+            />
+          </div>
+        </div>
+      )}
+
+      {formData.bookingMode === "slot" && (
+        <div className="availability-subsection availability-subsection-compact">
+          <h4>Repeat</h4>
+          <label className="availability-field availability-field-inline">
+            <span>How many weekly occurrences?</span>
+            <input
+              type="number"
+              min="1"
+              name="recurrenceCount"
+              value={formData.recurrenceCount}
+              onChange={onChange}
             />
           </label>
+        </div>
+      )}
+    </>
+  );
+}
+
+function ChoiceTile({ title, description, active, onClick }) {
+  return (
+    <button
+      type="button"
+      className={`availability-choice${active ? " is-active" : ""}`}
+      onClick={onClick}
+      aria-pressed={active}
+    >
+      <span>{title}</span>
+      <p>{description}</p>
+    </button>
+  );
+}
+
+function AccessStep({
+  formData,
+  onChange,
+  searchQuery,
+  setSearchQuery,
+  visibleSearchResults,
+  selectedUsers,
+  onSelectUser,
+  onRemoveUser,
+}) {
+  return (
+    <>
+      <div className="availability-choice-grid is-compact">
+        <ChoiceTile
+          title="Public"
+          description="Visible to students browsing Book Appointments."
+          active={formData.visibility === "public"}
+          onClick={() =>
+            onChange({ target: { name: "visibility", value: "public" } })
+          }
+        />
+        <ChoiceTile
+          title="Private"
+          description="Only intended participants can use it."
+          active={formData.visibility === "private"}
+          onClick={() =>
+            onChange({ target: { name: "visibility", value: "private" } })
+          }
+        />
+      </div>
+
+      {formData.bookingMode === "group" && (
+        <div className="availability-subsection">
+          <h4>Invite users</h4>
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search users by name or email"
+          />
+
           {visibleSearchResults.length > 0 && (
-            <div className="search-results">
+            <div className="availability-search-results">
               {visibleSearchResults.map((user) => (
                 <button
                   key={user._id}
                   type="button"
-                  onClick={() => handleSelectedUsers(user)}
-                  className="search-result-item"
+                  onClick={() => onSelectUser(user)}
                 >
-                  {user.name} — {user.email} ({user.role})
+                  <strong>{user.name}</strong>
+                  <span>{user.email}</span>
                 </button>
               ))}
             </div>
           )}
-          <h3>Selected users</h3>
-          {selectedUsers.length === 0 ? (
-            <p>No users selected yet.</p>
-          ) : (
-            <ul>
-              {selectedUsers.map((user) => (
-                <li key={user._id}>
-                  <div>
-                    {user.name} — {user.email} ({user.role})
-                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveUser(user._id)}
-                  >
-                    x
+          <div className="selected-users">
+            {selectedUsers.length === 0 ? (
+              <p>No users selected yet.</p>
+            ) : (
+              selectedUsers.map((user) => (
+                <span key={user._id}>
+                  {user.name}
+                  <button type="button" onClick={() => onRemoveUser(user._id)}>
+                    Remove
                   </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+                </span>
+              ))
+            )}
+          </div>
+        </div>
       )}
+    </>
+  );
+}
 
+function TimesStep({
+  formData,
+  selectedSlots,
+  setSelectedSlots,
+  activeDate,
+  setActiveDate,
+  showCalendarSlotSelector,
+  showHeatmapRangeSelector,
+  onRangeChange,
+}) {
+  return (
+    <>
       {showCalendarSlotSelector && (
-        <TwoPanelSelector
-          selectedSlots={selectedSlots}
-          setSelectedSlots={setSelectedSlots}
-          activeDate={activeDate}
-          setActiveDate={setActiveDate}
-          recurrenceCount={formData.bookingMode === "slot" ? formData.recurrenceCount : 1}
-        />
+        <>
+          <SelectedSlotSummary selectedSlots={selectedSlots} />
+          <TwoPanelSelector
+            selectedSlots={selectedSlots}
+            setSelectedSlots={setSelectedSlots}
+            activeDate={activeDate}
+            setActiveDate={setActiveDate}
+            recurrenceCount={
+              formData.bookingMode === "slot" ? formData.recurrenceCount : 1
+            }
+          />
+        </>
       )}
 
       {showHeatmapRangeSelector && (
-        <HeatmapSelector
-          formData={formData}
-          onRangeChange={handleHeatmapRangeChange}
-        />
+        <HeatmapSelector formData={formData} onRangeChange={onRangeChange} />
       )}
+    </>
+  );
+}
 
-      <div className="booking-slot-actions">
-        <button
-          className="button"
-          type="submit"
-          disabled={submitState.status === "submitting"}
-        >
-          {submitState.status === "submitting"
-            ? "Creating..."
-            : "Create Booking Slot"}
-        </button>
+function SelectedSlotSummary({ selectedSlots }) {
+  return (
+    <div className="selected-slot-summary">
+      <strong>{selectedSlots.length}</strong>
+      <span>{selectedSlots.length === 1 ? "time selected" : "times selected"}</span>
+    </div>
+  );
+}
 
-        {submitState.message && (
-          <p
-            className={`booking-slot-feedback is-${submitState.status}`}
-            role="status"
-          >
-            {submitState.message}
-          </p>
-        )}
-      </div>
-    </form>
+function ReviewStep({ formData, selectedSlots, selectedUsers }) {
+  return (
+    <div className="availability-review">
+      <ReviewItem label="Title" value={formData.title || "Untitled"} />
+      <ReviewItem
+        label="Type"
+        value={
+          formData.bookingMode === "slot" ? "Bookable slots" : "Group poll"
+        }
+      />
+      <ReviewItem label="Visibility" value={formData.visibility} />
+      <ReviewItem label="Capacity" value={String(formData.capacity)} />
+      {formData.bookingMode === "group" && (
+        <>
+          <ReviewItem
+            label="Poll style"
+            value={
+              formData.pollMethod === "calendar"
+                ? "Candidate times"
+                : "Date range heatmap"
+            }
+          />
+          <ReviewItem label="Invited users" value={String(selectedUsers.length)} />
+        </>
+      )}
+      <ReviewItem
+        label="Times"
+        value={
+          formData.pollMethod === "heatmap" && formData.bookingMode === "group"
+            ? `${formData.rangeStart || "Start"} to ${formData.rangeEnd || "End"}`
+            : `${selectedSlots.length} selected times`
+        }
+      />
+    </div>
+  );
+}
+
+function ReviewItem({ label, value }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 
@@ -233,6 +628,7 @@ function HeatmapSelector({ formData, onRangeChange }) {
       });
       return;
     }
+
     if (clickedDate < formData.rangeStart) {
       onRangeChange({
         rangeStart: clickedDate,
@@ -251,28 +647,26 @@ function HeatmapSelector({ formData, onRangeChange }) {
       return [];
     }
     if (!formData.rangeEnd) {
-      return [
-        {
-          start: formData.rangeStart,
-        },
-      ];
-    } else {
-      return [
-        {
-          title: "Time Interval",
-          start: formData.rangeStart,
-          end: addDays(formData.rangeEnd, 1),
-          display: "background",
-        },
-      ];
+      return [{ start: formData.rangeStart }];
     }
+    return [
+      {
+        title: "Poll range",
+        start: formData.rangeStart,
+        end: addDays(formData.rangeEnd, 1),
+        display: "background",
+      },
+    ];
   }, [formData.rangeStart, formData.rangeEnd]);
 
   return (
-    <section className="booking-slot-card">
-      <div className="booking-slot-card_header">
-        <h3>Date Range</h3>
-        <p>Select a date interval for the heatmap-style group poll.</p>
+    <section className="availability-calendar-card">
+      <div className="availability-calendar-header">
+        <h4>Date range</h4>
+        <p>
+          Select a start date, then an end date. Invitees will vote on
+          30-minute blocks within that range.
+        </p>
       </div>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
@@ -308,7 +702,6 @@ function TwoPanelSelector({
       start: info.startStr,
       end: info.endStr,
     };
-    //check overlaps
     setSelectedSlots((prev) => [...prev, newSlot]);
   }
 
@@ -376,11 +769,11 @@ function TwoPanelSelector({
   }, [activeDate, recurrenceCount, selectedSlots]);
 
   return (
-    <section className="booking-slot-selector">
-      <div className="booking-slot-card">
-        <div className="booking-slot-card_header">
-          <h3>Dates</h3>
-          <p>Pick a day on the month calendar to focus the detailed view.</p>
+    <section className="availability-calendar-grid">
+      <div className="availability-calendar-card">
+        <div className="availability-calendar-header">
+          <h4>Dates</h4>
+          <p>Pick a date to focus the detailed time view.</p>
         </div>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -399,10 +792,10 @@ function TwoPanelSelector({
         />
       </div>
 
-      <div className="booking-slot-card">
-        <div className="booking-slot-card_header">
-          <h3>Selected Day</h3>
-          <p>{activeDate}</p>
+      <div className="availability-calendar-card">
+        <div className="availability-calendar-header">
+          <h4>Times on {activeDate}</h4>
+          <p>Drag over a time range to add it. Click an existing time to remove it.</p>
         </div>
         <FullCalendar
           key={activeDate}
@@ -423,132 +816,6 @@ function TwoPanelSelector({
           height="auto"
         />
       </div>
-    </section>
-  );
-}
-
-function BookingFields({ formData, handleChange }) {
-  return (
-    <section className="booking-slot-card">
-      <div className="booking-slot-card_header">
-        <h3>Booking Details</h3>
-        <p>Configure the slot basics before choosing dates and times.</p>
-      </div>
-
-      <div className="booking-slot-fields">
-        <label className="booking-slot-field">
-          <span>Title</span>
-          <input name="title" value={formData.title} onChange={handleChange} />
-        </label>
-
-        <label className="booking-slot-field booking-slot-field-full">
-          <span>Description</span>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows="4"
-          />
-        </label>
-
-        <label className="booking-slot-field">
-          <span>Capacity</span>
-          <input
-            type="number"
-            min="1"
-            name="capacity"
-            value={formData.capacity}
-            onChange={handleChange}
-          />
-        </label>
-
-        {formData.bookingMode === "slot" && (
-          <label className="booking-slot-field">
-            <span>Recurrence Count</span>
-            <input
-              type="number"
-              min="1"
-              name="recurrenceCount"
-              value={formData.recurrenceCount}
-              onChange={handleChange}
-            />
-          </label>
-        )}
-      </div>
-
-      <fieldset className="booking-slot-choice-group">
-        <legend>Booking Mode</legend>
-        <label>
-          Slot
-          <input
-            type="radio"
-            name="bookingMode"
-            value="slot"
-            checked={formData.bookingMode === "slot"}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          Group
-          <input
-            type="radio"
-            name="bookingMode"
-            value="group"
-            checked={formData.bookingMode === "group"}
-            onChange={handleChange}
-          />
-        </label>
-      </fieldset>
-
-      <fieldset className="booking-slot-choice-group">
-        <legend>Visibility</legend>
-        <label>
-          Public
-          <input
-            type="radio"
-            name="visibility"
-            value="public"
-            checked={formData.visibility === "public"}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          Private
-          <input
-            type="radio"
-            name="visibility"
-            value="private"
-            checked={formData.visibility === "private"}
-            onChange={handleChange}
-          />
-        </label>
-      </fieldset>
-
-      {formData.bookingMode === "group" && (
-        <fieldset className="booking-slot-choice-group">
-          <legend>Polling Method</legend>
-          <label>
-            Calendar
-            <input
-              type="radio"
-              name="pollMethod"
-              value="calendar"
-              checked={formData.pollMethod === "calendar"}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            Heatmap
-            <input
-              type="radio"
-              name="pollMethod"
-              value="heatmap"
-              checked={formData.pollMethod === "heatmap"}
-              onChange={handleChange}
-            />
-          </label>
-        </fieldset>
-      )}
     </section>
   );
 }

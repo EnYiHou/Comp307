@@ -1,18 +1,14 @@
 import BookingSlotCreation from "../../features/booking/components/BookingSlotCreation";
-import OwnerPolls from "../../features/booking/components/OwnerPolls";
-import UserInvites from "../../features/booking/components/UserInvites";
 
 export default function CreateSlotPage() {
   return (
     <section className="page-stack">
-      <h2>Create Booking Slot</h2>
+      <h2>Create Availability</h2>
       <p>
-        Build a one-on-one slot or a group availability poll directly from the
-        owner dashboard.
+        Publish bookable appointment times or collect group availability with a
+        guided setup.
       </p>
       <BookingSlotCreation />
-      <UserInvites />
-      <OwnerPolls />
     </section>
   );
 }

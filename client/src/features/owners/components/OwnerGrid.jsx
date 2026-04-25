@@ -3,7 +3,7 @@ import "./owner.css";
 
 export default function OwnerGrid({ owners = [], onSelectOwner, onRequestOwner }) {
   if (owners.length === 0) {
-    return <p>No owners found.</p>;
+    return <p>No appointment hosts found.</p>;
   }
 
   return (

@@ -1,16 +1,21 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
-import {
-  formatTimeRange,
-} from "../utils/bookingCalendarUtils.js";
-import "./BookingSlotCreation.css";
+import { formatTimeRange } from "../utils/bookingCalendarUtils.js";
+import "./UserInvites.css";
 
 const SLOT_DURATION_MINUTES = 30;
 const SLOT_DURATION_MS = SLOT_DURATION_MINUTES * 60 * 1000;
+
+function getSelectedSlotIds(invite) {
+  return (invite?.candidateSlots ?? [])
+    .filter((slot) => slot.selectedByCurrentUser)
+    .map((slot) => String(slot._id));
+}
 
 function isSelectableRange(invite, start, end) {
   const rangeStart = new Date(invite.rangeStart);
@@ -21,6 +26,7 @@ function isSelectableRange(invite, start, end) {
 function collectSlotIdsInRange(candidateSlots, rangeStart, rangeEnd) {
   const rangeStartMs = rangeStart.getTime();
   const rangeEndMs = rangeEnd.getTime();
+
   return candidateSlots.flatMap((slot) => {
     const slotStartMs = new Date(slot.startTime).getTime();
     const slotEndMs = new Date(slot.endTime).getTime();
@@ -30,53 +36,75 @@ function collectSlotIdsInRange(candidateSlots, rangeStart, rangeEnd) {
     return [];
   });
 }
-function UserInvites() {
+
+export default function UserInvites() {
   const [invites, setInvites] = useState([]);
   const [selectedInviteId, setSelectedInviteId] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let isMounted = true;
+
     api
       .get("dashboard/getInvites")
       .then((response) => {
-        setInvites(
-          response.data.filter((invite) => invite.status === "collectingVotes"),
-        );
+        if (isMounted) {
+          const activeInvites = Array.isArray(response.data)
+            ? response.data.filter(
+                (invite) => invite.status === "collectingVotes",
+              )
+            : [];
+          setInvites(activeInvites);
+        }
       })
-      .catch((error) => {
-        console.error("Error: ", error);
-        setError(error.response?.data?.message || "Failed to load invites.");
+      .catch((caughtError) => {
+        console.error("Error: ", caughtError);
+        if (isMounted) {
+          setError(caughtError.response?.data?.message || "Failed to load invites.");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const selectedInvite = useMemo(() => {
-    return invites.find((invite) => invite._id === selectedInviteId) ?? null;
+    return (
+      invites.find((invite) => String(invite._id) === String(selectedInviteId)) ??
+      invites[0] ??
+      null
+    );
   }, [invites, selectedInviteId]);
 
   function applyLocalChange(inviteId, selectedSlotIds) {
     const selectedSlotIdsSet = new Set(selectedSlotIds.map(String));
-    setInvites((prev) => {
-      return prev.map((invite) => {
+    setInvites((prev) =>
+      prev.map((invite) => {
         if (String(invite._id) !== String(inviteId)) {
           return invite;
         }
+
         return {
           ...invite,
           voteAny: selectedSlotIds.length > 0,
-          candidateSlots: invite.candidateSlots.map((slot) => {
+          candidateSlots: (invite.candidateSlots ?? []).map((slot) => {
             const currentlySelected = selectedSlotIdsSet.has(String(slot._id));
             const wasSelected = slot.selectedByCurrentUser;
-            let newVoteCount = slot.voteCount;
+            let newVoteCount = slot.voteCount ?? 0;
+
             if (currentlySelected && !wasSelected) {
               newVoteCount += 1;
             } else if (!currentlySelected && wasSelected) {
               newVoteCount -= 1;
             }
+
             return {
               ...slot,
               voteCount: newVoteCount,
@@ -84,79 +112,84 @@ function UserInvites() {
             };
           }),
         };
-      });
-    });
-  }
-
-  if (loading) {
-    return <p>Loading invites...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  return (
-    <section>
-      <InviteList invites={invites} setSelectedInviteId={setSelectedInviteId} />
-      <InviteDetails invite={selectedInvite} onLocalChange={applyLocalChange} />
-    </section>
-  );
-}
-
-function InviteList({ invites, setSelectedInviteId }) {
-  return (
-    <section>
-      <div>
-        <h3>Your Invites</h3>
-      </div>
-      <div>
-        {invites.length === 0 && <p>No invites right now.</p>}
-        {invites.map((invite) => {
-          return (
-            <button
-              key={invite._id}
-              type="button"
-              onClick={() => setSelectedInviteId(invite._id)}
-            >
-              <div>{invite.title}</div>
-              <p>{invite.description || "No description provided."}</p>
-              <div>
-                <div>Professor: {invite.ownerId.name}</div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function InviteDetails({ invite, onLocalChange }) {
-  if (!invite) {
-    return (
-      <section>
-        <h3>Select an Invite</h3>
-      </section>
+      }),
     );
   }
 
   return (
-    <InviteVoteDetails
-      key={invite._id}
-      invite={invite}
-      onLocalChange={onLocalChange}
-    />
+    <section className="dashboard-panel dashboard-panel--wide invite-panel">
+      <div className="dashboard-panel__header">
+        <div>
+          <h2>Invites</h2>
+          <p>{loading ? "Loading..." : `${invites.length} total`}</p>
+        </div>
+        {!loading && <span className="dashboard-panel__count">{invites.length}</span>}
+      </div>
+
+      {error ? (
+        <p className="dashboard-panel__message is-error">{error}</p>
+      ) : loading ? (
+        <LoadingState label="Loading invites..." variant="panel" />
+      ) : invites.length === 0 ? (
+        <p className="dashboard-panel__message">No group meeting invites yet.</p>
+      ) : (
+        <div className="invite-panel__body">
+          <InviteList
+            invites={invites}
+            selectedInviteId={selectedInvite?._id}
+            onSelectInvite={setSelectedInviteId}
+          />
+          <InviteDetails
+            key={selectedInvite?._id ?? "no-invite"}
+            invite={selectedInvite}
+            onLocalChange={applyLocalChange}
+          />
+        </div>
+      )}
+    </section>
   );
 }
 
-function InviteVoteDetails({ invite, onLocalChange }) {
-  const [selectedSlotIds, setSelectedSlotIds] = useState(() => {
-    return invite.candidateSlots
-      .filter((slot) => slot.selectedByCurrentUser)
-      .map((slot) => String(slot._id));
-  });
+function InviteList({ invites, selectedInviteId, onSelectInvite }) {
+  return (
+    <aside className="invite-list" aria-label="Meeting invites">
+      {invites.map((invite) => {
+        const isSelected = String(invite._id) === String(selectedInviteId);
+        const hasVoted = Boolean(invite.voteAny);
+
+        return (
+          <button
+            className={`invite-list__item${isSelected ? " is-selected" : ""}${
+              hasVoted ? " is-voted" : ""
+            }`}
+            key={invite._id}
+            type="button"
+            onClick={() => onSelectInvite(invite._id)}
+            aria-pressed={isSelected}
+          >
+            <span className="invite-list__status">
+              {hasVoted ? "Voted" : "Pending"}
+            </span>
+            <span className="invite-list__title">{invite.title}</span>
+            <span className="invite-list__description">
+              {invite.description || "No description provided."}
+            </span>
+            <span className="invite-list__owner">
+              {invite.ownerId?.name || "Unknown teacher"}
+            </span>
+          </button>
+        );
+      })}
+    </aside>
+  );
+}
+
+function InviteDetails({ invite, onLocalChange }) {
+  const [selectedSlotIds, setSelectedSlotIds] = useState(() =>
+    getSelectedSlotIds(invite),
+  );
   const [saveMessage, setSaveMessage] = useState("");
+  const [saveStatus, setSaveStatus] = useState("idle");
   const saveTimeoutRef = useRef(null);
   const hideSaveMessageTimeoutRef = useRef(null);
 
@@ -168,11 +201,17 @@ function InviteVoteDetails({ invite, onLocalChange }) {
   }, []);
 
   function setSlotSelection(newSelectedSlotIds) {
+    if (!invite) {
+      return;
+    }
+
     const normalizedSelectedSlotIds = [
       ...new Set(newSelectedSlotIds.map(String)),
     ];
 
     setSelectedSlotIds(normalizedSelectedSlotIds);
+    setSaveStatus("saving");
+    setSaveMessage("Saving changes...");
     onLocalChange(invite._id, normalizedSelectedSlotIds);
 
     clearTimeout(saveTimeoutRef.current);
@@ -182,61 +221,92 @@ function InviteVoteDetails({ invite, onLocalChange }) {
           selectedSlotIds: normalizedSelectedSlotIds,
         })
         .then(() => {
+          setSaveStatus("success");
           setSaveMessage("Changes saved.");
 
           clearTimeout(hideSaveMessageTimeoutRef.current);
           hideSaveMessageTimeoutRef.current = setTimeout(() => {
             setSaveMessage("");
+            setSaveStatus("idle");
           }, 2000);
         })
-        .catch((error) => {
-          console.error("Failed to save vote:", error);
+        .catch((caughtError) => {
+          console.error("Failed to save vote:", caughtError);
+          setSaveStatus("error");
           setSaveMessage("Failed to save changes.");
         });
     }, 200);
   }
 
   function toggleSlotSelection(slotId) {
-    const newSelectedSlotIds = selectedSlotIds.includes(slotId)
-      ? selectedSlotIds.filter((id) => id !== slotId)
-      : [...selectedSlotIds, slotId];
+    const normalizedSlotId = String(slotId);
+    const newSelectedSlotIds = selectedSlotIds.includes(normalizedSlotId)
+      ? selectedSlotIds.filter((id) => id !== normalizedSlotId)
+      : [...selectedSlotIds, normalizedSlotId];
 
     setSlotSelection(newSelectedSlotIds);
   }
 
-  if (invite.method === "calendar") {
+  if (!invite) {
     return (
-      <section>
-        {saveMessage && <p>{saveMessage}</p>}
-        <CalendarInvite
-          invite={invite}
-          selectedSlotIds={selectedSlotIds}
-          onToggleSlotSelection={toggleSlotSelection}
-        />
-      </section>
-    );
-  } else if (invite.method === "heatmap") {
-    return (
-      <section>
-        {saveMessage && <p>{saveMessage}</p>}
-        <HeatmapInvite
-          invite={invite}
-          selectedSlotIds={selectedSlotIds}
-          onSetSlotSelection={setSlotSelection}
-        />
+      <section className="invite-details">
+        <p className="invite-details__empty">Select an invite to vote.</p>
       </section>
     );
   }
+
+  return (
+    <section className="invite-details">
+      <div className="invite-details__header">
+        <div>
+          <h3>{invite.title}</h3>
+          <p>{invite.description || "No description provided."}</p>
+        </div>
+        <span className={`invite-badge${invite.voteAny ? " is-voted" : ""}`}>
+          {invite.voteAny ? "Voted" : "Pending"}
+        </span>
+      </div>
+
+      <div className="invite-details__meta">
+        <span>{invite.ownerId?.name || "Unknown teacher"}</span>
+        <span>{selectedSlotIds.length} selected</span>
+        <span>{invite.method === "heatmap" ? "Heatmap" : "Calendar"}</span>
+      </div>
+
+      {saveMessage && (
+        <p className={`invite-save-message is-${saveStatus}`} role="status">
+          {saveMessage}
+        </p>
+      )}
+
+      <div className="invite-calendar-shell">
+        {invite.method === "heatmap" ? (
+          <HeatmapInvite
+            invite={invite}
+            selectedSlotIds={selectedSlotIds}
+            onSetSlotSelection={setSlotSelection}
+          />
+        ) : (
+          <CalendarInvite
+            invite={invite}
+            selectedSlotIds={selectedSlotIds}
+            onToggleSlotSelection={toggleSlotSelection}
+          />
+        )}
+      </div>
+    </section>
+  );
 }
 
 function getHeatColor(voteCount) {
-  const MAX_VOTE_COUNT = 5;
+  const maxVoteCount = 5;
 
   if (voteCount <= 0) {
     return "rgba(226, 232, 240, 0.45)";
   }
-  const cappedVoteCount = Math.min(voteCount, MAX_VOTE_COUNT);
-  const intensity = cappedVoteCount / MAX_VOTE_COUNT;
+
+  const cappedVoteCount = Math.min(voteCount, maxVoteCount);
+  const intensity = cappedVoteCount / maxVoteCount;
   const lightness = 92 - intensity * 42;
   return `hsl(199, 89%, ${lightness}%)`;
 }
@@ -258,12 +328,8 @@ function HeatmapInvite({ invite, selectedSlotIds, onSetSlotSelection }) {
         start: slot.startTime,
         end: slot.endTime,
         display: "background",
-        backgroundColor: getHeatColor(slot.voteCount),
+        backgroundColor: getHeatColor(slot.voteCount ?? 0),
         classNames: ["heatmap-vote-background"],
-        extendedProps: {
-          slotId,
-          voteCount: slot.voteCount,
-        },
       };
     });
   }, [candidateSlots]);
@@ -279,9 +345,6 @@ function HeatmapInvite({ invite, selectedSlotIds, onSetSlotSelection }) {
           end: slot.endTime,
           display: "background",
           classNames: ["heatmap-selected-background"],
-          extendedProps: {
-            slotId,
-          },
         };
       });
   }, [candidateSlots, selectedSlotIdSet]);
@@ -294,14 +357,17 @@ function HeatmapInvite({ invite, selectedSlotIds, onSetSlotSelection }) {
     if (!isSelectableRange(invite, rangeStart, rangeEnd)) {
       return;
     }
+
     const slotIdsInRange = collectSlotIdsInRange(
       candidateSlots,
       rangeStart,
       rangeEnd,
     );
+
     if (slotIdsInRange.length === 0) {
       return;
     }
+
     const currentSelection = new Set(selectedSlotIds.map(String));
     const firstSlotId = slotIdsInRange[0];
     const toRemove = currentSelection.has(firstSlotId);
@@ -313,6 +379,7 @@ function HeatmapInvite({ invite, selectedSlotIds, onSetSlotSelection }) {
         currentSelection.add(slotId);
       }
     });
+
     onSetSlotSelection([...currentSelection]);
   }
 
@@ -327,58 +394,48 @@ function HeatmapInvite({ invite, selectedSlotIds, onSetSlotSelection }) {
   }
 
   return (
-    <section>
-      <h3>{invite.title}</h3>
-      <p>
-        {invite.description} Click a candidate slot to select or unselect your
-        vote.
-      </p>
-      <div>Professor: {invite.ownerId.name}</div>
-      <div>Status: {invite.voteAny ? "Voted" : "Not voted yet"}</div>
-      <div className="heatmap-calendar">
-        <FullCalendar
-          plugins={[timeGridPlugin, interactionPlugin]}
-          initialView="timeGridWeek"
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "",
-          }}
-          events={calendarEvents}
-          validRange={{
-            start: invite.rangeStart,
-            end: invite.rangeEnd,
-          }}
-          allDaySlot={false}
-          selectable={true}
-          selectMirror={false}
-          selectMinDistance={1}
-          select={handleSelect}
-          selectAllow={(info) =>
-            isSelectableRange(invite, info.start, info.end)
-          }
-          dateClick={handleDateClick}
-          slotDuration="00:30:00"
-          snapDuration="00:30:00"
-          slotMinTime="08:00:00"
-          slotMaxTime="18:00:00"
-          height="auto"
-        />
-      </div>
-    </section>
+    <div className="invite-calendar heatmap-calendar">
+      <FullCalendar
+        plugins={[timeGridPlugin, interactionPlugin]}
+        initialView="timeGridWeek"
+        headerToolbar={{
+          left: "prev,next today",
+          center: "title",
+          right: "",
+        }}
+        events={calendarEvents}
+        validRange={{
+          start: invite.rangeStart,
+          end: invite.rangeEnd,
+        }}
+        allDaySlot={false}
+        selectable={true}
+        selectMirror={false}
+        selectMinDistance={1}
+        select={handleSelect}
+        selectAllow={(info) => isSelectableRange(invite, info.start, info.end)}
+        dateClick={handleDateClick}
+        slotDuration="00:30:00"
+        snapDuration="00:30:00"
+        slotMinTime="08:00:00"
+        slotMaxTime="18:00:00"
+        height="auto"
+      />
+    </div>
   );
 }
 
 function CalendarInvite({ invite, selectedSlotIds, onToggleSlotSelection }) {
   const calendarEvents = useMemo(() => {
-    return invite.candidateSlots.map((slot) => {
+    return (invite.candidateSlots ?? []).map((slot) => {
+      const slotId = String(slot._id);
       return {
-        id: slot._id,
+        id: slotId,
         start: slot.startTime,
         end: slot.endTime,
         extendedProps: {
-          voteCount: slot.voteCount,
-          isSelected: selectedSlotIds.includes(slot._id),
+          voteCount: slot.voteCount ?? 0,
+          isSelected: selectedSlotIds.includes(slotId),
         },
       };
     });
@@ -386,23 +443,16 @@ function CalendarInvite({ invite, selectedSlotIds, onToggleSlotSelection }) {
 
   function renderEventContent(info) {
     return (
-      <section>
-        <div>{formatTimeRange(info.event.start, info.event.end)}</div>
-        <div>Votes: {info.event.extendedProps.voteCount}</div>
-        {info.event.extendedProps.isSelected && <div>Selected</div>}
-      </section>
+      <div className="invite-event">
+        <span>{formatTimeRange(info.event.start, info.event.end)}</span>
+        <span>{info.event.extendedProps.voteCount} votes</span>
+        {info.event.extendedProps.isSelected && <span>Selected</span>}
+      </div>
     );
   }
 
   return (
-    <section>
-      <h3>{invite.title}</h3>
-      <p>
-        {invite.description} Click a candidate slot to select or unselect your
-        vote.
-      </p>
-      <div>Professor: {invite.ownerId.name}</div>
-      <div>Status: {invite.voteAny ? "Voted" : "Not voted yet"}</div>
+    <div className="invite-calendar">
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
@@ -418,8 +468,6 @@ function CalendarInvite({ invite, selectedSlotIds, onToggleSlotSelection }) {
         fixedWeekCount={false}
         dayMaxEvents={3}
       />
-    </section>
+    </div>
   );
 }
-
-export default UserInvites;

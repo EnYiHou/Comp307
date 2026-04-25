@@ -8,14 +8,12 @@ export default function LandingPage() {
         <div className="hero-copy">
           <p className="landing-eyebrow">McGill University</p>
 
-          <h1>
-            A better way to book office hours.
-          </h1>
+          <h1>BERK keeps appointment booking clear.</h1>
 
           <p className="landing-description">
-            SOCS Booking helps students, professors, and teaching assistants
-            coordinate appointments, office hours, and group meetings without
-            long email threads.
+            BERK helps students, professors, and teaching assistants coordinate
+            office hours, appointments, and group meeting polls without long
+            email threads.
           </p>
 
           <div className="action-row">
@@ -26,7 +24,7 @@ export default function LandingPage() {
 
           <div className="trust-row">
             <span>McGill email access</span>
-            <span>Owner-managed slots</span>
+            <span>Owner-managed availability</span>
             <span>Student booking dashboard</span>
           </div>
         </div>

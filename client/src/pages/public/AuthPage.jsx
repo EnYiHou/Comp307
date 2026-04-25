@@ -1,5 +1,6 @@
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import LoadingState from "../../components/loading/LoadingState.jsx";
 import { useAuth } from "../../features/auth/useAuth.js";
 import "./AuthPage.css";
 
@@ -12,7 +13,7 @@ export default function AuthPage() {
   const [error, setError] = useState(null);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <LoadingState label="Checking your session..." variant="page" size="large" />;
   }
 
   if (user) {

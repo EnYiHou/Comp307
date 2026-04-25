@@ -5,6 +5,7 @@ import OwnerGrid from "../../features/owners/components/OwnerGrid";
 import OwnerModal from "../../features/owners/components/OwnerModal";
 import Notification from "../../components/notification/Notification";
 import NewMeetingRequestModal from "./NewMeetingRequestModal";
+import LoadingState from "../../components/loading/LoadingState";
 import "./OwnersDirectoryPage.css";
 
 export default function OwnersDirectoryPage() {
@@ -13,13 +14,18 @@ export default function OwnersDirectoryPage() {
   const [selectedOwner, setSelectedOwner] = useState(null);
   const [requestOwner, setRequestOwner] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchOwners = useCallback(async () => {
     try {
       const data = await getOwners(searchTerm);
       setOwners(Array.isArray(data) ? data : []);
-    } catch {
+      setError("");
+    } catch (caughtError) {
+      console.error("Book appointments load error:", caughtError);
       setOwners([]);
+      setError("Failed to load appointment hosts.");
     }
   }, [searchTerm]);
 
@@ -27,14 +33,23 @@ export default function OwnersDirectoryPage() {
     let isMounted = true;
 
     const loadOwners = async () => {
+      setLoading(true);
+      setError("");
+
       try {
         const data = await getOwners(searchTerm);
         if (isMounted) {
           setOwners(Array.isArray(data) ? data : []);
         }
-      } catch {
+      } catch (caughtError) {
+        console.error("Book appointments search error:", caughtError);
         if (isMounted) {
           setOwners([]);
+          setError("Failed to load appointment hosts.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
         }
       }
     };
@@ -55,17 +70,30 @@ export default function OwnersDirectoryPage() {
   }, []);
 
   return (
-    <section className="page-stack">
+    <section className="appointments-page">
       <div className="owners-page-header">
-        <h2>Teachers Directory</h2>
+        <div>
+          <p>Availability browser</p>
+          <h1>Book Appointments</h1>
+          <span>
+            Find available appointment hosts, view open times, or request a
+            custom meeting.
+          </span>
+        </div>
       </div>
       <SearchBar
-        placeholder="Search for teachers..."
+        placeholder="Search by name or email..."
         value={searchTerm}
         onChange={setSearchTerm}
       />
-      {owners.length === 0 ? (
-        <p>No teachers found.</p>
+      {error ? (
+        <p className="appointments-empty is-error">{error}</p>
+      ) : loading ? (
+        <div className="appointments-loading">
+          <LoadingState label="Loading appointment hosts..." variant="panel" />
+        </div>
+      ) : owners.length === 0 ? (
+        <p className="appointments-empty">No appointment hosts found.</p>
       ) : (
         <OwnerGrid
           owners={owners}

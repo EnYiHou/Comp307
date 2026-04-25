@@ -20,7 +20,7 @@ export default function Sidebar({ links }) {
   return (
     <aside className={collapsed ? "sidebar collapsed" : "sidebar"}>
       <div className="sidebar-header">
-        <span className="title">App</span>
+        <span className="title">BERK</span>
         <button
           className="collapse-btn"
           onClick={() => setCollapsed(!collapsed)}
@@ -30,18 +30,21 @@ export default function Sidebar({ links }) {
       </div>
 
       <nav className="sidebar-nav" aria-label="Primary">
-        {links.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebar-item nav-link-active"
-                : "sidebar-item"
-            }
-          >
-            <span className="label">{link.label}</span>
-          </NavLink>
+        {links.map((group) => (
+          <div className="sidebar-group" key={group.label}>
+            <p className="sidebar-group-label">{group.label}</p>
+            {group.items.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  isActive ? "sidebar-item nav-link-active" : "sidebar-item"
+                }
+              >
+                <span className="label">{link.label}</span>
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
 

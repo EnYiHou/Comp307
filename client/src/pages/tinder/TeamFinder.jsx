@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import LoadingState from "../../components/loading/LoadingState.jsx";
 import api from "../../shared/api/api.js";
 import { useAuth } from "../../features/auth/useAuth.js";
 import "./TeamFinder.css";
@@ -42,14 +43,14 @@ export default function TeamFinder() {
     }, [fetchData]);
 
     if (loading) {
-        return <div className="no-teams">Loading teams...</div>;
+        return <LoadingState label="Loading teams..." variant="page" size="large" />;
     }
 
 
     return (
         <div className="team-finder page-stack">
             <header className="team-finder-header">
-                <h1>Team Finder</h1>
+                <h1>Tinder</h1>
                 <p>Find partners for your courses or manage your existing teams.</p>
                 <button 
                     className="button"

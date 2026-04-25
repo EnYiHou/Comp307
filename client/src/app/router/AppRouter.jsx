@@ -56,24 +56,30 @@ export default function AppRouter() {
           <Route path="/owners" element={<OwnersDirectoryPage />} />
 
           <Route path="/dashboard/settings" element={<SettingsPage />} />
-          <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
-          <Route path="/owner/slots" element={<ManageSlotsPage />} />
-          <Route path="/owner/slots/new" element={<CreateSlotPage />} />
           <Route
-            path="/owner/bookings/:bookingId/edit"
-            element={<EditBookingPage />}
-          />
-          <Route
-            path="/owner/recurring-office-hours"
-            element={<RecurringOfficeHoursPage />}
-          />
-          <Route path="/owner/requests" element={<BookingRequestsPage />} />
-          <Route
-            path="/owner/group-meetings/new"
-            element={<GroupMeetingSetupPage />}
-          />
-          <Route path="/owner/bookings" element={<ViewBookingsPage />} />
-          <Route path="/owner/invite-links" element={<InviteLinksPage />} />
+            element={
+              <ProtectedRoute allowedRoles={["OWNER"]} redirectTo="/dashboard" />
+            }
+          >
+            <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
+            <Route path="/owner/slots" element={<ManageSlotsPage />} />
+            <Route path="/owner/slots/new" element={<CreateSlotPage />} />
+            <Route
+              path="/owner/bookings/:bookingId/edit"
+              element={<EditBookingPage />}
+            />
+            <Route
+              path="/owner/recurring-office-hours"
+              element={<RecurringOfficeHoursPage />}
+            />
+            <Route path="/owner/requests" element={<BookingRequestsPage />} />
+            <Route
+              path="/owner/group-meetings/new"
+              element={<GroupMeetingSetupPage />}
+            />
+            <Route path="/owner/bookings" element={<ViewBookingsPage />} />
+            <Route path="/owner/invite-links" element={<InviteLinksPage />} />
+          </Route>
 
           <Route path="/tinder" element={<TeamFinder />} />
           <Route path="/tinder/:teamId" element={<TeamFinder />} />

@@ -3,8 +3,8 @@ import "./Footer.css";
 export default function Footer() {
   return (
     <footer className="app-footer">
-      <p>COMP 307 Booking App</p>
-      <p>TODO - add contact info, links to GitHub repo, etc.</p>
+      <p>BERK</p>
+      <p>Appointment coordination for McGill students, professors, and TAs.</p>
     </footer>
   );
 }
