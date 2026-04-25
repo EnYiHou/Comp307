@@ -15,7 +15,6 @@
   background: var(--color-surface);
   color: inherit;
   text-align: left;
-  cursor: pointer;
 }
 
 .owner-card:hover {
@@ -34,10 +33,30 @@
   font-weight: 700;
 }
 
-.owner-card__action {
+.owner-card__actions {
+  display: grid;
+  gap: 0.5rem;
   margin-top: auto;
+}
+
+.owner-card__action {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-md);
   font-weight: 600;
+  cursor: pointer;
+}
+
+.owner-card__action--secondary {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: var(--color-primary);
+}
+
+.owner-card__action--primary {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-surface);
 }
 
 .owner-modal-backdrop {

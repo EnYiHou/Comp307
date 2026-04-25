@@ -11,7 +11,7 @@ export default function OwnersDirectoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [owners, setOwners] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState(null);
-  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestOwner, setRequestOwner] = useState(null);
   const [notification, setNotification] = useState(null);
 
   const fetchOwners = useCallback(async () => {
@@ -58,13 +58,6 @@ export default function OwnersDirectoryPage() {
     <section className="page-stack">
       <div className="owners-page-header">
         <h2>Teachers Directory</h2>
-        <button
-          className="new-request-button"
-          type="button"
-          onClick={() => setShowRequestModal(true)}
-        >
-          Make New Request
-        </button>
       </div>
       <SearchBar
         placeholder="Search for teachers..."
@@ -72,11 +65,12 @@ export default function OwnersDirectoryPage() {
         onChange={setSearchTerm}
       />
       {owners.length === 0 ? (
-        <p>No teachers with available booking slots found.</p>
+        <p>No teachers found.</p>
       ) : (
         <OwnerGrid
           owners={owners}
           onSelectOwner={(owner) => setSelectedOwner(owner)}
+          onRequestOwner={(owner) => setRequestOwner(owner)}
         />
       )}
 
@@ -88,9 +82,11 @@ export default function OwnersDirectoryPage() {
           onBookingSuccess={fetchOwners}
         />
       )}
-      {showRequestModal && (
+      {requestOwner && (
         <NewMeetingRequestModal
-          onClose={() => setShowRequestModal(false)}
+          initialTeacher={requestOwner}
+          lockTeacher
+          onClose={() => setRequestOwner(null)}
           onSuccess={showNotification}
         />
       )}

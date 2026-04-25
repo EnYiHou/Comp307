@@ -85,6 +85,40 @@ export const updateOwnerBooking = async (req, res, next) => {
     }
 };
 
+export const deleteMyAppointment = async (req, res, next) => {
+    try {
+        const { bookingId } = req.params;
+        const userId = req.user.id;
+
+        const booking = await Booking.findOne({
+            _id: bookingId,
+            participants: userId,
+            startTime: { $gte: new Date() },
+        });
+
+        if (!booking) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        booking.participants = booking.participants.filter(
+            (participantId) => participantId.toString() !== userId,
+        );
+
+        if (booking.participants.length < booking.capacity) {
+            booking.status = "open";
+        }
+
+        await booking.save();
+
+        res.json({
+            success: true,
+            message: "Appointment deleted successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getBookingsByOwner = async (req, res, next) => {
     try {
         const { ownerId, userId } = req.query;

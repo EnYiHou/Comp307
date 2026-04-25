@@ -1,9 +1,21 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../features/auth/useAuth.js";
 import "./Sidebar.css";
 
 export default function Sidebar({ links }) {
   const [collapsed, setCollapsed] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    try {
+      await logout();
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  }
 
   return (
     <aside className={collapsed ? "sidebar collapsed" : "sidebar"}>
@@ -33,7 +45,9 @@ export default function Sidebar({ links }) {
         ))}
       </nav>
 
-      <div className="sidebar-footer">Logout</div>
+      <button className="sidebar-footer" type="button" onClick={handleLogout}>
+        <span className="label">Logout</span>
+      </button>
     </aside>
   );
 }

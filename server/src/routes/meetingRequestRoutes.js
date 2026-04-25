@@ -103,6 +103,20 @@ router.get("/owner/upcoming", requireAuth, async (req, res, next) => {
   }
 });
 
+router.get("/user", requireAuth, async (req, res, next) => {
+  try {
+    const requests = await MeetingRequest.find({
+      requesterId: req.user.id,
+    })
+      .populate("ownerId", "name email")
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: requests });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.patch("/:requestId/status", requireAuth, async (req, res, next) => {
   try {
     const { requestId } = req.params;
@@ -138,6 +152,30 @@ router.patch("/:requestId/status", requireAuth, async (req, res, next) => {
 
     request.status = status;
     await request.save();
+
+    res.json({ success: true, data: request });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:requestId/cancel", requireAuth, async (req, res, next) => {
+  try {
+    const { requestId } = req.params;
+
+    const request = await MeetingRequest.findOneAndUpdate(
+      {
+        _id: requestId,
+        requesterId: req.user.id,
+        status: "PENDING",
+      },
+      { status: "CANCELLED" },
+      { new: true },
+    ).populate("ownerId", "name email");
+
+    if (!request) {
+      return res.status(404).json({ message: "Pending request not found" });
+    }
 
     res.json({ success: true, data: request });
   } catch (error) {

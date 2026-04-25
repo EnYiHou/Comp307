@@ -26,7 +26,7 @@ const meetingRequestSchema = new mongoose.Schema(
     preferredEnd: Date,
     status: {
       type: String,
-      enum: ["PENDING", "ACCEPTED", "DECLINED"],
+      enum: ["PENDING", "ACCEPTED", "DECLINED", "CANCELLED"],
       default: "PENDING",
     },
   },

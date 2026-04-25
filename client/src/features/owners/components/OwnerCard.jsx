@@ -1,18 +1,29 @@
 import "./owner.css";
-export default function OwnerCard({ owner, onSelect }) {
+export default function OwnerCard({ owner, onSelect, onRequest }) {
   return (
-    <button
-      className="owner-card"
-      type="button"
-      onClick={() => onSelect(owner)}
-    >
+    <article className="owner-card">
       <div className="owner-card__avatar">{owner.name}</div>
 
       <div className="owner-card__body">
         <p>{owner.email}</p>
       </div>
 
-      <span className="owner-card__action">View slots</span>
-    </button>
+      <div className="owner-card__actions">
+        <button
+          className="owner-card__action owner-card__action--secondary"
+          type="button"
+          onClick={() => onSelect(owner)}
+        >
+          View slots
+        </button>
+        <button
+          className="owner-card__action owner-card__action--primary"
+          type="button"
+          onClick={() => onRequest(owner)}
+        >
+          Make a request
+        </button>
+      </div>
+    </article>
   );
 }

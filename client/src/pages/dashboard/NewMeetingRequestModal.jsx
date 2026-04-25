@@ -15,22 +15,20 @@ function getDefaultStart() {
   return toDateTimeInputValue(date);
 }
 
-function getDefaultEnd() {
-  const date = new Date();
-  date.setDate(date.getDate() + 1);
-  date.setHours(date.getHours() + 1, 0, 0, 0);
-  return toDateTimeInputValue(date);
-}
-
-export default function NewMeetingRequestModal({ onClose, onSuccess }) {
+export default function NewMeetingRequestModal({
+  initialTeacher = null,
+  lockTeacher = false,
+  onClose,
+  onSuccess,
+}) {
   const [teacherSearch, setTeacherSearch] = useState("");
   const [teachers, setTeachers] = useState([]);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState(initialTeacher);
   const [formData, setFormData] = useState({
     topic: "",
     message: "",
     preferredStart: getDefaultStart(),
-    preferredEnd: getDefaultEnd(),
+    durationHours: 1,
   });
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -64,11 +62,16 @@ export default function NewMeetingRequestModal({ onClose, onSuccess }) {
     setMessage("");
 
     try {
+      const preferredStart = new Date(formData.preferredStart);
+      const preferredEnd = new Date(
+        preferredStart.getTime() + Number(formData.durationHours) * 60 * 60 * 1000,
+      );
+
       await api.post("/meeting-requests", {
         ...formData,
         ownerId: selectedTeacher._id,
-        preferredStart: new Date(formData.preferredStart).toISOString(),
-        preferredEnd: new Date(formData.preferredEnd).toISOString(),
+        preferredStart: preferredStart.toISOString(),
+        preferredEnd: preferredEnd.toISOString(),
       });
       onSuccess?.("Meeting request sent.", "success");
       onClose();
@@ -92,7 +95,7 @@ export default function NewMeetingRequestModal({ onClose, onSuccess }) {
         onClick={(event) => event.stopPropagation()}
       >
         <div className="request-modal-header">
-          <h2 id="request-modal-title">Make New Request</h2>
+          <h2 id="request-modal-title">Make a Request</h2>
           <button type="button" onClick={onClose}>
             Close
           </button>
@@ -136,9 +139,11 @@ export default function NewMeetingRequestModal({ onClose, onSuccess }) {
           <form className="request-form" onSubmit={handleSubmit}>
             <div className="request-selected-teacher">
               <p>Requesting {selectedTeacher.name}</p>
-              <button type="button" onClick={() => setSelectedTeacher(null)}>
-                Change
-              </button>
+              {!lockTeacher && (
+                <button type="button" onClick={() => setSelectedTeacher(null)}>
+                  Change
+                </button>
+              )}
             </div>
 
             <label>
@@ -174,11 +179,13 @@ export default function NewMeetingRequestModal({ onClose, onSuccess }) {
               </label>
 
               <label>
-                Preferred end
+                Hours
                 <input
-                  type="datetime-local"
-                  name="preferredEnd"
-                  value={formData.preferredEnd}
+                  type="number"
+                  min="0.5"
+                  step="0.5"
+                  name="durationHours"
+                  value={formData.durationHours}
                   onChange={handleChange}
                   required
                 />
