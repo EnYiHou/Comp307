@@ -1,4 +1,5 @@
 import { useAuth } from "../../features/auth/useAuth.js";
+import Dashboard from "../../features/dashboard/components/Dashboard.jsx";
 
 export default function UserDashboardPage() {
   const { logout } = useAuth();
@@ -21,6 +22,7 @@ export default function UserDashboardPage() {
         Welcome to your dashboard! Here you can manage your appointments, view
         your schedule, and update your settings.
       </p>
+      <Dashboard />
     </section>
   );
 }
