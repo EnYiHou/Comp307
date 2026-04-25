@@ -53,20 +53,32 @@ router.post('/createBookingSlot', requireAuth, async (req, res) => {
 });
 
 async function createBookingSlot(userId, bookingData) {
-    const slotsToCreate = bookingData.selectedSlots.map((slot) => ({
-        ownerId: userId,
-        title: bookingData.title,
-        description: bookingData.description,
-        startTime: new Date(slot.start),
-        endTime: new Date(slot.end),
-        visibility: bookingData.visibility,
-        capacity: bookingData.capacity,
-        status: "open",
-        participants: [],
-    }))
+    const recurrenceCount = Math.max(1, Number(bookingData.recurrenceCount) || 1);
+    const slotsToCreate = bookingData.selectedSlots.flatMap((slot) => {
+        const slotStart = new Date(slot.start);
+        const slotEnd = new Date(slot.end);
+
+        return Array.from({ length: recurrenceCount }, (_, weekOffset) => ({
+            ownerId: userId,
+            title: bookingData.title,
+            description: bookingData.description,
+            startTime: addWeeks(slotStart, weekOffset),
+            endTime: addWeeks(slotEnd, weekOffset),
+            visibility: bookingData.visibility,
+            capacity: bookingData.capacity,
+            status: "open",
+            participants: [],
+        }));
+    });
 
     return await Booking.insertMany(slotsToCreate);
 };
+
+function addWeeks(date, weekOffset) {
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + (weekOffset * 7));
+    return nextDate;
+}
 
 async function createBookingGroup(userId, bookingData) {
     let candidateSlots = [];

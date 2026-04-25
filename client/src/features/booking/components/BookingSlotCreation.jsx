@@ -18,6 +18,12 @@ function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function addWeeks(dateLike, weekOffset) {
+  const nextDate = new Date(dateLike);
+  nextDate.setDate(nextDate.getDate() + weekOffset * 7);
+  return nextDate;
+}
+
 function BookingSlotCreation() {
   const [formData, setFormData] = useState({
     title: "",
@@ -181,6 +187,7 @@ function BookingSlotCreation() {
           setSelectedSlots={setSelectedSlots}
           activeDate={activeDate}
           setActiveDate={setActiveDate}
+          recurrenceCount={formData.bookingMode === "slot" ? formData.recurrenceCount : 1}
         />
       )}
 
@@ -289,6 +296,7 @@ function TwoPanelSelector({
   setSelectedSlots,
   activeDate,
   setActiveDate,
+  recurrenceCount,
 }) {
   function handleMonthDateClick(info) {
     setActiveDate(info.dateStr);
@@ -315,16 +323,28 @@ function TwoPanelSelector({
   }
 
   const monthEvents = useMemo(() => {
-    return selectedSlots.map((slot) => ({
+    const selectedSlotEvents = selectedSlots.map((slot) => ({
       id: slot.id,
       title: formatTimeRange(slot.start, slot.end),
       start: slot.start,
       end: slot.end,
     }));
-  }, [selectedSlots]);
+
+    const recurringPreviewEvents = selectedSlots.flatMap((slot) =>
+      Array.from({ length: Math.max(0, recurrenceCount - 1) }, (_, index) => ({
+        id: `${slot.id}-recurrence-${index + 1}`,
+        start: addWeeks(slot.start, index + 1),
+        end: addWeeks(slot.end, index + 1),
+        display: "background",
+        classNames: ["booking-slot-recurring-preview"],
+      })),
+    );
+
+    return [...selectedSlotEvents, ...recurringPreviewEvents];
+  }, [recurrenceCount, selectedSlots]);
 
   const dayEvents = useMemo(() => {
-    return selectedSlots
+    const selectedDayEvents = selectedSlots
       .filter((slot) => getDateOnly(slot.start) === activeDate)
       .map((slot) => ({
         id: slot.id,
@@ -332,7 +352,28 @@ function TwoPanelSelector({
         start: slot.start,
         end: slot.end,
       }));
-  }, [activeDate, selectedSlots]);
+
+    const recurringPreviewEvents = selectedSlots.flatMap((slot) =>
+      Array.from({ length: Math.max(0, recurrenceCount - 1) }, (_, index) => {
+        const recurringStart = addWeeks(slot.start, index + 1);
+        const recurringEnd = addWeeks(slot.end, index + 1);
+
+        if (getDateOnly(recurringStart) !== activeDate) {
+          return [];
+        }
+
+        return {
+          id: `${slot.id}-day-recurrence-${index + 1}`,
+          start: recurringStart,
+          end: recurringEnd,
+          display: "background",
+          classNames: ["booking-slot-recurring-preview"],
+        };
+      }),
+    );
+
+    return [...selectedDayEvents, ...recurringPreviewEvents];
+  }, [activeDate, recurrenceCount, selectedSlots]);
 
   return (
     <section className="booking-slot-selector">

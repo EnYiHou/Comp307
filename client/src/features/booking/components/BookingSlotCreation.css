@@ -150,6 +150,14 @@
   color: var(--color-text);
 }
 
+.fc .booking-slot-recurring-preview {
+  background-color: rgb(237 27 47 / 0.14);
+}
+
+.fc .booking-slot-recurring-preview.fc-bg-event {
+  opacity: 1;
+}
+
 @media (max-width: 960px) {
 
   .booking-slot-fields,
