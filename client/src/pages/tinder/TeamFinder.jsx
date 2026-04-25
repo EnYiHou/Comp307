@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import api from "../../services/api";
+import { useAuth } from "../../features/auth/useAuth.js";
+import api from "../../shared/api/api.js";
 import "./TeamFinder.css";
 
 export default function TeamFinder() {
