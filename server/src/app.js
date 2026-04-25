@@ -12,7 +12,6 @@ import groupMeetingRoutes from "./routes/groupMeetingRoutes.js";
 import inviteRoutes from "./routes/inviteRoutes.js";
 import meetingRequestRoutes from "./routes/meetingRequestRoutes.js";
 import ownerRoutes from "./routes/ownerRoutes.js";
-import slotRoutes from "./routes/slotRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import dashboardRoutes from './routes/dashboardRoutes.js'
 import teamRoutes from './routes/teamRoutes.js';
@@ -43,7 +42,6 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/owners", ownerRoutes);
-app.use("/api/slots", slotRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/meeting-requests", meetingRequestRoutes);
 app.use("/api/invites", inviteRoutes);

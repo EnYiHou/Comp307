@@ -9,7 +9,7 @@ export default function OwnerGrid({ owners = [], onSelectOwner }) {
   return (
     <div className="owner-grid">
       {owners.map((owner) => (
-        <OwnerCard key={owner.id} owner={owner} onSelect={onSelectOwner} />
+        <OwnerCard key={owner._id} owner={owner} onSelect={onSelectOwner} />
       ))}
     </div>
   );
