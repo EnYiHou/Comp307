@@ -29,7 +29,7 @@
   .fc-toolbar.fc-header-toolbar {
   align-items: center;
   gap: var(--spacing-3);
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--spacing-3);
 }
 
 :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
@@ -53,7 +53,7 @@
 :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
   .fc
   .fc-button {
-  padding: 0.58rem 0.9rem;
+  padding: 0.5rem 0.82rem;
   border: none;
   border-radius: 999px;
   background: rgb(255 255 255 / 0.92);
@@ -159,7 +159,7 @@
 :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
   .fc
   .fc-daygrid-day-frame {
-  min-height: 8.5rem;
+  min-height: 6.35rem;
   transition: background-color 160ms ease;
 }
 
@@ -223,7 +223,7 @@
 :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
   .fc
   .fc-timegrid-slot {
-  height: 2.9rem;
+  height: 2.2rem;
   transition: background-color 160ms ease;
 }
 
@@ -267,7 +267,7 @@
 :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
   .fc
   .fc-event-main {
-  padding: 0.46rem 0.62rem;
+  padding: 0.38rem 0.54rem;
   white-space: normal;
 }
 
@@ -293,7 +293,7 @@
   .fc
   .fc-daygrid-event
   .fc-event-main {
-  min-height: 3.1rem;
+  min-height: 2.5rem;
 }
 
 :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
@@ -444,13 +444,13 @@
   :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
     .fc
     .fc-daygrid-day-frame {
-    min-height: 6.75rem;
+    min-height: 5.5rem;
   }
 
   :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
     .fc
     .fc-timegrid-slot {
-    height: 2.5rem;
+    height: 2rem;
   }
 
   .owner-poll-event,
