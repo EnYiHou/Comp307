@@ -726,8 +726,9 @@ function TwoPanelSelector({
     const recurringPreviewEvents = selectedSlots.flatMap((slot) =>
       Array.from({ length: Math.max(0, recurrenceCount - 1) }, (_, index) => ({
         id: `${slot.id}-recurrence-${index + 1}`,
-        start: addWeeks(slot.start, index + 1),
-        end: addWeeks(slot.end, index + 1),
+        start: getDateOnly(addWeeks(slot.start, index + 1)),
+        end: addDays(getDateOnly(addWeeks(slot.start, index + 1)), 1),
+        allDay: true,
         display: "background",
         classNames: ["booking-slot-recurring-preview"],
       })),
