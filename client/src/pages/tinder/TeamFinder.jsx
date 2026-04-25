@@ -1,0 +1,364 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
+import "./TeamFinder.css";
+
+export default function TeamFinder() {
+    const { user } = useAuth();
+    const [myTeams, setMyTeams] = useState([]);
+    const [searchedTeams, setSearchedTeams] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState(null);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [myRes, searchRes] = await Promise.all([
+                api.get("/teams"),
+                api.get(`/teams/search${searchQuery ? `?query=${searchQuery}` : ""}`)
+            ]);
+            setMyTeams(myRes.data);
+            setSearchedTeams(searchRes.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [searchQuery]);
+
+    if (loading) {
+        return <div className="no-teams">Loading teams...</div>;
+    }
+
+
+    return (
+        <div className="team-finder page-stack">
+            <header className="team-finder-header">
+                <h1>Team Finder</h1>
+                <p>Find partners for your courses or manage your existing teams.</p>
+                <button 
+                    className="button"
+                    onClick={() => setShowCreateModal(true)}
+                >
+                    + Create Team
+                </button>
+            </header>
+
+            <div className="team-finder-content">
+                <section className="team-finder-section">
+                    <h2>My Teams</h2>
+                    <TeamsListBox 
+                        teams={myTeams} 
+                        onViewTeam={setSelectedTeam} 
+                        onRefresh={fetchData}
+                    />
+                </section>
+
+                <section className="team-finder-section">
+                    <h2>Find Teams</h2>
+                    <SearchBar value={searchQuery} onChange={setSearchQuery} />
+                    <TeamsListBox 
+                        teams={searchedTeams} 
+                        onViewTeam={setSelectedTeam} 
+                        onRefresh={fetchData}
+                    />
+                </section>
+            </div>
+
+            {selectedTeam && (
+                <TeamCardView 
+                    team={selectedTeam} 
+                    onClose={() => setSelectedTeam(null)} 
+                    onRefresh={fetchData}
+                />
+            )}
+
+            {showCreateModal && (
+                <CreateTeamModal 
+                    onClose={() => setShowCreateModal(false)} 
+                    onRefresh={fetchData}
+                />
+            )}
+        </div>
+    );
+}
+
+function TeamsListBox({ teams, onViewTeam, onRefresh }) {
+    const validTeams = Array.isArray(teams) ? teams.filter(t => t && t._id) : [];
+    
+    if (validTeams.length === 0) {
+        return <div className="no-teams">No teams found in this category.</div>;
+    }
+    return (
+        <div className="teams-list-box">
+            {validTeams.map((team) => (
+                <TeamCard 
+                    key={team._id} 
+                    team={team} 
+                    onView={() => onViewTeam(team)} 
+                    onRefresh={onRefresh}
+                />
+            ))}
+        </div>
+    );
+}
+
+function TeamCard({ team, onView, onRefresh }) {
+    const { user } = useAuth();
+    if (!team) return null;
+    
+    const isMember = Array.isArray(team.members) && team.members.some(m => {
+        if (!m) return false;
+        const memberId = m._id || m;
+        return memberId === user?.id;
+    });
+
+    return (
+    <div className="team-card">
+        <div className="team-card-top">
+            <span className="team-card-name">{team.name}</span>
+            <span className="team-card-course">{team.course}</span>
+        </div>
+        <div className="team-card-members">
+            👥 {team.members?.length || 0} / {team.size} members
+        </div>
+        <div className="team-card-body">
+            <span>👑 {team.leader?.name || "Unknown Leader"}</span>
+            {team.leader?.email && (
+                <span><a href={`mailto:${team.leader.email}`}>{team.leader.email}</a></span>
+            )}
+        </div>
+        <div className="team-card-middle">
+            <p>{team.description?.length > 120 ? team.description.substring(0, 120) + "..." : team.description}</p>
+        </div>
+        <div className="team-card-bottom">
+            <button className="button button-secondary" onClick={onView}>View Details</button>
+            {!isMember && <JoinButton team={team} onRefresh={onRefresh} />}
+            {team.leader?._id === user?.id && <DeleteButton team={team} onRefresh={onRefresh} />}
+        </div>
+    </div>
+    );
+}
+
+function TeamCardView({ team, onClose, onRefresh }) {
+    const { user } = useAuth();
+    if (!team) return null;
+
+    const isMember = Array.isArray(team.members) && team.members.some(m => {
+        if (!m) return false;
+        const memberId = m._id || m;
+        return memberId === user?.id;
+    });
+
+    const members = Array.isArray(team.members) ? team.members.filter(Boolean) : [];
+
+    const handleRemoveMember = async (teamId, memberId) => {
+        if (!window.confirm("Are you sure you want to remove this member?")) return;
+        try {
+            await api.post(`/teams/${teamId}/remove/${memberId}`);
+            onRefresh();
+        } catch (error) {
+            console.error("Failed to remove member", error);
+        }
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <button className="close-modal" onClick={onClose}>&times;</button>
+                <div className="team-card-view-top">
+                    <h2>{team.name}</h2>
+                    <span className="team-card-course">{team.course}</span>
+                </div>
+                
+                <div className="team-details">
+                    <p className="description">{team.description}</p>
+                    
+                    <div className="member-list">
+                        <h3>Members ({members.length}/{team.size})</h3>
+                        {members.map((member) => (
+                            <div key={member._id || member} className="team-card-view-body-member">
+                                <div>
+                                    <span>{member._id === team.leader?._id ? <span>👑</span> : null} {member.name || "Unknown User"}</span>
+                                    {member.email && (
+                                        <span> - <a href={`mailto:${member.email}`}>{member.email}</a></span>
+                                    )}
+                                </div>
+                                {team.leader?._id === user?.id && member._id !== user?.id && (
+                                    <button 
+                                        className="remove-member-btn"
+                                        onClick={() => handleRemoveMember(team._id, member._id)}
+                                    >
+                                        Remove
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="team-card-view-bottom">
+                    {isMember ? (
+                        <LeaveButton team={team} onRefresh={() => { onClose(); onRefresh(); }} />
+                    ) : (
+                        <JoinButton team={team} onRefresh={onRefresh} />
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function SearchBar({ value, onChange }) {
+    return (
+        <div className="search-bar">
+            <input 
+                type="text" 
+                placeholder="Search by course (e.g. COMP 307)" 
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+        </div>
+    );
+}
+
+function LeaveButton({ team, onRefresh }) {
+    const handleLeave = async () => {
+        if (!window.confirm("Are you sure you want to leave this team?")) return;
+        try {
+            await api.post(`/teams/${team._id}/leave`);
+            onRefresh();
+        } catch (error) {
+            console.error("Failed to leave team", error);
+        }
+    };
+
+    return (
+        <button className="button button-secondary" onClick={handleLeave} style={{ color: "var(--color-danger)", borderColor: "var(--color-danger)" }}>Leave Team</button>
+    );
+}
+
+function DeleteButton({ team, onRefresh }) {
+    const handleDelete = async () => {
+        if (!window.confirm("Are you sure you want to delete this team? This cannot be undone.")) return;
+        try {
+            await api.delete(`/teams/${team._id}`);
+            onRefresh();
+        } catch (error) {
+            console.error("Failed to delete team", error);
+        }
+    };
+
+    return (
+        <button className="button button-secondary" onClick={handleDelete} style={{ color: "var(--color-danger)", borderColor: "var(--color-danger)" }}>Delete Team</button>
+    );
+}
+
+function JoinButton({ team, onRefresh }) {
+    const [status, setStatus] = useState("Join");
+    const [loading, setLoading] = useState(false);
+
+    const handleJoin = async () => {
+        setLoading(true);
+        try {
+            await api.post(`/teams/${team._id}/join`);
+            setStatus("Joined");
+            onRefresh();
+        } catch (error) {
+            const msg = error.response?.data?.message;
+            if (msg === "Already in team") setStatus("Joined");
+            else if (msg === "Team is full") setStatus("Full");
+            else setStatus("Error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <button 
+            className="button" 
+            onClick={handleJoin} 
+            disabled={loading || status !== "Join"}
+        >
+            {loading ? "Processing..." : status}
+        </button>
+    );
+}
+
+function CreateTeamModal({ onClose, onRefresh }) {
+    const [formData, setFormData] = useState({
+        name: "",
+        course: "",
+        description: "",
+        size: 3
+    });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await api.post("/teams", formData);
+            console.log("Team created successfully!");
+            onRefresh();
+            onClose();
+        } catch (error) {
+            console.log("Failed to create team");
+        }
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <button className="close-modal" onClick={onClose}>&times;</button>
+                <h2>Create a New Team</h2>
+                <form onSubmit={handleSubmit} className="create-team-form">
+                    <div className="form-group">
+                        <label>Team Name</label>
+                        <input 
+                            type="text" 
+                            required 
+                            value={formData.name}
+                            onChange={e => setFormData({...formData, name: e.target.value})}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Course</label>
+                        <input 
+                            type="text" 
+                            required 
+                            placeholder="e.g. COMP 307"
+                            value={formData.course}
+                            onChange={e => setFormData({...formData, course: e.target.value})}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Max Size</label>
+                        <input 
+                            type="number" 
+                            min="2" 
+                            max="10" 
+                            required 
+                            value={formData.size}
+                            onChange={e => setFormData({...formData, size: parseInt(e.target.value)})}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Description</label>
+                        <textarea 
+                            required 
+                            rows="4"
+                            value={formData.description}
+                            onChange={e => setFormData({...formData, description: e.target.value})}
+                        ></textarea>
+                    </div>
+                    <button type="submit" className="button">Create Team</button>
+                </form>
+            </div>
+        </div>
+    );
+}

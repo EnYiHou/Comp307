@@ -7,6 +7,7 @@ const links = [
   { to: "/dashboard-owners", label: "Owners" },
   { to: "/owner/dashboard", label: "Owner Dashboard" },
   { to: "/owner/slots/new", label: "Create Slot" },
+  { to: "/tinder", label: "Team Finder" },
 ];
 
 export default function DashboardShell() {

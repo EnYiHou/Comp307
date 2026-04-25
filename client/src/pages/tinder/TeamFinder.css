@@ -1,0 +1,222 @@
+.team-finder {
+  display: grid;
+  gap: var(--spacing-8);
+}
+
+.team-finder-header {
+  margin-bottom: var(--spacing-2);
+}
+
+.team-finder-header h1 {
+  margin: 0 0 var(--spacing-2);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-3xl);
+  color: var(--color-secondary);
+}
+
+.team-finder-header p {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.team-finder-content {
+  display: grid;
+  gap: var(--spacing-8);
+}
+
+.team-finder-section h2 {
+  margin: 0 0 var(--spacing-5);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-xl);
+  color: var(--color-secondary);
+  border-bottom: 2px solid var(--color-tertiary);
+  padding-bottom: var(--spacing-1);
+  display: inline-block;
+}
+
+.teams-list-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--spacing-6);
+}
+
+.no-teams {
+  padding: var(--spacing-8);
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-muted);
+}
+
+/* Search Bar */
+.search-bar {
+  margin-bottom: var(--spacing-6);
+  max-width: 400px;
+}
+
+/* Team Card - Matches booking-slot-card */
+.team-card {
+  padding: var(--spacing-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.team-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.team-card-top {
+  margin-bottom: var(--spacing-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team-card-name {
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-xl);
+  color: var(--color-secondary);
+}
+
+.team-card-course {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  background: rgba(237, 27, 47, 0.08);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.team-card-members {
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+  margin-bottom: var(--spacing-4);
+}
+
+.team-card-body {
+  margin-bottom: var(--spacing-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+}
+
+.team-card-body span {
+  display: block;
+  margin-bottom: var(--spacing-1);
+}
+
+.team-card-body a {
+  color: var(--color-primary);
+}
+
+.team-card-middle {
+  flex: 1;
+  margin-bottom: var(--spacing-6);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.team-card-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+}
+
+/* Modal / Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(31, 31, 31, 0.7);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  padding: var(--spacing-4);
+}
+
+.modal-content {
+  background: var(--color-background);
+  padding: var(--spacing-8);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+}
+
+.close-modal {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-muted);
+}
+
+.team-details .description {
+  margin-bottom: var(--spacing-6);
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+.member-list h3 {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-xl);
+  color: var(--color-secondary);
+  margin-bottom: var(--spacing-4);
+}
+
+.team-card-view-body-member {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.team-card-view-body-member:last-child {
+  border-bottom: none;
+}
+
+/* Forms */
+.create-team-form {
+  display: grid;
+  gap: var(--spacing-5);
+}
+
+.form-group {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.form-group textarea {
+  min-height: 100px;
+}
+
+.remove-member-btn {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: 0 var(--spacing-2);
+}
+
+.remove-member-btn:hover {
+  text-decoration: underline;
+}

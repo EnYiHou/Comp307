@@ -20,6 +20,7 @@ import LandingPage from "../../pages/public/LandingPage";
 import OwnerPublicSlotsPage from "../../pages/public/OwnerPublicSlotsPage";
 import OwnersDirectoryPage from "../../pages/public/OwnersDirectoryPage";
 import ProtectedRoute from "./ProtectedRoute";
+import TeamFinder from "../../pages/tinder/TeamFinder";
 
 export default function AppRouter() {
   return (
@@ -69,6 +70,9 @@ export default function AppRouter() {
           />
           <Route path="/owner/bookings" element={<ViewBookingsPage />} />
           <Route path="/owner/invite-links" element={<InviteLinksPage />} />
+
+          <Route path="/tinder" element={<TeamFinder />} />
+          <Route path="/tinder/:teamId" element={<TeamFinder />} />
         </Route>
       </Route>
     </Routes>

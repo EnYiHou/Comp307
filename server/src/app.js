@@ -15,6 +15,7 @@ import ownerRoutes from "./routes/ownerRoutes.js";
 import slotRoutes from "./routes/slotRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import dashboardRoutes from './routes/dashboardRoutes.js'
+import teamRoutes from './routes/teamRoutes.js';
 
 
 const app = express();
@@ -50,6 +51,7 @@ app.use("/api/group-meetings", groupMeetingRoutes);
 app.use("/api/calendar", calendarRoutes);
 
 app.use('/api/dashboard', dashboardRoutes);
+app.use("/api/teams", teamRoutes);
 app.use('/api/users', userRoutes);
 
 // Fallback error handler
