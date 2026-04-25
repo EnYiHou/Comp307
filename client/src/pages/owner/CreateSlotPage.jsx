@@ -1,4 +1,5 @@
 import BookingSlotCreation from "../../features/booking/components/BookingSlotCreation";
+import UserInvites from "../../features/booking/components/UserInvites";
 
 export default function CreateSlotPage() {
   return (
@@ -9,6 +10,7 @@ export default function CreateSlotPage() {
         owner dashboard.
       </p>
       <BookingSlotCreation />
+      <UserInvites />
     </section>
   );
 }

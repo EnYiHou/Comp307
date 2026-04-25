@@ -2,11 +2,10 @@ import React from 'react';
 import { useEffect, useState } from "react";
 import "./dashboard.css";
 import BookingSlotCreation from '../../booking/components/BookingSlotCreation';
-//import BookingSlotCreation from './gpt_booking';
-
 
 
 import { Emitter } from '@fullcalendar/core/internal';
+import UserInvites from '../../booking/components/UserInvites';
 
 function AppointmentSection() {
     const [appointments, setAppointments] = useState([]);

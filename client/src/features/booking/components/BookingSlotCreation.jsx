@@ -1,37 +1,18 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import api from "../../../shared/api/api";
 import "./BookingSlotCreation.css";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-
-function formatDate(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function getDatePart(dateStr) {
-  const date = new Date(dateStr);
-  return formatDate(date);
-}
-
-function formatTime(dateStr) {
-  const date = new Date(dateStr);
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-function formatTimeRange(start, end) {
-  return `${formatTime(start)}-${formatTime(end)}`;
-}
-
-function addDays(dateStr, nb) {
-  const date = new Date(`${dateStr}T00:00:00`);
-  date.setDate(date.getDate() + nb);
-  return formatDate(date);
-}
+import SearchBar from "../../search/components/SearchBar";
+import { getAll } from "../../search/services/searchService";
+import {
+  addDays,
+  formatDate,
+  formatTimeRange,
+  getDateOnly,
+} from "../utils/bookingCalendarUtils.js";
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -51,10 +32,18 @@ function BookingSlotCreation() {
   });
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [activeDate, setActiveDate] = useState(formatDate(new Date()));
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+
   const [submitState, setSubmitState] = useState({
     status: "idle",
     message: "",
   });
+
+  const visibleSearchResults =
+    searchQuery.trim().length >= 3 ? searchResults : [];
 
   function handleChange(event) {
     const { name, type, value } = event.target;
@@ -71,11 +60,41 @@ function BookingSlotCreation() {
     }));
   }
 
+  function handleSelectedUsers(user) {
+    setSelectedUsers((prev) => {
+      return (prev.some((u) => u._id === user._id)) ? prev : [...prev, user];
+    })
+
+    setSearchResults([]);
+    setSearchQuery("");
+  }
+
+  function handleRemoveUser(user_id) {
+    setSelectedUsers((prev) =>
+      prev.filter((user) => user._id !== user_id)
+    );
+  }
+
+  useEffect(() => {
+    if (searchQuery.trim().length < 3) {
+      return;
+    }
+    getAll(searchQuery)
+      .then((users) => {
+        setSearchResults(users);
+      })
+      .catch((error) => {
+        console.error("Search failed:", error);
+        setSearchResults([]);
+      });
+  }, [searchQuery]);
+
   async function handleSubmit(event) {
     event.preventDefault();
     const payload = {
       ...formData,
       selectedSlots,
+      invitedUsers: selectedUsers.map((user) => user._id)
     };
 
     setSubmitState({
@@ -109,6 +128,53 @@ function BookingSlotCreation() {
     <form className="booking-slot-form" onSubmit={handleSubmit}>
       <BookingFields formData={formData} handleChange={handleChange} />
 
+      {formData.bookingMode === "group" && (
+        <section>
+          <label>Invite users
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search users by name or email"
+            />
+          </label>
+          {visibleSearchResults.length > 0 && (
+            <div className="search-results">
+              {visibleSearchResults.map((user) => (
+                <button
+                  key={user._id}
+                  type="button"
+                  onClick={() => handleSelectedUsers(user)}
+                  className="search-result-item"
+                >
+                  {user.name} — {user.email} ({user.role})
+                </button>
+              ))}
+            </div>
+          )}
+          <h3>Selected users</h3>
+          {selectedUsers.length === 0 ? (
+            <p>No users selected yet.</p>
+          ) : (
+            <ul>
+              {selectedUsers.map((user) => (
+                <li key={user._id}>
+                  <div>
+                    {user.name} — {user.email} ({user.role})
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveUser(user._id)}
+                  >
+                    x
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
       {showCalendarSlotSelector && (
         <TwoPanelSelector
           selectedSlots={selectedSlots}
@@ -135,6 +201,7 @@ function BookingSlotCreation() {
             ? "Creating..."
             : "Create Booking Slot"}
         </button>
+
         {submitState.message && (
           <p
             className={`booking-slot-feedback is-${submitState.status}`}
@@ -244,7 +311,7 @@ function TwoPanelSelector({
   }
 
   function handleMonthEventClick(info) {
-    setActiveDate(getDatePart(info.event.start));
+    setActiveDate(getDateOnly(info.event.start));
   }
 
   const monthEvents = useMemo(() => {
@@ -258,7 +325,7 @@ function TwoPanelSelector({
 
   const dayEvents = useMemo(() => {
     return selectedSlots
-      .filter((slot) => getDatePart(slot.start) === activeDate)
+      .filter((slot) => getDateOnly(slot.start) === activeDate)
       .map((slot) => ({
         id: slot.id,
         title: formatTimeRange(slot.start, slot.end),
@@ -303,7 +370,7 @@ function TwoPanelSelector({
           initialDate={activeDate}
           headerToolbar={false}
           selectable={true}
-          selectMirror={true}
+          selectMirror={false}
           select={handleDaySelect}
           eventClick={handleDayEventClick}
           events={dayEvents}
