@@ -10,6 +10,7 @@ import {
   getDateOnly,
 } from "../utils/bookingCalendarUtils.js";
 import "./OwnerPolls.css";
+import "./FullCalendarTheme.css";
 
 function getHeatColor(voteCount) {
   const maxVoteCount = 5;

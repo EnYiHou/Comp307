@@ -7,6 +7,7 @@ import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
 import { formatTimeRange } from "../utils/bookingCalendarUtils.js";
 import "./UserInvites.css";
+import "./FullCalendarTheme.css";
 
 const SLOT_DURATION_MINUTES = 30;
 const SLOT_DURATION_MS = SLOT_DURATION_MINUTES * 60 * 1000;

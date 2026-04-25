@@ -14,6 +14,7 @@ import {
   getDateOnly,
 } from "../utils/bookingCalendarUtils.js";
 import "./BookingSlotCreation.css";
+import "./FullCalendarTheme.css";
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
