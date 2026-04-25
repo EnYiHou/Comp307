@@ -3,394 +3,360 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
 import {
-    formatTimeRange,
-    getDateOnly,
+  formatTimeRange,
+  getDateOnly,
 } from "../utils/bookingCalendarUtils.js";
-import "./BookingSlotCreation.css";
+import "./OwnerPolls.css";
 
 function getHeatColor(voteCount) {
-    const MAX_VOTE_COUNT = 5;
+  const maxVoteCount = 5;
 
-    if (voteCount <= 0) {
-        return "rgba(226, 232, 240, 0.45)";
-    }
+  if (voteCount <= 0) {
+    return "rgba(226, 232, 240, 0.45)";
+  }
 
-    const cappedVoteCount = Math.min(voteCount, MAX_VOTE_COUNT);
-    const intensity = cappedVoteCount / MAX_VOTE_COUNT;
-    const lightness = 92 - intensity * 42;
-    return `hsl(199, 89%, ${lightness}%)`;
+  const cappedVoteCount = Math.min(voteCount, maxVoteCount);
+  const intensity = cappedVoteCount / maxVoteCount;
+  const lightness = 92 - intensity * 42;
+  return `hsl(199, 89%, ${lightness}%)`;
 }
 
 function getFinalSlotId(poll) {
-    if (!poll?.finalSelection?.startTime || !poll?.finalSelection?.endTime) {
-        return "";
-    }
+  if (!poll?.finalSelection?.startTime || !poll?.finalSelection?.endTime) {
+    return "";
+  }
 
-    const finalStartMs = new Date(poll.finalSelection.startTime).getTime();
-    const finalEndMs = new Date(poll.finalSelection.endTime).getTime();
+  const finalStartMs = new Date(poll.finalSelection.startTime).getTime();
+  const finalEndMs = new Date(poll.finalSelection.endTime).getTime();
 
-    const matchingSlot = poll.candidateSlots.find((slot) => {
-        return (
-            new Date(slot.startTime).getTime() === finalStartMs &&
-            new Date(slot.endTime).getTime() === finalEndMs
-        );
-    });
+  const matchingSlot = (poll.candidateSlots ?? []).find((slot) => {
+    return (
+      new Date(slot.startTime).getTime() === finalStartMs &&
+      new Date(slot.endTime).getTime() === finalEndMs
+    );
+  });
 
-    return matchingSlot ? String(matchingSlot._id) : "";
+  return matchingSlot ? String(matchingSlot._id) : "";
 }
 
 function formatFinalSelection(finalSelection) {
-    if (!finalSelection?.startTime || !finalSelection?.endTime) {
-        return "Not selected yet";
-    }
+  if (!finalSelection?.startTime || !finalSelection?.endTime) {
+    return "Not selected yet";
+  }
 
-    return `${getDateOnly(finalSelection.startTime)} ${formatTimeRange(
-        finalSelection.startTime,
-        finalSelection.endTime,
-    )}`;
+  return `${getDateOnly(finalSelection.startTime)} ${formatTimeRange(
+    finalSelection.startTime,
+    finalSelection.endTime,
+  )}`;
 }
 
 function getStatusLabel(status) {
-    if (status === "finalized") {
-        return "Finalized";
-    }
+  if (status === "finalized") {
+    return "Finalized";
+  }
 
-    if (status === "cancelled") {
-        return "Cancelled";
-    }
+  if (status === "cancelled") {
+    return "Cancelled";
+  }
 
-    return "Collecting votes";
+  return "Collecting votes";
 }
 
 function OwnerPolls() {
-    const [polls, setPolls] = useState([]);
-    const [selectedPollId, setSelectedPollId] = useState("");
+  const [polls, setPolls] = useState([]);
+  const [selectedPollId, setSelectedPollId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  useEffect(() => {
+    let isMounted = true;
 
-    useEffect(() => {
-        api
-            .get("dashboard/getPolls")
-            .then((response) => {
-                setPolls(
-                    response.data.filter((poll) => poll.status === "collectingVotes"),
-                );
-            })
-            .catch((error) => {
-                console.error("Error: ", error);
-                setError(error.response?.data?.message || "Failed to load polls.");
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
+    api
+      .get("dashboard/getPolls")
+      .then((response) => {
+        if (isMounted) {
+          const activePolls = Array.isArray(response.data)
+            ? response.data.filter((poll) => poll.status === "collectingVotes")
+            : [];
+          setPolls(activePolls);
+        }
+      })
+      .catch((caughtError) => {
+        console.error("Error: ", caughtError);
+        if (isMounted) {
+          setError(caughtError.response?.data?.message || "Failed to load polls.");
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
 
-    const selectedPoll = useMemo(() => {
-        return polls.find((poll) => poll._id === selectedPollId) ?? null;
-    }, [polls, selectedPollId]);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-    function removePoll(pollId) {
-        setPolls((prev) => {
-            return prev.filter((poll) => String(poll._id) !== String(pollId));
-        });
-        setSelectedPollId("");
-    }
-
-    if (loading) {
-        return <p>Loading polls...</p>;
-    }
-
-    if (error) {
-        return <p>{error}</p>;
-    }
-
+  const selectedPoll = useMemo(() => {
     return (
-        <section>
-            <PollList polls={polls} setSelectedPollId={setSelectedPollId} />
-            <PollDetails poll={selectedPoll} onLocalChange={removePoll} />
-        </section>
+      polls.find((poll) => String(poll._id) === String(selectedPollId)) ??
+      polls[0] ??
+      null
     );
+  }, [polls, selectedPollId]);
+
+  function removePoll(pollId) {
+    setPolls((prev) =>
+      prev.filter((poll) => String(poll._id) !== String(pollId)),
+    );
+    setSelectedPollId("");
+  }
+
+  return (
+    <section className="owner-dashboard-panel owner-polls-panel">
+      <div className="owner-dashboard-panel-header">
+        <div>
+          <h2>Group Polls</h2>
+          <p>Review votes and finalize the best time for group meetings.</p>
+        </div>
+        {!loading && <span>{polls.length}</span>}
+      </div>
+
+      {error ? (
+        <p className="owner-polls-message is-error">{error}</p>
+      ) : loading ? (
+        <LoadingState label="Loading polls..." variant="panel" />
+      ) : polls.length === 0 ? (
+        <div className="owner-polls-empty">
+          <h3>No active polls</h3>
+          <p>Group polls that are collecting votes will appear here.</p>
+        </div>
+      ) : (
+        <div className="owner-polls-body">
+          <PollList
+            polls={polls}
+            selectedPollId={selectedPoll?._id}
+            onSelectPoll={setSelectedPollId}
+          />
+          <PollDetails poll={selectedPoll} onFinalize={removePoll} />
+        </div>
+      )}
+    </section>
+  );
 }
 
-function PollList({ polls, setSelectedPollId }) {
-    return (
-        <section>
-            <div>
-                <h3>Your Polls</h3>
-            </div>
-            <div>
-                {polls.length === 0 && <p>No polls created yet.</p>}
-                {polls.map((poll) => {
-                    return (
-                        <button
-                            key={poll._id}
-                            type="button"
-                            onClick={() => setSelectedPollId(poll._id)}
-                        >
-                            <div>{poll.title}</div>
-                            <p>{poll.description || "No description provided."}</p>
-                            <div>
-                                <div>Status: {getStatusLabel(poll.status)}</div>
-                                <div>
-                                    Final date: {formatFinalSelection(poll.finalSelection)}
-                                </div>
-                            </div>
-                        </button>
-                    );
-                })}
-            </div>
-        </section>
-    );
-}
+function PollList({ polls, selectedPollId, onSelectPoll }) {
+  return (
+    <aside className="owner-poll-list" aria-label="Owner group polls">
+      {polls.map((poll) => {
+        const isSelected = String(poll._id) === String(selectedPollId);
 
-function PollDetails({ poll, onLocalChange }) {
-    if (!poll) {
         return (
-            <section>
-                <h3>Select a Poll</h3>
-            </section>
-        );
-    }
-
-    return (
-        <PollDecisionDetails
+          <button
+            className={`owner-poll-list__item${isSelected ? " is-selected" : ""}`}
             key={poll._id}
-            poll={poll}
-            onFinalize={onLocalChange}
-        />
+            type="button"
+            onClick={() => onSelectPoll(poll._id)}
+            aria-pressed={isSelected}
+          >
+            <span className="owner-poll-list__status">
+              {getStatusLabel(poll.status)}
+            </span>
+            <span className="owner-poll-list__title">{poll.title}</span>
+            <span className="owner-poll-list__description">
+              {poll.description || "No description provided."}
+            </span>
+            <span className="owner-poll-list__meta">
+              {poll.candidateSlots?.length ?? 0} candidate times
+            </span>
+          </button>
+        );
+      })}
+    </aside>
+  );
+}
+
+function PollDetails({ poll, onFinalize }) {
+  if (!poll) {
+    return (
+      <section className="owner-poll-details">
+        <p className="owner-polls-message">Select a poll to review votes.</p>
+      </section>
     );
+  }
+
+  return (
+    <PollDecisionDetails
+      key={poll._id}
+      poll={poll}
+      onFinalize={onFinalize}
+    />
+  );
 }
 
 function PollDecisionDetails({ poll, onFinalize }) {
-    const [selectedFinalSlotId, setSelectedFinalSlotId] = useState(() =>
-        getFinalSlotId(poll),
+  const [selectedFinalSlotId, setSelectedFinalSlotId] = useState(() =>
+    getFinalSlotId(poll),
+  );
+  const [saveMessage, setSaveMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const selectedFinalSlot = useMemo(() => {
+    return (
+      (poll.candidateSlots ?? []).find(
+        (slot) => String(slot._id) === String(selectedFinalSlotId),
+      ) ?? null
     );
-    const [saveMessage, setSaveMessage] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  }, [poll.candidateSlots, selectedFinalSlotId]);
 
-    const selectedFinalSlot = useMemo(() => {
-        return (
-            poll.candidateSlots.find(
-                (slot) => String(slot._id) === String(selectedFinalSlotId),
-            ) ?? null
-        );
-    }, [poll.candidateSlots, selectedFinalSlotId]);
+  function setFinalSlotSelection(slotId) {
+    setSelectedFinalSlotId(String(slotId));
+    setSaveMessage("");
+  }
 
-    function setFinalSlotSelection(slotId) {
-        setSelectedFinalSlotId(String(slotId));
-        setSaveMessage("");
+  function finalizePollDecision() {
+    if (!selectedFinalSlotId) {
+      setSaveMessage("Choose a final time before finalizing.");
+      return;
     }
 
-    function finalizePollDecision() {
-        if (!selectedFinalSlotId) {
-            return;
+    const confirmed = window.confirm("Finalize this group poll?");
+    if (!confirmed) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    api
+      .patch(`/dashboard/pollDecision/${poll._id}`, {
+        finalSlotId: selectedFinalSlotId,
+      })
+      .then(() => {
+        onFinalize(poll._id);
+      })
+      .catch((caughtError) => {
+        console.error("Failed to save final selection:", caughtError);
+        setSaveMessage(
+          caughtError.response?.data?.message || "Failed to finalize poll.",
+        );
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  }
+
+  return (
+    <section className="owner-poll-details">
+      <div className="owner-poll-details__header">
+        <div>
+          <h3>{poll.title}</h3>
+          <p>{poll.description || "No description provided."}</p>
+        </div>
+        <span>{getStatusLabel(poll.status)}</span>
+      </div>
+
+      <div className="owner-poll-details__meta">
+        <span>{poll.method === "heatmap" ? "Heatmap" : "Calendar"}</span>
+        <span>{poll.candidateSlots?.length ?? 0} candidate times</span>
+        <span>{formatFinalSelection(selectedFinalSlot)}</span>
+      </div>
+
+      {saveMessage && (
+        <p className="owner-polls-message is-error" role="status">
+          {saveMessage}
+        </p>
+      )}
+
+      <PollCalendar
+        poll={poll}
+        selectedFinalSlotId={selectedFinalSlotId}
+        onSelectFinalSlot={setFinalSlotSelection}
+      />
+
+      <div className="owner-poll-actions">
+        <button
+          type="button"
+          onClick={finalizePollDecision}
+          disabled={!selectedFinalSlotId || isSubmitting}
+        >
+          {isSubmitting ? "Finalizing..." : "Finalize Poll"}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function PollCalendar({ poll, selectedFinalSlotId, onSelectFinalSlot }) {
+  const isHeatmap = poll.method === "heatmap";
+  const calendarEvents = useMemo(() => {
+    return (poll.candidateSlots ?? []).map((slot) => {
+      const isFinal = String(slot._id) === String(selectedFinalSlotId);
+      const heatColor = getHeatColor(slot.voteCount ?? 0);
+
+      return {
+        id: String(slot._id),
+        start: slot.startTime,
+        end: slot.endTime,
+        backgroundColor: isFinal ? "#0f766e" : isHeatmap ? heatColor : undefined,
+        borderColor: isFinal ? "#0f766e" : isHeatmap ? heatColor : undefined,
+        textColor: isFinal || isHeatmap ? "#ffffff" : undefined,
+        extendedProps: {
+          voteCount: slot.voteCount ?? 0,
+          isFinal,
+        },
+      };
+    });
+  }, [isHeatmap, poll.candidateSlots, selectedFinalSlotId]);
+
+  function renderEventContent(info) {
+    return (
+      <div className="owner-poll-event">
+        <span>{formatTimeRange(info.event.start, info.event.end)}</span>
+        <span>{info.event.extendedProps.voteCount} votes</span>
+        {info.event.extendedProps.isFinal && <span>Final</span>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="owner-poll-calendar">
+      <FullCalendar
+        plugins={
+          isHeatmap
+            ? [timeGridPlugin, interactionPlugin]
+            : [dayGridPlugin, interactionPlugin]
         }
-
-        setIsSubmitting(true);
-        api
-            .patch(`/dashboard/pollDecision/${poll._id}`, {
-                finalSlotId: selectedFinalSlotId,
-            })
-            .then(() => {
-                onFinalize(poll._id);
-            })
-            .catch((error) => {
-                console.error("Failed to save final selection:", error);
-                setSaveMessage("Failed to save changes.");
-            })
-            .finally(() => {
-                setIsSubmitting(false);
-            });
-    }
-
-    if (poll.method === "calendar") {
-        return (
-            <section>
-                {saveMessage && <p>{saveMessage}</p>}
-                <CalendarPoll
-                    poll={poll}
-                    selectedFinalSlot={selectedFinalSlot}
-                    selectedFinalSlotId={selectedFinalSlotId}
-                    onSelectFinalSlot={setFinalSlotSelection}
-                    onFinalizePoll={finalizePollDecision}
-                    isSubmitting={isSubmitting}
-                />
-            </section>
-        );
-    } else if (poll.method === "heatmap") {
-        return (
-            <section>
-                {saveMessage && <p>{saveMessage}</p>}
-                <HeatmapPoll
-                    poll={poll}
-                    selectedFinalSlot={selectedFinalSlot}
-                    selectedFinalSlotId={selectedFinalSlotId}
-                    onSelectFinalSlot={setFinalSlotSelection}
-                    onFinalizePoll={finalizePollDecision}
-                    isSubmitting={isSubmitting}
-                />
-            </section>
-        );
-    }
-
-    return null;
-}
-
-function CalendarPoll({
-    poll,
-    selectedFinalSlot,
-    selectedFinalSlotId,
-    onSelectFinalSlot,
-    onFinalizePoll,
-    isSubmitting,
-}) {
-    const calendarEvents = useMemo(() => {
-        return poll.candidateSlots.map((slot) => {
-            const isFinal = String(slot._id) === selectedFinalSlotId;
-
-            return {
-                id: String(slot._id),
-                start: slot.startTime,
-                end: slot.endTime,
-                backgroundColor: isFinal ? "#0f766e" : undefined,
-                borderColor: isFinal ? "#0f766e" : undefined,
-                extendedProps: {
-                    voteCount: slot.voteCount,
-                    isFinal,
-                },
-            };
-        });
-    }, [poll.candidateSlots, selectedFinalSlotId]);
-
-    function renderEventContent(info) {
-        return (
-            <section>
-                <div>{formatTimeRange(info.event.start, info.event.end)}</div>
-                <div>Votes: {info.event.extendedProps.voteCount}</div>
-                {info.event.extendedProps.isFinal && <div>Final selection</div>}
-            </section>
-        );
-    }
-
-    return (
-        <section>
-            <h3>{poll.title}</h3>
-            <p>{poll.description} Click a candidate slot, then confirm the final decision.</p>
-            <div>Status: {getStatusLabel(poll.status)}</div>
-            <div>
-                Selected final date:{" "}
-                {selectedFinalSlot
-                    ? formatFinalSelection(selectedFinalSlot)
-                    : "Not selected yet"}
-            </div>
-            <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                headerToolbar={{
-                    left: "prev,next today",
-                    center: "title",
-                    right: "",
-                }}
-                events={calendarEvents}
-                eventClick={(info) => onSelectFinalSlot(info.event.id)}
-                eventContent={renderEventContent}
-                height="auto"
-                fixedWeekCount={false}
-                dayMaxEvents={3}
-            />
-            <button
-                type="button"
-                onClick={onFinalizePoll}
-                disabled={!selectedFinalSlotId || isSubmitting}
-            >
-                {isSubmitting ? "Finalizing..." : "Finalize decision"}
-            </button>
-        </section>
-    );
-}
-
-function HeatmapPoll({
-    poll,
-    selectedFinalSlot,
-    selectedFinalSlotId,
-    onSelectFinalSlot,
-    onFinalizePoll,
-    isSubmitting,
-}) {
-    const calendarEvents = useMemo(() => {
-        return poll.candidateSlots.map((slot) => {
-            const isFinal = String(slot._id) === selectedFinalSlotId;
-
-            return {
-                id: String(slot._id),
-                start: slot.startTime,
-                end: slot.endTime,
-                backgroundColor: isFinal ? "#0f766e" : getHeatColor(slot.voteCount),
-                borderColor: isFinal ? "#0f766e" : getHeatColor(slot.voteCount),
-                textColor: isFinal ? "#ffffff" : "#0f172a",
-                extendedProps: {
-                    voteCount: slot.voteCount,
-                    isFinal,
-                },
-            };
-        });
-    }, [poll.candidateSlots, selectedFinalSlotId]);
-
-    function renderEventContent(info) {
-        return (
-            <section>
-                <div>{formatTimeRange(info.event.start, info.event.end)}</div>
-                <div>Votes: {info.event.extendedProps.voteCount}</div>
-                {info.event.extendedProps.isFinal && <div>Final selection</div>}
-            </section>
-        );
-    }
-
-    return (
-        <section>
-            <h3>{poll.title}</h3>
-            <p>{poll.description} Click a candidate slot, then confirm the final decision.</p>
-            <div>Status: {getStatusLabel(poll.status)}</div>
-            <div>
-                Selected final date:{" "}
-                {selectedFinalSlot
-                    ? formatFinalSelection(selectedFinalSlot)
-                    : "Not selected yet"}
-            </div>
-            <FullCalendar
-                plugins={[timeGridPlugin, interactionPlugin]}
-                initialView="timeGridWeek"
-                headerToolbar={{
-                    left: "prev,next today",
-                    center: "title",
-                    right: "",
-                }}
-                events={calendarEvents}
-                validRange={{
-                    start: poll.rangeStart,
-                    end: poll.rangeEnd,
-                }}
-                allDaySlot={false}
-                eventClick={(info) => onSelectFinalSlot(info.event.id)}
-                eventContent={renderEventContent}
-                slotDuration="00:30:00"
-                snapDuration="00:30:00"
-                slotMinTime="08:00:00"
-                slotMaxTime="18:00:00"
-                height="auto"
-            />
-            <button
-                type="button"
-                onClick={onFinalizePoll}
-                disabled={!selectedFinalSlotId || isSubmitting}
-            >
-                {isSubmitting ? "Finalizing..." : "Finalize decision"}
-            </button>
-        </section>
-    );
+        initialView={isHeatmap ? "timeGridWeek" : "dayGridMonth"}
+        headerToolbar={{
+          left: "prev,next today",
+          center: "title",
+          right: "",
+        }}
+        events={calendarEvents}
+        validRange={
+          isHeatmap
+            ? {
+                start: poll.rangeStart,
+                end: poll.rangeEnd,
+              }
+            : undefined
+        }
+        allDaySlot={false}
+        eventClick={(info) => onSelectFinalSlot(info.event.id)}
+        eventContent={renderEventContent}
+        slotDuration="00:30:00"
+        snapDuration="00:30:00"
+        slotMinTime="08:00:00"
+        slotMaxTime="18:00:00"
+        height="auto"
+        fixedWeekCount={false}
+        dayMaxEvents={3}
+      />
+    </div>
+  );
 }
 
 export default OwnerPolls;

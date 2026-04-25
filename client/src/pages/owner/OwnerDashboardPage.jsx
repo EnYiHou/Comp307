@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import LoadingState from "../../components/loading/LoadingState";
+import OwnerPolls from "../../features/booking/components/OwnerPolls";
 import api from "../../shared/api/api";
 import "./OwnerDashboardPage.css";
 
@@ -174,6 +175,8 @@ export default function OwnerDashboardPage() {
           </section>
         </aside>
       </div>
+
+      <OwnerPolls />
     </section>
   );
 }
