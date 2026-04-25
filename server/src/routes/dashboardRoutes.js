@@ -5,9 +5,21 @@ import requireAuth from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get('/appointments', async (req, res) => {
-    console.log("wtf");
-    res.json(["Appointment 1", "Appointment 2", "Appointment 3"]);
+router.get('/appointments', requireAuth, async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const appointments = await Booking.find({
+            participants: userId,
+            startTime: { $gte: new Date() },
+        })
+            .populate("ownerId", "name email")
+            .sort({ startTime: 1 })
+            .lean();
+
+        return res.status(200).json(appointments);
+    } catch (error) {
+        next(error);
+    }
 });
 
 
@@ -119,13 +131,6 @@ function generateHeatmapCandidates(rangeStart, rangeEnd) {
     return slots;
 }
 
-export default router
-
-
-
-
-
-
 router.get('/searchOwners', requireAuth, makeUserSearchHandler(["OWNER"]));
 router.get('/searchAll', requireAuth, makeUserSearchHandler(["USER", "OWNER"]));
 
@@ -164,4 +169,6 @@ async function searchAllUsers(id, query, roles) {
 
     return users;
 }
+
+export default router
 
