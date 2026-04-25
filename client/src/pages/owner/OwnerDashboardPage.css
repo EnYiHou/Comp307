@@ -108,23 +108,11 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgb(215 203 192 / 0.6);
-  border-radius: 1.15rem;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(248 244 239 / 0.8)),
-    var(--color-surface);
-  box-shadow: 0 18px 38px rgb(31 31 31 / 0.07);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease,
-    transform 150ms ease;
-}
-
-.owner-dashboard-panel:hover {
-  border-color: rgb(237 27 47 / 0.28);
-  box-shadow: 0 22px 42px rgb(31 31 31 / 0.1);
-  transform: translateY(-2px);
 }
 
 .owner-dashboard-panel--requests {
@@ -138,7 +126,6 @@
   gap: var(--spacing-4);
   padding: var(--spacing-5);
   border-bottom: 1px solid rgb(215 203 192 / 0.72);
-  background: rgb(255 255 255 / 0.62);
 }
 
 .owner-dashboard-panel-header h2 {
@@ -174,13 +161,6 @@
 .owner-request-list {
   max-height: 560px;
   overflow: auto;
-  overscroll-behavior: contain;
-}
-
-.owner-booking-list-compact {
-  max-height: 420px;
-  overflow: auto;
-  overscroll-behavior: contain;
 }
 
 .owner-request-card {
@@ -191,16 +171,6 @@
   border: 1px solid rgb(215 203 192 / 0.72);
   border-radius: var(--radius-md);
   background: rgb(248 244 239 / 0.42);
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease,
-    border-color 150ms ease;
-}
-
-.owner-request-card:hover {
-  transform: translateY(-1px);
-  border-color: rgb(237 27 47 / 0.24);
-  box-shadow: var(--shadow-sm);
 }
 
 .owner-request-time span,
@@ -281,14 +251,6 @@
   gap: var(--spacing-4);
   padding: var(--spacing-4) 0;
   border-bottom: 1px solid rgb(215 203 192 / 0.65);
-  transition:
-    background-color 150ms ease,
-    transform 150ms ease;
-}
-
-.owner-booking-card:hover {
-  background: rgb(248 244 239 / 0.62);
-  transform: translateY(-1px);
 }
 
 .owner-booking-card:last-child {
@@ -335,17 +297,15 @@
     padding: var(--spacing-6) 0;
   }
 
-  .owner-dashboard-hero {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .owner-request-card {
+  .owner-dashboard-hero,
+  .owner-request-card,
+  .owner-booking-card {
     grid-template-columns: 1fr;
   }
 
-  .owner-booking-card {
+  .owner-dashboard-hero {
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .owner-request-actions {
