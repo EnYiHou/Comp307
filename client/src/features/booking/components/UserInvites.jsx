@@ -4,12 +4,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import api from "../../../shared/api/api.js";
-import { useAuth } from "../../auth/useAuth.js";
 import {
-  addDays,
-  formatDate,
   formatTimeRange,
-  getDateOnly,
 } from "../utils/bookingCalendarUtils.js";
 import "./BookingSlotCreation.css";
 
@@ -45,7 +41,9 @@ function UserInvites() {
     api
       .get("dashboard/getInvites")
       .then((response) => {
-        setInvites(response.data);
+        setInvites(
+          response.data.filter((invite) => invite.status === "collectingVotes"),
+        );
       })
       .catch((error) => {
         console.error("Error: ", error);
@@ -113,6 +111,7 @@ function InviteList({ invites, setSelectedInviteId }) {
         <h3>Your Invites</h3>
       </div>
       <div>
+        {invites.length === 0 && <p>No invites right now.</p>}
         {invites.map((invite) => {
           return (
             <button
@@ -134,22 +133,32 @@ function InviteList({ invites, setSelectedInviteId }) {
 }
 
 function InviteDetails({ invite, onLocalChange }) {
-  const [selectedSlotIds, setSelectedSlotIds] = useState([]);
+  if (!invite) {
+    return (
+      <section>
+        <h3>Select an Invite</h3>
+      </section>
+    );
+  }
+
+  return (
+    <InviteVoteDetails
+      key={invite._id}
+      invite={invite}
+      onLocalChange={onLocalChange}
+    />
+  );
+}
+
+function InviteVoteDetails({ invite, onLocalChange }) {
+  const [selectedSlotIds, setSelectedSlotIds] = useState(() => {
+    return invite.candidateSlots
+      .filter((slot) => slot.selectedByCurrentUser)
+      .map((slot) => String(slot._id));
+  });
   const [saveMessage, setSaveMessage] = useState("");
   const saveTimeoutRef = useRef(null);
   const hideSaveMessageTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    if (!invite) {
-      setSelectedSlotIds([]);
-      return;
-    }
-    const alreadySelectedSlotIds = invite.candidateSlots
-      .filter((slot) => slot.selectedByCurrentUser)
-      .map((slot) => String(slot._id));
-
-    setSelectedSlotIds(alreadySelectedSlotIds);
-  }, [invite]);
 
   useEffect(() => {
     return () => {
@@ -195,13 +204,7 @@ function InviteDetails({ invite, onLocalChange }) {
     setSlotSelection(newSelectedSlotIds);
   }
 
-  if (!invite) {
-    return (
-      <section>
-        <h3>Select an Invite</h3>
-      </section>
-    );
-  } else if (invite.method === "calendar") {
+  if (invite.method === "calendar") {
     return (
       <section>
         {saveMessage && <p>{saveMessage}</p>}
@@ -368,7 +371,7 @@ function HeatmapInvite({ invite, selectedSlotIds, onSetSlotSelection }) {
 
 function CalendarInvite({ invite, selectedSlotIds, onToggleSlotSelection }) {
   const calendarEvents = useMemo(() => {
-    return invite.candidateSlots.map((slot, index) => {
+    return invite.candidateSlots.map((slot) => {
       return {
         id: slot._id,
         start: slot.startTime,

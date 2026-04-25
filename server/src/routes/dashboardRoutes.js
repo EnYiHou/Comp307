@@ -191,7 +191,8 @@ router.get('/getInvites', requireAuth, async (req, res) => {
     try {
         const userId = req.user.id;
         const invites = await BookingPoll.find({
-            invitedUsers: userId
+            invitedUsers: userId,
+            status: "collectingVotes",
         })
             .select("_id title description candidateSlots ownerId method rangeStart rangeEnd status updatedAt")
             .populate("ownerId", "_id name email")
@@ -250,6 +251,7 @@ router.patch("/pollVoting/:pollId", requireAuth, async (req, res) => {
             {
                 _id: pollId,
                 invitedUsers: userId,
+                status: "collectingVotes",
             },
             {
                 $pull: {
@@ -262,6 +264,7 @@ router.patch("/pollVoting/:pollId", requireAuth, async (req, res) => {
                 {
                     _id: pollId,
                     invitedUsers: userId,
+                    status: "collectingVotes",
                 },
                 {
                     $addToSet: {
@@ -284,6 +287,109 @@ router.patch("/pollVoting/:pollId", requireAuth, async (req, res) => {
         console.error("Failed to save poll vote:", error);
         res.status(500).json({
             message: "Failed to save vote.",
+        });
+    }
+});
+
+router.get('/getPolls', requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const polls = await BookingPoll.find({
+            ownerId: userId,
+            status: "collectingVotes",
+        })
+            .select("_id title description candidateSlots method rangeStart rangeEnd status finalSelection createdBookingIds updatedAt")
+            .sort({ updatedAt: -1 })
+            .lean();
+
+        const safePolls = polls.map((poll) => {
+            const safeCandidateSlots = poll.candidateSlots.map((slot) => ({
+                _id: slot._id,
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+                voteCount: slot.selectedByUsers.length,
+            }));
+
+            return {
+                _id: poll._id,
+                title: poll.title,
+                description: poll.description,
+                candidateSlots: safeCandidateSlots,
+                method: poll.method,
+                rangeStart: poll.rangeStart,
+                rangeEnd: poll.rangeEnd,
+                status: poll.status,
+                finalSelection: poll.finalSelection,
+                createdBookingIds: poll.createdBookingIds,
+                updatedAt: poll.updatedAt,
+            };
+        });
+
+        res.status(200).json(safePolls);
+    }
+    catch (error) {
+        console.error("Failed to fetch owner polls: ", error);
+        res.status(500).json({
+            message: "Failed to retrieve polls"
+        });
+    }
+});
+
+router.patch("/pollDecision/:pollId", requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const pollId = req.params.pollId;
+        const finalSlotId = req.body.finalSlotId;
+
+        const poll = await BookingPoll.findOne({
+            _id: pollId,
+            ownerId: userId,
+            status: "collectingVotes",
+        });
+
+        if (!poll) {
+            return res.status(404).json({
+                message: "Poll not found.",
+            });
+        }
+
+        const finalSlot = poll.candidateSlots.find((slot) => String(slot._id) === String(finalSlotId));
+
+        if (!finalSlot) {
+            return res.status(400).json({
+                message: "Invalid final slot.",
+            });
+        }
+
+        const createdBooking = await Booking.create({
+            ownerId: userId,
+            title: poll.title,
+            description: poll.description,
+            startTime: finalSlot.startTime,
+            endTime: finalSlot.endTime,
+            visibility: "public",
+            status: "reserved",
+            participants: finalSlot.selectedByUsers,
+            capacity: poll.invitedUsers.length + 1,
+        });
+
+        let createdBookingId = createdBooking._id;
+
+        poll.status = "finalized";
+        poll.finalSelection = {
+            startTime: finalSlot.startTime,
+            endTime: finalSlot.endTime,
+        };
+        poll.createdBookingIds = createdBookingId ? [createdBookingId] : [];
+        await poll.save();
+
+        res.status(200).json({
+            message: "Changes saved.",
+        });
+    } catch (error) {
+        console.error("Failed to save poll decision:", error);
+        res.status(500).json({
+            message: "Failed to save final decision.",
         });
     }
 });
