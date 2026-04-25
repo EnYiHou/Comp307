@@ -1,4 +1,4 @@
-import BookingSlotCreation from "../../Components/BookingSlotCreation";
+import BookingSlotCreation from "../../features/booking/components/BookingSlotCreation";
 
 export default function CreateSlotPage() {
   return (

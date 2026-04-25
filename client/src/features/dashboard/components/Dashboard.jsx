@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from "react";
 import "./dashboard.css";
-import BookingSlotCreation from './BookingSlotCreation';
+import BookingSlotCreation from '../../booking/components/BookingSlotCreation';
 //import BookingSlotCreation from './gpt_booking';
 
 

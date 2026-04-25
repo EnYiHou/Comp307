@@ -1,8 +1,7 @@
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
-import "./AuthPage.css";
-import { use } from "react";
 import { useState } from "react";
+import { useAuth } from "../../features/auth/useAuth.js";
+import "./AuthPage.css";
 
 export default function AuthPage() {
   const navigate = useNavigate();
