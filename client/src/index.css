@@ -65,6 +65,7 @@ body {
   background:
     linear-gradient(180deg, #fffaf7 0%, var(--color-background) 320px),
     var(--color-background);
+  overflow-x: hidden;
 }
 
 #root {
@@ -73,6 +74,13 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
 }
 
 a {
@@ -201,6 +209,37 @@ button:focus-visible,
 a:focus-visible {
   outline: 3px solid rgb(237 27 47 / 0.24);
   outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(159 16 32 / 0.28) rgb(241 214 168 / 0.25);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgb(241 214 168 / 0.22);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(159 16 32 / 0.28);
+  border: 2px solid rgb(241 214 168 / 0.22);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(159 16 32 / 0.42);
 }
 
 @media (max-width: 700px) {

@@ -8,7 +8,9 @@
 .public-shell_content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
+  flex: 1;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-width: 0;
+  padding: 0;
 }
