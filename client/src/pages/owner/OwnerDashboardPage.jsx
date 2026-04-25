@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
 import LoadingState from "../../components/loading/LoadingState";
 import OwnerPolls from "../../features/booking/components/OwnerPolls";
 import api from "../../shared/api/api";
@@ -32,6 +33,7 @@ export default function OwnerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [updatingRequestId, setUpdatingRequestId] = useState(null);
+  const { confirm, confirmationDialog } = useConfirmationDialog();
 
   const todayBookings = useMemo(() => getTodayBookings(bookings), [bookings]);
 
@@ -63,7 +65,11 @@ export default function OwnerDashboardPage() {
 
   async function updateRequestStatus(requestId, status) {
     if (status === "DECLINED") {
-      const confirmed = window.confirm("Decline this meeting request?");
+      const confirmed = await confirm({
+        title: "Decline request?",
+        message: "The request will move out of your pending queue.",
+        confirmLabel: "Decline",
+      });
       if (!confirmed) {
         return;
       }
@@ -177,6 +183,7 @@ export default function OwnerDashboardPage() {
       </div>
 
       <OwnerPolls />
+      {confirmationDialog}
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog.jsx";
 import LoadingState from "../../components/loading/LoadingState.jsx";
 import api from "../../shared/api/api.js";
 import { useAuth } from "../../features/auth/useAuth.js";
@@ -159,6 +160,7 @@ function TeamCard({ team, onView, onRefresh }) {
 
 function TeamCardView({ team, onClose, onRefresh }) {
     const { user } = useAuth();
+    const { confirm, confirmationDialog } = useConfirmationDialog();
     if (!team) return null;
 
     const isMember = Array.isArray(team.members) && team.members.some(m => {
@@ -170,7 +172,13 @@ function TeamCardView({ team, onClose, onRefresh }) {
     const members = Array.isArray(team.members) ? team.members.filter(Boolean) : [];
 
     const handleRemoveMember = async (teamId, memberId) => {
-        if (!window.confirm("Are you sure you want to remove this member?")) return;
+        const confirmed = await confirm({
+            title: "Remove member?",
+            message: "This person will be removed from the team.",
+            confirmLabel: "Remove",
+        });
+        if (!confirmed) return;
+
         try {
             await api.post(`/teams/${teamId}/remove/${memberId}`);
             onRefresh();
@@ -222,6 +230,7 @@ function TeamCardView({ team, onClose, onRefresh }) {
                     )}
                 </div>
             </div>
+            {confirmationDialog}
         </div>
     );
 }
@@ -240,8 +249,16 @@ function SearchBar({ value, onChange }) {
 }
 
 function LeaveButton({ team, onRefresh }) {
+    const { confirm, confirmationDialog } = useConfirmationDialog();
+
     const handleLeave = async () => {
-        if (!window.confirm("Are you sure you want to leave this team?")) return;
+        const confirmed = await confirm({
+            title: "Leave team?",
+            message: "You will no longer be listed as a member of this team.",
+            confirmLabel: "Leave team",
+        });
+        if (!confirmed) return;
+
         try {
             await api.post(`/teams/${team._id}/leave`);
             onRefresh();
@@ -251,13 +268,24 @@ function LeaveButton({ team, onRefresh }) {
     };
 
     return (
-        <button className="button button-secondary" onClick={handleLeave} style={{ color: "var(--color-danger)", borderColor: "var(--color-danger)" }}>Leave Team</button>
+        <>
+            <button className="button button-secondary" onClick={handleLeave} style={{ color: "var(--color-danger)", borderColor: "var(--color-danger)" }}>Leave Team</button>
+            {confirmationDialog}
+        </>
     );
 }
 
 function DeleteButton({ team, onRefresh }) {
+    const { confirm, confirmationDialog } = useConfirmationDialog();
+
     const handleDelete = async () => {
-        if (!window.confirm("Are you sure you want to delete this team? This cannot be undone.")) return;
+        const confirmed = await confirm({
+            title: "Delete team?",
+            message: "This permanently removes the team and cannot be undone.",
+            confirmLabel: "Delete team",
+        });
+        if (!confirmed) return;
+
         try {
             await api.delete(`/teams/${team._id}`);
             onRefresh();
@@ -267,7 +295,10 @@ function DeleteButton({ team, onRefresh }) {
     };
 
     return (
-        <button className="button button-secondary" onClick={handleDelete} style={{ color: "var(--color-danger)", borderColor: "var(--color-danger)" }}>Delete Team</button>
+        <>
+            <button className="button button-secondary" onClick={handleDelete} style={{ color: "var(--color-danger)", borderColor: "var(--color-danger)" }}>Delete Team</button>
+            {confirmationDialog}
+        </>
     );
 }
 

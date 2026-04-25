@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import useConfirmationDialog from "../../../components/confirmation/useConfirmationDialog";
 import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
 import {
@@ -205,6 +206,7 @@ function PollDecisionDetails({ poll, onFinalize }) {
   );
   const [saveMessage, setSaveMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { confirm, confirmationDialog } = useConfirmationDialog();
 
   const selectedFinalSlot = useMemo(() => {
     return (
@@ -219,13 +221,18 @@ function PollDecisionDetails({ poll, onFinalize }) {
     setSaveMessage("");
   }
 
-  function finalizePollDecision() {
+  async function finalizePollDecision() {
     if (!selectedFinalSlotId) {
       setSaveMessage("Choose a final time before finalizing.");
       return;
     }
 
-    const confirmed = window.confirm("Finalize this group poll?");
+    const confirmed = await confirm({
+      title: "Finalize group poll?",
+      message: "This saves the selected time as the final decision.",
+      confirmLabel: "Finalize",
+      variant: "primary",
+    });
     if (!confirmed) {
       return;
     }
@@ -287,6 +294,7 @@ function PollDecisionDetails({ poll, onFinalize }) {
           {isSubmitting ? "Finalizing..." : "Finalize Poll"}
         </button>
       </div>
+      {confirmationDialog}
     </section>
   );
 }

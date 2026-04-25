@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import useConfirmationDialog from "../../../components/confirmation/useConfirmationDialog";
 import LoadingState from "../../../components/loading/LoadingState.jsx";
 import UserInvites from "../../booking/components/UserInvites";
 import api from "../../../shared/api/api.js";
@@ -49,6 +50,7 @@ function AppointmentSection() {
   const [error, setError] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [cancellingRequestId, setCancellingRequestId] = useState(null);
+  const { confirm, confirmationDialog } = useConfirmationDialog();
 
   useEffect(() => {
     let isMounted = true;
@@ -84,7 +86,11 @@ function AppointmentSection() {
   }, []);
 
   async function deleteAppointment(appointmentId) {
-    const confirmed = window.confirm("Delete this appointment from your dashboard?");
+    const confirmed = await confirm({
+      title: "Delete appointment?",
+      message: "This removes the appointment from your dashboard.",
+      confirmLabel: "Delete",
+    });
     if (!confirmed) {
       return;
     }
@@ -105,7 +111,11 @@ function AppointmentSection() {
   }
 
   async function cancelRequest(requestId) {
-    const confirmed = window.confirm("Cancel this meeting request?");
+    const confirmed = await confirm({
+      title: "Cancel meeting request?",
+      message: "The owner will no longer see this request as pending.",
+      confirmLabel: "Cancel request",
+    });
     if (!confirmed) {
       return;
     }
@@ -164,6 +174,7 @@ function AppointmentSection() {
           ))}
         </div>
       </DashboardPanel>
+      {confirmationDialog}
     </>
   );
 }

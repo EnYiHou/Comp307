@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
 import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import "./OwnerDashboardPage.css";
@@ -16,6 +17,7 @@ export default function InviteLinksPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [workingId, setWorkingId] = useState("");
+  const { confirm, confirmationDialog } = useConfirmationDialog();
 
   async function loadLinks() {
     setLoading(true);
@@ -71,7 +73,11 @@ export default function InviteLinksPage() {
   }
 
   async function deleteLink(link) {
-    const confirmed = window.confirm("Delete this invite link?");
+    const confirmed = await confirm({
+      title: "Delete invite link?",
+      message: "People with this URL will no longer be able to use it.",
+      confirmLabel: "Delete link",
+    });
     if (!confirmed) {
       return;
     }
@@ -177,6 +183,7 @@ export default function InviteLinksPage() {
           </div>
         )}
       </section>
+      {confirmationDialog}
     </section>
   );
 }

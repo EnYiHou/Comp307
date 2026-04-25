@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
 import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import { bookingMailto } from "../../shared/utils/mailto";
@@ -28,6 +29,7 @@ export default function ManageSlotsPage() {
   const [message, setMessage] = useState("");
   const [updatingId, setUpdatingId] = useState("");
   const [deletedSlotNotice, setDeletedSlotNotice] = useState(null);
+  const { confirm, confirmationDialog } = useConfirmationDialog();
 
   async function loadSlots() {
     setLoading(true);
@@ -77,7 +79,11 @@ export default function ManageSlotsPage() {
   }
 
   async function deleteSlot(slot) {
-    const confirmed = window.confirm("Delete this slot? Reserved students should be notified by email.");
+    const confirmed = await confirm({
+      title: "Delete slot?",
+      message: "Students who reserved this time should be notified by email after deletion.",
+      confirmLabel: "Delete slot",
+    });
     if (!confirmed) {
       return;
     }
@@ -205,6 +211,7 @@ export default function ManageSlotsPage() {
           </div>
         )}
       </section>
+      {confirmationDialog}
     </section>
   );
 }

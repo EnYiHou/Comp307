@@ -1,110 +1,52 @@
 import { Link } from "react-router-dom";
+import bookingDeskImage from "../../assets/landing/booking-desk.jpg";
 import "./LandingPage.css";
 
 export default function LandingPage() {
   return (
     <main className="landing-page">
-    <section className="landing-hero">
-        <div className="hero-copy">
-          <p className="landing-eyebrow">McGill University</p>
-
-          <h1>BERK keeps appointment booking clear.</h1>
-
+      <section className="landing-hero">
+        <div className="landing-intro">
+          <p className="landing-kicker">McGill booking</p>
+          <h1>BERK</h1>
           <p className="landing-description">
-            BERK helps students, professors, and teaching assistants coordinate
-            office hours, appointments, and group meeting polls without long
-            email threads.
+            BERK helps students and staff arrange office hours, appointments,
+            and group meetings without passing long email threads back and
+            forth.
           </p>
 
-          <div className="action-row">
-            <Link className="button button-primary" to="/auth?mode=signup">
-              Get started
+          <div className="landing-actions">
+            <Link
+              className="landing-link landing-link-primary"
+              to="/auth?mode=signup"
+            >
+              Create account
             </Link>
-          </div>
-
-          <div className="trust-row">
-            <span>McGill email access</span>
-            <span>Owner-managed availability</span>
-            <span>Student booking dashboard</span>
+            <Link className="landing-link" to="/auth?mode=login">
+              Sign in
+            </Link>
           </div>
         </div>
 
-        <aside className="hero-visual">
-          <div className="visual-glow" />
-
-          <div className="schedule-card main-card">
-            <div className="card-top">
-              <div>
-                <p className="card-kicker">Today</p>
-                <h2>Available Office Hours</h2>
-              </div>
-            </div>
-
-            <div className="landing-owner-card">
-              <div className="landing-owner-avatar">MC</div>
-              <div>
-                <strong>Prof. Vybihal</strong>
-                <p>COMP 307 - Web development</p>
-              </div>
-            </div>
-
-            <div className="slot-list">
-              <div className="slot-card active">
-                <div>
-                  <strong>10:00 AM</strong>
-                  <span>30 minute appointment</span>
-                </div>
-                <p>Available</p>
-              </div>
-
-              <div className="slot-card active">
-                <div>
-                  <strong>1:30 PM</strong>
-                  <span>30 minute appointment</span>
-                </div>
-                <p>Available</p>
-              </div>
-
-              <div className="slot-card booked">
-                <div>
-                  <strong>3:00 PM</strong>
-                  <span>Reserved by student</span>
-                </div>
-                <p>Booked</p>
-              </div>
-            </div>
-          </div>
-
-          
-        </aside>
+        <img
+          className="landing-image"
+          src={bookingDeskImage}
+          alt="A desk with a laptop calendar open for appointment planning"
+        />
       </section>
 
-      <section className="landing-features">
-        <article className="feature-card">
-          <span className="feature-icon">01</span>
-          <h3>Book faster</h3>
-          <p>
-            Students can find available office-hour slots and reserve a time
-            without sending extra emails.
-          </p>
+      <section className="landing-notes" aria-label="What BERK does">
+        <article>
+          <h2>For students</h2>
+          <p>Browse staff, book an available time, or request a custom meeting.</p>
         </article>
-
-        <article className="feature-card featured">
-          <span className="feature-icon">02</span>
-          <h3>Manage availability</h3>
-          <p>
-            Professors and TAs can create private slots, activate public
-            availability, and track who booked each appointment.
-          </p>
+        <article>
+          <h2>For staff</h2>
+          <p>Create appointment slots, manage bookings, and share invite links.</p>
         </article>
-
-        <article className="feature-card">
-          <span className="feature-icon">03</span>
-          <h3>Stay organized</h3>
-          <p>
-            Dashboards keep upcoming bookings, cancellations, and appointment
-            actions in one clear place.
-          </p>
+        <article>
+          <h2>For groups</h2>
+          <p>Send a poll, collect availability, and choose the best meeting time.</p>
         </article>
       </section>
     </main>

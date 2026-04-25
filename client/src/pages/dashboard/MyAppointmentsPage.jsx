@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
 import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import { bookingMailto } from "../../shared/utils/mailto";
@@ -19,6 +20,7 @@ export default function MyAppointmentsPage() {
   const [message, setMessage] = useState("");
   const [notifyLink, setNotifyLink] = useState("");
   const [deletingId, setDeletingId] = useState("");
+  const { confirm, confirmationDialog } = useConfirmationDialog();
 
   async function loadAppointments() {
     setLoading(true);
@@ -40,7 +42,11 @@ export default function MyAppointmentsPage() {
   }, []);
 
   async function deleteAppointment(appointment) {
-    const confirmed = window.confirm("Delete this appointment?");
+    const confirmed = await confirm({
+      title: "Delete appointment?",
+      message: "This removes the booking from your appointments.",
+      confirmLabel: "Delete",
+    });
     if (!confirmed) {
       return;
     }
@@ -145,6 +151,7 @@ export default function MyAppointmentsPage() {
           </div>
         )}
       </section>
+      {confirmationDialog}
     </section>
   );
 }

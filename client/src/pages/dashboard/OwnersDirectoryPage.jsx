@@ -73,11 +73,11 @@ export default function OwnersDirectoryPage() {
     <section className="appointments-page">
       <div className="owners-page-header">
         <div>
-          <p>Availability browser</p>
+          <p>Staff directory</p>
           <h1>Book Appointments</h1>
           <span>
-            Find available appointment hosts, view open times, or request a
-            custom meeting.
+            Find appointment hosts, view open times, or request a custom
+            meeting.
           </span>
         </div>
       </div>
