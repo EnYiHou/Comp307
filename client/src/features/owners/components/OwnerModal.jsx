@@ -31,7 +31,7 @@ function BookingSlotCard({ booking, isSelected, onSelect }) {
         </span>
       )}
       <span className="owner-booking-slot_meta">
-        {formatTime(booking.startTime)} - {formatTime(booking.endTime)} ·{" "}
+        {formatTime(booking.startTime)} - {formatTime(booking.endTime)} -{" "}
         {spotsAvailable} {spotsAvailable === 1 ? "spot" : "spots"} available
       </span>
     </button>
@@ -132,7 +132,7 @@ export default function OwnerModal({
     setIsBooking(true);
 
     try {
-      const response = await acceptBooking(selectedBooking._id, user.id);
+      const response = await acceptBooking(selectedBooking._id);
       onNotify?.(response.message || "Booking accepted successfully.", "success");
       setSelectedBooking(null);
       onBookingSuccess?.();

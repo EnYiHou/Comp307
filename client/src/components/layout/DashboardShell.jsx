@@ -9,6 +9,8 @@ const links = [
     items: [
       { to: "/dashboard", label: "Dashboard" },
       { to: "/dashboard-owners", label: "Book Appointments" },
+      { to: "/dashboard/appointments", label: "My Appointments" },
+      { to: "/dashboard/request-meeting", label: "Request Meeting" },
       { to: "/tinder", label: "Tinder" },
     ],
   },
@@ -17,6 +19,12 @@ const links = [
     items: [
       { to: "/owner/dashboard", label: "Owner Dashboard" },
       { to: "/owner/slots/new", label: "Create Availability" },
+      { to: "/owner/slots", label: "Manage Slots" },
+      { to: "/owner/bookings", label: "View Bookings" },
+      { to: "/owner/requests", label: "Booking Requests" },
+      { to: "/owner/group-meetings/new", label: "Group Meetings" },
+      { to: "/owner/recurring-office-hours", label: "Recurring Hours" },
+      { to: "/owner/invite-links", label: "Invite Links" },
     ],
   },
 ];

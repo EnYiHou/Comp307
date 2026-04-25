@@ -3,6 +3,7 @@ import DashboardShell from "../../components/layout/DashboardShell";
 import PublicShell from "../../components/layout/PublicShell";
 import MyAppointmentsPage from "../../pages/dashboard/MyAppointmentsPage";
 import BookAppointmentPage from "../../pages/dashboard/BookAppointmentPage";
+import InviteBookingPage from "../../pages/dashboard/InviteBookingPage";
 import RequestMeetingPage from "../../pages/dashboard/RequestMeetingPage";
 import SettingsPage from "../../pages/dashboard/SettingsPage";
 import UserDashboardPage from "../../pages/dashboard/UserDashboardPage";
@@ -54,6 +55,7 @@ export default function AppRouter() {
             element={<RequestMeetingPage />}
           />
           <Route path="/owners" element={<OwnersDirectoryPage />} />
+          <Route path="/invite/:token" element={<InviteBookingPage />} />
 
           <Route path="/dashboard/settings" element={<SettingsPage />} />
           <Route

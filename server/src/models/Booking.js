@@ -166,6 +166,11 @@ const bookingPollsSchema = new mongoose.Schema(
             type: String,
             default: null,
         },
+        recurrenceCount: {
+            type: Number,
+            default: 1,
+            min: 1,
+        },
         createdBookingIds: [
             {
                 type: mongoose.Schema.Types.ObjectId,

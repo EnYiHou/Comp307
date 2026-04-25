@@ -1,5 +1,5 @@
 import express from "express";
-import requireAuth from "../middleware/authMiddleware.js";
+import requireAuth, { requireRole } from "../middleware/authMiddleware.js";
 import { Booking } from "../models/Booking.js";
 import MeetingRequest from "../models/MeetingRequest.js";
 import User from "../models/User.js";
@@ -61,7 +61,7 @@ router.post("/", requireAuth, async (req, res, next) => {
   }
 });
 
-router.get("/owner", requireAuth, async (req, res, next) => {
+router.get("/owner", requireAuth, requireRole("OWNER"), async (req, res, next) => {
   try {
     const status = req.query.status || "PENDING";
     const requests = await MeetingRequest.find({
@@ -77,7 +77,7 @@ router.get("/owner", requireAuth, async (req, res, next) => {
   }
 });
 
-router.get("/owner/upcoming", requireAuth, async (req, res, next) => {
+router.get("/owner/upcoming", requireAuth, requireRole("OWNER"), async (req, res, next) => {
   try {
     const now = new Date();
 
@@ -117,7 +117,7 @@ router.get("/user", requireAuth, async (req, res, next) => {
   }
 });
 
-router.patch("/:requestId/status", requireAuth, async (req, res, next) => {
+router.patch("/:requestId/status", requireAuth, requireRole("OWNER"), async (req, res, next) => {
   try {
     const { requestId } = req.params;
     const { status } = req.body;

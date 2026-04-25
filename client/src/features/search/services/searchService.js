@@ -11,19 +11,19 @@ export async function getAll(searchTerm) {
 
 
 export async function getOwners(searchTerm) {
-    const response = await api.get("/dashboard/searchOwners", {
+    const response = await api.get("/owners", {
         params: {
             q: searchTerm
         }
     });
-    return response.data;
+    return response.data.data;
 }
 
 export async function getMcGillOwners(searchTerm) {
-    const response = await api.get("/dashboard/searchMcGillOwners", {
+    const response = await api.get("/owners/all-mcgill", {
         params: {
             q: searchTerm
         }
     });
-    return response.data;
+    return response.data.data;
 }

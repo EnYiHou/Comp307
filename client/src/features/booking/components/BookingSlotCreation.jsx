@@ -418,6 +418,16 @@ function TypeStep({ formData, onModeChange, onChange }) {
               }
             />
           </div>
+          <label className="availability-field availability-field-inline">
+            <span>How many weekly meetings after final selection?</span>
+            <input
+              type="number"
+              min="1"
+              name="recurrenceCount"
+              value={formData.recurrenceCount}
+              onChange={onChange}
+            />
+          </label>
         </div>
       )}
 
@@ -595,6 +605,12 @@ function ReviewStep({ formData, selectedSlots, selectedUsers }) {
             }
           />
           <ReviewItem label="Invited users" value={String(selectedUsers.length)} />
+          <ReviewItem
+            label="Final recurrence"
+            value={`${formData.recurrenceCount} week${
+              Number(formData.recurrenceCount) === 1 ? "" : "s"
+            }`}
+          />
         </>
       )}
       <ReviewItem

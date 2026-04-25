@@ -10,9 +10,7 @@ export async function getOwnerBookings(ownerId, userId) {
     return response.data.data;
 }
 
-export async function acceptBooking(bookingId, userId) {
-    const response = await api.post(`/bookings/${bookingId}/accept`, {
-        userId,
-    });
+export async function acceptBooking(bookingId) {
+    const response = await api.post(`/bookings/${bookingId}/accept`);
     return response.data;
 }

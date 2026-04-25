@@ -1,7 +1,7 @@
 import express from 'express';
 import { Booking, BookingRequest, BookingPoll } from "../models/Booking.js";
 import User from "../models/User.js";
-import requireAuth from "../middleware/authMiddleware.js";
+import requireAuth, { requireRole } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -23,7 +23,7 @@ router.get('/appointments', requireAuth, async (req, res, next) => {
 });
 
 
-router.post('/createBookingSlot', requireAuth, async (req, res) => {
+router.post('/createBookingSlot', requireAuth, requireRole("OWNER"), async (req, res) => {
     try {
         const userId = req.user.id;
         const bookingData = req.body;
@@ -54,6 +54,7 @@ router.post('/createBookingSlot', requireAuth, async (req, res) => {
 
 async function createBookingSlot(userId, bookingData) {
     const recurrenceCount = Math.max(1, Number(bookingData.recurrenceCount) || 1);
+    const capacity = Math.max(1, Number(bookingData.capacity) || 1);
     const slotsToCreate = bookingData.selectedSlots.flatMap((slot) => {
         const slotStart = new Date(slot.start);
         const slotEnd = new Date(slot.end);
@@ -65,7 +66,7 @@ async function createBookingSlot(userId, bookingData) {
             startTime: addWeeks(slotStart, weekOffset),
             endTime: addWeeks(slotEnd, weekOffset),
             visibility: bookingData.visibility,
-            capacity: bookingData.capacity,
+            capacity,
             status: "open",
             participants: [],
         }));
@@ -106,6 +107,7 @@ async function createBookingGroup(userId, bookingData) {
         rangeStart: bookingData.rangeStart ? new Date(bookingData.rangeStart) : null,
         rangeEnd: bookingData.rangeEnd ? new Date(bookingData.rangeEnd) : null,
         status: "collectingVotes",
+        recurrenceCount: Math.max(1, Number(bookingData.recurrenceCount) || 1),
     }
 
     return await BookingPoll.create(pollsToCreate)
@@ -113,8 +115,8 @@ async function createBookingGroup(userId, bookingData) {
 
 function generateHeatmapCandidates(rangeStart, rangeEnd) {
     const SLOTS_MINUTES_INTERVAL = 30;
-    const DAYS_HOUR_START = 8;
-    const DAYS_HOUR_END = 18;
+    const DAYS_HOUR_START = 6;
+    const DAYS_HOUR_END = 23;
 
     const slots = [];
 
@@ -128,7 +130,7 @@ function generateHeatmapCandidates(rangeStart, rangeEnd) {
         const daySLotEnd = new Date(currentDay)
         daySLotEnd.setHours(DAYS_HOUR_END, 0, 0, 0);
         let currentSlotStart = new Date(daySlotStart);
-        while (currentSlotStart <= daySLotEnd) {
+        while (currentSlotStart < daySLotEnd) {
             const currentSlotEnd = new Date(currentSlotStart);
             currentSlotEnd.setMinutes(currentSlotEnd.getMinutes() + SLOTS_MINUTES_INTERVAL);
             slots.push({
@@ -143,7 +145,7 @@ function generateHeatmapCandidates(rangeStart, rangeEnd) {
     return slots;
 }
 
-router.get('/searchOwners', requireAuth, makeUserSearchHandler(["OWNER"]));
+router.get('/searchOwners', requireAuth, makeUserSearchHandler(["OWNER"], { availableOnly: true }));
 router.get('/searchMcGillOwners', requireAuth, makeUserSearchHandler(["OWNER"], { emailDomain: "mcgill.ca" }));
 router.get('/searchAll', requireAuth, makeUserSearchHandler(["USER", "OWNER"]));
 
@@ -303,14 +305,14 @@ router.patch("/pollVoting/:pollId", requireAuth, async (req, res) => {
     }
 });
 
-router.get('/getPolls', requireAuth, async (req, res) => {
+router.get('/getPolls', requireAuth, requireRole("OWNER"), async (req, res) => {
     try {
         const userId = req.user.id;
         const polls = await BookingPoll.find({
             ownerId: userId,
             status: "collectingVotes",
         })
-            .select("_id title description candidateSlots method rangeStart rangeEnd status finalSelection createdBookingIds updatedAt")
+            .select("_id title description invitedUsers candidateSlots method rangeStart rangeEnd status finalSelection recurrenceCount createdBookingIds updatedAt")
             .sort({ updatedAt: -1 })
             .lean();
 
@@ -332,6 +334,7 @@ router.get('/getPolls', requireAuth, async (req, res) => {
                 rangeEnd: poll.rangeEnd,
                 status: poll.status,
                 finalSelection: poll.finalSelection,
+                recurrenceCount: poll.recurrenceCount,
                 createdBookingIds: poll.createdBookingIds,
                 updatedAt: poll.updatedAt,
             };
@@ -347,7 +350,7 @@ router.get('/getPolls', requireAuth, async (req, res) => {
     }
 });
 
-router.patch("/pollDecision/:pollId", requireAuth, async (req, res) => {
+router.patch("/pollDecision/:pollId", requireAuth, requireRole("OWNER"), async (req, res) => {
     try {
         const userId = req.user.id;
         const pollId = req.params.pollId;
@@ -373,26 +376,28 @@ router.patch("/pollDecision/:pollId", requireAuth, async (req, res) => {
             });
         }
 
-        const createdBooking = await Booking.create({
-            ownerId: userId,
-            title: poll.title,
-            description: poll.description,
-            startTime: finalSlot.startTime,
-            endTime: finalSlot.endTime,
-            visibility: "public",
-            status: "reserved",
-            participants: finalSlot.selectedByUsers,
-            capacity: poll.invitedUsers.length + 1,
-        });
-
-        let createdBookingId = createdBooking._id;
+        const recurrenceCount = Math.max(1, Number(poll.recurrenceCount) || 1);
+        const participants = [...new Set(poll.invitedUsers.map((id) => String(id)))];
+        const createdBookings = await Booking.insertMany(
+            Array.from({ length: recurrenceCount }, (_, weekOffset) => ({
+                ownerId: userId,
+                title: poll.title,
+                description: poll.description,
+                startTime: addWeeks(finalSlot.startTime, weekOffset),
+                endTime: addWeeks(finalSlot.endTime, weekOffset),
+                visibility: "public",
+                status: "reserved",
+                participants,
+                capacity: Math.max(participants.length, 1),
+            })),
+        );
 
         poll.status = "finalized";
         poll.finalSelection = {
             startTime: finalSlot.startTime,
             endTime: finalSlot.endTime,
         };
-        poll.createdBookingIds = createdBookingId ? [createdBookingId] : [];
+        poll.createdBookingIds = createdBookings.map((booking) => booking._id);
         await poll.save();
 
         res.status(200).json({

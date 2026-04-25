@@ -1,8 +1,66 @@
 import express from "express";
-import { sendPlaceholder } from "../utils/response.js";
+import requireAuth from "../middleware/authMiddleware.js";
+import { Booking } from "../models/Booking.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => sendPlaceholder(res, "Owners"));
+router.get("/", requireAuth, async (req, res, next) => {
+  try {
+    const query = (req.query.q || "").trim();
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(escapedQuery, "i");
+
+    const ownerIdsWithActiveSlots = await Booking.distinct("ownerId", {
+      visibility: "public",
+      status: "open",
+      startTime: { $gte: new Date() },
+      participants: { $ne: req.user.id },
+    });
+
+    const owners = await User.find({
+      _id: { $in: ownerIdsWithActiveSlots, $ne: req.user.id },
+      role: "OWNER",
+      email: /@mcgill\.ca$/i,
+      ...(query
+        ? {
+            $or: [{ name: regex }, { email: regex }],
+          }
+        : {}),
+    })
+      .select("_id name email role")
+      .sort({ name: 1 });
+
+    res.json({ success: true, data: owners });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/all-mcgill", requireAuth, async (req, res, next) => {
+  try {
+    const query = (req.query.q || "").trim();
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(escapedQuery, "i");
+
+    const owners = await User.find({
+      _id: { $ne: req.user.id },
+      role: "OWNER",
+      email: /@mcgill\.ca$/i,
+      ...(query
+        ? {
+            $or: [{ name: regex }, { email: regex }],
+          }
+        : {}),
+    })
+      .select("_id name email role")
+      .sort({ name: 1 })
+      .limit(25);
+
+    res.json({ success: true, data: owners });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;

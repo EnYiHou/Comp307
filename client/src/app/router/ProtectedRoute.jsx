@@ -10,7 +10,7 @@ export default function ProtectedRoute({ allowedRoles, redirectTo = "/dashboard"
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/auth?mode=login" replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {

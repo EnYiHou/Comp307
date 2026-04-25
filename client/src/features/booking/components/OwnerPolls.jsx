@@ -262,6 +262,7 @@ function PollDecisionDetails({ poll, onFinalize }) {
       <div className="owner-poll-details__meta">
         <span>{poll.method === "heatmap" ? "Heatmap" : "Calendar"}</span>
         <span>{poll.candidateSlots?.length ?? 0} candidate times</span>
+        <span>{poll.recurrenceCount || 1} week(s)</span>
         <span>{formatFinalSelection(selectedFinalSlot)}</span>
       </div>
 

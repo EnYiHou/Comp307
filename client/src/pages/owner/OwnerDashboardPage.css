@@ -249,6 +249,7 @@
 }
 
 .owner-request-actions button,
+.owner-request-actions a,
 .owner-booking-card a,
 .owner-empty-state a {
   padding: 0.45rem 0.7rem;

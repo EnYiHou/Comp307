@@ -46,9 +46,15 @@ export async function registerUser(formData) {
     const nEmail = email.toLowerCase().trim();
 
     // Check if email is a valid McGill email
-    const validEmail = email.endsWith("@mcgill.ca") || email.endsWith("@mail.mcgill.ca");
+    const validEmail = nEmail.endsWith("@mcgill.ca") || nEmail.endsWith("@mail.mcgill.ca");
     if (!validEmail) {
         const error = new Error("Only McGill email addresses are allowed");
+        error.status = 400;
+        throw error;
+    }
+
+    if (!username?.trim() || !password) {
+        const error = new Error("Username and password are required");
         error.status = 400;
         throw error;
     }
@@ -69,7 +75,7 @@ export async function registerUser(formData) {
         name: username,
         email: nEmail,
         passwordHash: hashedPassword,
-        role: email.endsWith("@mcgill.ca") ? "OWNER" : "USER",
+        role: nEmail.endsWith("@mcgill.ca") ? "OWNER" : "USER",
     });
     await user.save();
 

@@ -1,5 +1,81 @@
 import { Booking } from "../models/Booking.js";
 
+function parseBookingDates(startTime, endTime) {
+    const parsedStartTime = new Date(startTime);
+    const parsedEndTime = new Date(endTime);
+
+    if (Number.isNaN(parsedStartTime.getTime()) || Number.isNaN(parsedEndTime.getTime())) {
+        const error = new Error("Invalid booking date");
+        error.status = 400;
+        throw error;
+    }
+
+    if (parsedEndTime <= parsedStartTime) {
+        const error = new Error("End time must be after start time");
+        error.status = 400;
+        throw error;
+    }
+
+    return { parsedStartTime, parsedEndTime };
+}
+
+function normalizeCapacity(capacity) {
+    const parsedCapacity = Number(capacity);
+    if (!Number.isInteger(parsedCapacity) || parsedCapacity < 1) {
+        const error = new Error("Capacity must be at least 1");
+        error.status = 400;
+        throw error;
+    }
+
+    return parsedCapacity;
+}
+
+export const listMyAppointments = async (req, res, next) => {
+    try {
+        const appointments = await Booking.find({
+            participants: req.user.id,
+        })
+            .populate("ownerId", "name email")
+            .sort({ startTime: 1 })
+            .lean();
+
+        res.json({ success: true, data: appointments });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const listOwnerSlots = async (req, res, next) => {
+    try {
+        const bookings = await Booking.find({
+            ownerId: req.user.id,
+        })
+            .populate("participants", "name email")
+            .sort({ startTime: 1 })
+            .lean();
+
+        res.json({ success: true, data: bookings });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const listOwnerUpcomingBookings = async (req, res, next) => {
+    try {
+        const bookings = await Booking.find({
+            ownerId: req.user.id,
+            startTime: { $gte: new Date() },
+        })
+            .populate("participants", "name email")
+            .sort({ startTime: 1 })
+            .lean();
+
+        res.json({ success: true, data: bookings });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getOwnerBookingById = async (req, res, next) => {
     try {
         const { bookingId } = req.params;
@@ -7,7 +83,7 @@ export const getOwnerBookingById = async (req, res, next) => {
         const booking = await Booking.findOne({
             _id: bookingId,
             ownerId: req.user.id,
-        });
+        }).populate("participants", "name email");
 
         if (!booking) {
             return res.status(404).json({ message: "Booking not found" });
@@ -41,18 +117,8 @@ export const updateOwnerBooking = async (req, res, next) => {
             });
         }
 
-        const parsedStartTime = new Date(startTime);
-        const parsedEndTime = new Date(endTime);
-
-        if (Number.isNaN(parsedStartTime.getTime()) || Number.isNaN(parsedEndTime.getTime())) {
-            return res.status(400).json({ message: "Invalid booking date" });
-        }
-
-        if (parsedEndTime <= parsedStartTime) {
-            return res.status(400).json({
-                message: "End time must be after start time",
-            });
-        }
+        const { parsedStartTime, parsedEndTime } = parseBookingDates(startTime, endTime);
+        const parsedCapacity = normalizeCapacity(capacity);
 
         const booking = await Booking.findOneAndUpdate(
             {
@@ -66,10 +132,10 @@ export const updateOwnerBooking = async (req, res, next) => {
                 endTime: parsedEndTime,
                 visibility,
                 status,
-                capacity,
+                capacity: parsedCapacity,
             },
             { new: true, runValidators: true },
-        );
+        ).populate("participants", "name email");
 
         if (!booking) {
             return res.status(404).json({ message: "Booking not found" });
@@ -85,6 +151,29 @@ export const updateOwnerBooking = async (req, res, next) => {
     }
 };
 
+export const deleteOwnerBooking = async (req, res, next) => {
+    try {
+        const { bookingId } = req.params;
+
+        const booking = await Booking.findOneAndDelete({
+            _id: bookingId,
+            ownerId: req.user.id,
+        }).populate("participants", "name email");
+
+        if (!booking) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        res.json({
+            success: true,
+            data: booking,
+            message: "Booking deleted successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const deleteMyAppointment = async (req, res, next) => {
     try {
         const { bookingId } = req.params;
@@ -94,7 +183,7 @@ export const deleteMyAppointment = async (req, res, next) => {
             _id: bookingId,
             participants: userId,
             startTime: { $gte: new Date() },
-        });
+        }).populate("ownerId", "name email");
 
         if (!booking) {
             return res.status(404).json({ message: "Appointment not found" });
@@ -112,6 +201,7 @@ export const deleteMyAppointment = async (req, res, next) => {
 
         res.json({
             success: true,
+            data: booking,
             message: "Appointment deleted successfully",
         });
     } catch (error) {
@@ -121,20 +211,19 @@ export const deleteMyAppointment = async (req, res, next) => {
 
 export const getBookingsByOwner = async (req, res, next) => {
     try {
-        const { ownerId, userId } = req.query;
+        const { ownerId } = req.query;
 
-        const bookingQuery = {
+        if (!ownerId) {
+            return res.status(400).json({ message: "Owner is required" });
+        }
+
+        const bookings = await Booking.find({
             ownerId,
             visibility: "public",
             status: "open",
             startTime: { $gte: new Date() },
-        };
-
-        if (userId) {
-            bookingQuery.participants = { $ne: userId };
-        }
-
-        const bookings = await Booking.find(bookingQuery).sort({ startTime: 1 });
+            participants: { $ne: req.user.id },
+        }).sort({ startTime: 1 });
 
         res.json({
             success: true,
@@ -148,17 +237,21 @@ export const getBookingsByOwner = async (req, res, next) => {
 export const acceptBooking = async (req, res, next) => {
     try {
         const { bookingId } = req.params;
-        const { userId } = req.body;
+        const userId = req.user.id;
 
         const booking = await Booking.findOne({
             _id: bookingId,
             visibility: "public",
             status: "open",
             startTime: { $gte: new Date() },
-        });
+        }).populate("ownerId", "name email");
 
         if (!booking) {
             return res.status(404).json({ message: "Booking not found" });
+        }
+
+        if (booking.ownerId?._id?.toString() === userId || booking.ownerId?.toString() === userId) {
+            return res.status(400).json({ message: "You cannot book your own slot" });
         }
 
         if (booking.participants.some((participantId) => participantId.toString() === userId)) {
@@ -179,10 +272,10 @@ export const acceptBooking = async (req, res, next) => {
 
         res.json({
             success: true,
+            data: booking,
             message: "Booking accepted successfully",
         });
-    }
-    catch (error) {
+    } catch (error) {
         next(error);
     }
 };
