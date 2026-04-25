@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import bookingDeskImage from "../../assets/landing/booking-desk.jpg";
 import "./LandingPage.css";
 
 export default function LandingPage() {
@@ -30,7 +29,7 @@ export default function LandingPage() {
 
         <img
           className="landing-image"
-          src={bookingDeskImage}
+          src="/images/booking-desk.jpg"
           alt="A desk with a laptop calendar open for appointment planning"
         />
       </section>
