@@ -12,7 +12,6 @@ router.get('/appointments', async (req, res) => {
 
 
 router.post('/createBookingSlot', requireAuth, async (req, res) => {
-    console.log("YOYOYOYOYOY");
     try {
         const userId = req.user.id;
         const bookingData = req.body;
@@ -122,4 +121,47 @@ function generateHeatmapCandidates(rangeStart, rangeEnd) {
 
 export default router
 
+
+
+
+
+
+router.get('/searchOwners', requireAuth, makeUserSearchHandler(["OWNER"]));
+router.get('/searchAll', requireAuth, makeUserSearchHandler(["USER", "OWNER"]));
+
+function makeUserSearchHandler(roles) {
+    return async function (req, res) {
+        try {
+            const query = (req.query.q || "").trim();
+            const users = await searchAllUsers(req.user.id, query, roles);
+            return res.status(200).json(users);
+        }
+        catch (error) {
+            console.error("User search error:", error);
+            return res.status(500).json({
+                message: "Failed to search users",
+            });
+        }
+    };
+}
+
+async function searchAllUsers(id, query, roles) {
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(escapedQuery, "i");
+
+    const users = await User.find({
+        role: { $in: roles },
+        _id: { $ne: id },
+        $or: [
+            { name: regex },
+            { name: regex },
+        ],
+    })
+        .select("_id name email role")
+        .sort({ name: 1 })
+        .limit(10);
+
+    return users;
+}
 

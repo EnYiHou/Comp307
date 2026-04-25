@@ -1,12 +1,11 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
+import { AuthContext } from "./authContext.js";
 import {
   getCurrentUser as getCurrentUserService,
   login as loginService,
   logout as logoutService,
   register as registerService,
-} from "../services/authService.js";
-
-const AuthContext = createContext(null);
+} from "./authService.js";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -54,7 +53,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
-export const useAuth = () => {
-  return useContext(AuthContext);
-};

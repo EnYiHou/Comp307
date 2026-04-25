@@ -1,4 +1,4 @@
-import { useAuth } from "../../context/AuthContext.jsx";
+import { useAuth } from "../../features/auth/useAuth.js";
 
 export default function UserDashboardPage() {
   const { logout } = useAuth();
