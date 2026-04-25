@@ -1,6 +1,6 @@
 .landing-page {
   min-height: calc(100vh - 72px);
-  overflow-x: clip;
+  overflow: hidden;
   color: #191919;
   background: linear-gradient(135deg, #fbfaf8 0%, #f5f1ed 52%, #ffffff 100%);
   padding: 76px 24px 64px;
@@ -59,7 +59,6 @@
 
 .action-row {
   display: flex;
-  flex-wrap: wrap;
   gap: 14px;
   margin-top: 38px;
 }

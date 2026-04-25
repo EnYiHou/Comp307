@@ -43,10 +43,9 @@
   gap: var(--spacing-3);
   margin-bottom: var(--spacing-5);
   padding: var(--spacing-3);
-  border: 1px solid rgb(215 203 192 / 0.58);
-  border-radius: 1.1rem;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.78), rgb(248 244 239 / 0.72));
-  box-shadow: 0 16px 34px rgb(31 31 31 / 0.05);
+  border: 1px solid rgb(215 203 192 / 0.72);
+  border-radius: var(--radius-lg);
+  background: rgb(255 255 255 / 0.66);
 }
 
 .dashboard-quick-action {
@@ -88,27 +87,23 @@
 
 .dashboard-panel {
   min-width: 0;
-  min-height: 380px;
-  max-height: 560px;
+  min-height: 420px;
+  max-height: 520px;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgb(215 203 192 / 0.6);
-  border-radius: 1.15rem;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(248 244 239 / 0.8)),
-    var(--color-surface);
-  box-shadow: 0 18px 38px rgb(31 31 31 / 0.07);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition:
     border-color 150ms ease,
-    box-shadow 150ms ease,
-    transform 150ms ease;
+    box-shadow 150ms ease;
 }
 
 .dashboard-panel:hover {
   border-color: rgb(237 27 47 / 0.32);
-  box-shadow: 0 22px 42px rgb(31 31 31 / 0.1);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .dashboard-panel--wide {
@@ -122,8 +117,7 @@
   justify-content: space-between;
   gap: var(--spacing-4);
   padding: var(--spacing-5);
-  border-bottom: 1px solid rgb(215 203 192 / 0.62);
-  background: rgb(255 255 255 / 0.62);
+  border-bottom: 1px solid rgb(215 203 192 / 0.72);
 }
 
 .dashboard-panel__header h2,
@@ -169,7 +163,6 @@
   flex: 1;
   overflow: auto;
   padding: var(--spacing-3) var(--spacing-5) var(--spacing-5);
-  overscroll-behavior: contain;
 }
 
 .dashboard-list {
@@ -184,14 +177,11 @@
   gap: var(--spacing-4);
   padding: var(--spacing-4) 0;
   border-bottom: 1px solid rgb(215 203 192 / 0.65);
-  transition:
-    background-color 150ms ease,
-    transform 150ms ease;
+  transition: background-color 150ms ease;
 }
 
 .dashboard-row:hover {
   background: rgb(248 244 239 / 0.7);
-  transform: translateY(-1px);
 }
 
 .dashboard-row:last-child {
@@ -311,10 +301,6 @@
   .user-dashboard {
     width: min(100% - 32px, 1180px);
     padding: var(--spacing-6) 0;
-  }
-
-  .dashboard-panel {
-    min-height: 340px;
   }
 
   .dashboard-row {
