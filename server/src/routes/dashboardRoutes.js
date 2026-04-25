@@ -88,7 +88,7 @@ async function createBookingGroup(userId, bookingData) {
         ownerId: userId,
         title: bookingData.title,
         description: bookingData.description,
-        invitedUsers: [],
+        invitedUsers: bookingData.invitedUsers,
         method: bookingData.pollMethod,
         candidateSlots,
         rangeStart: bookingData.rangeStart ? new Date(bookingData.rangeStart) : null,
@@ -186,5 +186,106 @@ async function searchAllUsers(id, query, roles, options = {}) {
 
     return users;
 }
+
+router.get('/getInvites', requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const invites = await BookingPoll.find({
+            invitedUsers: userId
+        })
+            .select("_id title description candidateSlots ownerId method rangeStart rangeEnd status updatedAt")
+            .populate("ownerId", "_id name email")
+            .sort({ updatedAt: -1 })
+            .lean();
+
+        const safeInvites = invites.map((invite) => {
+            const safeCandidateSlots = invite.candidateSlots.map((slot) => {
+                const selectedByUsers = slot.selectedByUsers;
+                const selectedByCurrentUser = selectedByUsers.some((selectedUserId) => String(selectedUserId) === String(userId));
+
+                return {
+                    _id: slot._id,
+                    startTime: slot.startTime,
+                    endTime: slot.endTime,
+                    voteCount: selectedByUsers.length,
+                    selectedByCurrentUser,
+                }
+            });
+
+            const voteAny = safeCandidateSlots.some((slot) => slot.selectedByCurrentUser);
+            return {
+                _id: invite._id,
+                title: invite.title,
+                description: invite.description,
+                candidateSlots: safeCandidateSlots,
+                ownerId: invite.ownerId,
+                method: invite.method,
+                rangeStart: invite.rangeStart,
+                rangeEnd: invite.rangeEnd,
+                status: invite.status,
+                updatedAt: invite.updatedAt,
+                voteAny,
+            }
+        })
+
+        res.status(200).json(safeInvites);
+    }
+    catch (error) {
+        console.error("Failed to fetch invites: ", error);
+        res.status(500).json({
+            message: "Failed to retrive invites"
+        });
+    }
+});
+
+
+
+router.patch("/pollVoting/:pollId", requireAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const pollId = req.params.pollId;
+        const selectedSlotIds = req.body.selectedSlotIds;
+
+        await BookingPoll.updateOne(
+            {
+                _id: pollId,
+                invitedUsers: userId,
+            },
+            {
+                $pull: {
+                    "candidateSlots.$[].selectedByUsers": userId,
+                },
+            }
+        );
+        if (selectedSlotIds.length > 0) {
+            await BookingPoll.updateOne(
+                {
+                    _id: pollId,
+                    invitedUsers: userId,
+                },
+                {
+                    $addToSet: {
+                        "candidateSlots.$[slot].selectedByUsers": userId,
+                    },
+                },
+                {
+                    arrayFilters: [
+                        {
+                            "slot._id": { $in: selectedSlotIds },
+                        },
+                    ],
+                }
+            );
+        }
+        res.status(200).json({
+            message: "Changes saved.",
+        });
+    } catch (error) {
+        console.error("Failed to save poll vote:", error);
+        res.status(500).json({
+            message: "Failed to save vote.",
+        });
+    }
+});
 
 export default router

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./dashboard.css";
 import api from '../../../shared/api/api.js';
+import UserInvites from '../../booking/components/UserInvites';
 
 function AppointmentSection() {
     const [appointments, setAppointments] = useState([]);
@@ -197,6 +198,7 @@ function Dashboard() {
         <section className="dashboard-appointments">
             <h2>Dashboard</h2>
             <AppointmentSection />
+            <UserInvites />
         </section>
     )
 }
