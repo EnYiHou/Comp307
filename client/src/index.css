@@ -48,6 +48,7 @@
   --radius-lg: 0.75rem;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
   --shadow-md: 0 8px 24px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 18px 44px rgb(31 31 31 / 0.12);
 }
 
 html {
@@ -61,7 +62,9 @@ body {
   font-weight: var(--font-weight-normal);
   line-height: 1.5;
   color: var(--color-text);
-  background: var(--color-background);
+  background:
+    linear-gradient(180deg, #fffaf7 0%, var(--color-background) 320px),
+    var(--color-background);
 }
 
 #root {
@@ -95,13 +98,14 @@ select {
   padding: 0.9rem 1.4rem;
   width: auto;
   border: 1px solid transparent;
-  border-radius: 1rem;
+  border-radius: var(--radius-md);
   background: var(--color-primary);
   color: var(--color-surface);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
   transition:
     transform 160ms ease,
+    box-shadow 160ms ease,
     background-color 160ms ease,
     color 160ms ease,
     border-color 160ms ease;
@@ -111,6 +115,7 @@ select {
   transform: translateY(-1px);
   background: var(--color-primary-dark);
   color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .button-secondary {
@@ -139,4 +144,68 @@ input {
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
+}
+
+input,
+select,
+textarea {
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(237 27 47 / 0.12);
+}
+
+textarea,
+select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.page-stack {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: var(--spacing-8) 0;
+}
+
+.page-stack > h1,
+.page-stack > h2 {
+  margin: 0 0 var(--spacing-2);
+  font-family: var(--font-family-heading);
+  color: var(--color-secondary);
+}
+
+.page-stack > p {
+  max-width: 720px;
+  margin: 0 0 var(--spacing-6);
+  color: var(--color-muted);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgb(237 27 47 / 0.24);
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  .page-stack {
+    width: min(100% - 32px, 1120px);
+    padding: var(--spacing-6) 0;
+  }
 }

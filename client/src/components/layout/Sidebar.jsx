@@ -25,7 +25,7 @@ export default function Sidebar({ links }) {
           className="collapse-btn"
           onClick={() => setCollapsed(!collapsed)}
         >
-          {collapsed ? "coll" : "open"}
+          {collapsed ? "Show" : "Hide"}
         </button>
       </div>
 

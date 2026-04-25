@@ -6,7 +6,8 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgb(0 0 0 / 45%);
+  background: rgb(31 31 31 / 48%);
+  backdrop-filter: blur(3px);
 }
 
 .request-modal {
@@ -14,8 +15,10 @@
   max-height: 90vh;
   overflow: auto;
   padding: 20px;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   background: white;
+  box-shadow: var(--shadow-lg);
 }
 
 .request-modal-header {
@@ -33,9 +36,9 @@
 .request-modal-header button,
 .request-form button {
   padding: 8px 12px;
-  border: 1px solid #111;
-  border-radius: 6px;
-  background: #111;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
   color: white;
   cursor: pointer;
 }
@@ -51,8 +54,8 @@
 .request-modal textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: white;
 }
 
@@ -64,7 +67,7 @@
 
 .teacher-search-results p {
   margin: 0;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .teacher-search-results button {
@@ -72,20 +75,20 @@
   gap: 2px;
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: white;
-  color: #111;
+  color: var(--color-text);
   text-align: left;
   cursor: pointer;
 }
 
 .teacher-search-results button:hover {
-  border-color: #111;
+  border-color: var(--color-primary);
 }
 
 .teacher-search-results span {
-  color: #666;
+  color: var(--color-muted);
   font-size: 14px;
 }
 
@@ -104,21 +107,21 @@
 
 .request-selected-teacher p {
   margin: 0;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .request-selected-teacher button {
   padding: 6px 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: white;
-  color: #111;
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .request-form-message {
   margin: 0;
-  color: #b00020;
+  color: var(--color-danger);
 }
 
 .request-form button:disabled {

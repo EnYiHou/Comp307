@@ -12,7 +12,8 @@
   width: 100%;
   z-index: 100;
   padding: 0 1.5rem;
-  background: var(--color-background);
+  background: rgb(248 244 239 / 0.92);
+  backdrop-filter: blur(10px);
 }
 
 .app-header_brand {
@@ -37,4 +38,13 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   text-decoration: none;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-md);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.app-header_nav a:hover {
+  background: rgb(237 27 47 / 0.08);
 }

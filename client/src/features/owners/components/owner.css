@@ -1,25 +1,31 @@
 .owner-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-5);
 }
 
 .owner-card {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  min-height: 180px;
-  padding: 1rem;
+  min-height: 210px;
+  padding: var(--spacing-5);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   background: var(--color-surface);
   color: inherit;
   text-align: left;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    border-color 150ms ease;
 }
 
 .owner-card:hover {
+  transform: translateY(-2px);
   border-color: var(--color-primary);
-  box-shadow: 0 8px 20px rgb(0 0 0 / 10%);
+  box-shadow: var(--shadow-md);
 }
 
 .owner-card__avatar {
@@ -27,10 +33,22 @@
   place-items: center;
   width: 48px;
   height: 48px;
-  border-radius: 999px;
-  background: var(--color-primary);
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   color: white;
   font-weight: 700;
+}
+
+.owner-card__body h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-secondary);
+}
+
+.owner-card__body p {
+  margin: var(--spacing-1) 0 0;
+  color: var(--color-muted);
+  word-break: break-word;
 }
 
 .owner-card__actions {
@@ -45,6 +63,14 @@
   border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.owner-card__action:hover {
+  transform: translateY(-1px);
 }
 
 .owner-card__action--secondary {
@@ -68,7 +94,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(0 0 0 / 45%);
+  background: rgb(31 31 31 / 48%);
+  backdrop-filter: blur(3px);
   z-index: 100;
 }
 
@@ -77,6 +104,7 @@
   max-height: 85vh;
   overflow: auto;
   padding: 1.5rem;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   box-shadow: var(--shadow-md);
@@ -91,9 +119,12 @@
 }
 
 .owner-modal_close-button {
-  background: transparent;
-  border: none;
-  color: red;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-danger);
   font-size: 1rem;
   cursor: pointer;
 }
@@ -170,12 +201,17 @@
   color: var(--color-text);
   text-align: left;
   cursor: pointer;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease;
 }
 
 .owner-booking-slot:hover,
 .owner-booking-slot:focus-visible,
 .owner-booking-slot.is-selected {
   border-color: var(--color-primary);
+  transform: translateY(-1px);
 }
 
 .owner-booking-slot.is-selected {

@@ -51,8 +51,14 @@
 
 /* Search Bar */
 .search-bar {
-  margin-bottom: var(--spacing-6);
+  margin-bottom: var(--spacing-3);
   max-width: 400px;
+}
+
+.search-status {
+  margin: 0 0 var(--spacing-4);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
 }
 
 /* Team Card - Matches booking-slot-card */

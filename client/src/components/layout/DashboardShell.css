@@ -3,8 +3,17 @@
 .dashboard-shell {
   display: flex;
   flex-direction: row;
+  min-height: 100vh;
 }
 
 .dashboard-shell_content {
   flex: 1;
+  min-width: 0;
+  background: var(--color-background);
+}
+
+@media (max-width: 760px) {
+  .dashboard-shell {
+    flex-direction: column;
+  }
 }

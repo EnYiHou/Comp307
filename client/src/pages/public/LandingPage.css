@@ -2,10 +2,7 @@
   min-height: calc(100vh - 72px);
   overflow: hidden;
   color: #191919;
-  background:
-    radial-gradient(circle at 85% 15%, rgba(237, 27, 47, 0.16), transparent 28%),
-    radial-gradient(circle at 8% 82%, rgba(30, 30, 30, 0.08), transparent 26%),
-    linear-gradient(135deg, #fbfaf8 0%, #f5f1ed 48%, #ffffff 100%);
+  background: linear-gradient(135deg, #fbfaf8 0%, #f5f1ed 52%, #ffffff 100%);
   padding: 76px 24px 64px;
 }
 
@@ -40,15 +37,15 @@
   width: 34px;
   height: 2px;
   background: #ed1b2f;
-  border-radius: 999px;
+  border-radius: 2px;
 }
 
 .hero-copy h1 {
   max-width: 760px;
   margin: 0;
-  font-size: clamp(3.4rem, 7vw, 6.8rem);
-  line-height: 0.88;
-  letter-spacing: -0.085em;
+  font-size: clamp(3rem, 6.2vw, 5.8rem);
+  line-height: 0.96;
+  letter-spacing: 0;
   font-weight: 900;
 }
 
@@ -72,7 +69,7 @@
   justify-content: center;
   min-height: 50px;
   padding: 0 24px;
-  border-radius: 999px;
+  border-radius: 10px;
   font-size: 0.96rem;
   font-weight: 800;
   text-decoration: none;
@@ -123,7 +120,7 @@
 .trust-row span {
   padding: 8px 12px;
   border: 1px solid rgba(25, 25, 25, 0.09);
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.62);
   color: #5c5c5c;
   font-size: 0.84rem;
@@ -139,13 +136,7 @@
 }
 
 .visual-glow {
-  position: absolute;
-  width: 390px;
-  height: 390px;
-  border-radius: 999px;
-  background: rgba(237, 27, 47, 0.22);
-  filter: blur(80px);
-  opacity: 0.8;
+  display: none;
 }
 
 .schedule-card {
@@ -155,7 +146,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
   border: 1px solid rgba(255, 255, 255, 0.86);
-  border-radius: 32px;
+  border-radius: 18px;
   padding: 30px;
   box-shadow:
     0 36px 80px rgba(0, 0, 0, 0.14),
@@ -167,7 +158,7 @@
   content: "";
   position: absolute;
   inset: -1px;
-  border-radius: 32px;
+  border-radius: 18px;
   padding: 1px;
   background: linear-gradient(135deg, rgba(237, 27, 47, 0.45), transparent 45%, rgba(0, 0, 0, 0.14));
   mask:
@@ -196,38 +187,38 @@
   margin: 0;
   font-size: 1.6rem;
   line-height: 1.15;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
-.owner-card {
+.landing-owner-card {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 16px;
   margin-bottom: 18px;
-  border-radius: 22px;
+  border-radius: 12px;
   background: #f7f3ef;
   border: 1px solid #ebe4dd;
 }
 
-.owner-avatar {
+.landing-owner-avatar {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   background: #191919;
   color: white;
   font-weight: 900;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
-.owner-card strong {
+.landing-owner-card strong {
   display: block;
   color: #191919;
 }
 
-.owner-card p {
+.landing-owner-card p {
   margin: 4px 0 0;
   color: #696969;
   font-size: 0.9rem;
@@ -244,7 +235,7 @@
   justify-content: space-between;
   gap: 18px;
   padding: 17px;
-  border-radius: 20px;
+  border-radius: 12px;
   background: white;
   border: 1px solid #ececec;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.045);
@@ -299,7 +290,7 @@
   overflow: hidden;
   min-height: 220px;
   padding: 28px;
-  border-radius: 28px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.76);
   border: 1px solid rgba(25, 25, 25, 0.08);
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.055);
@@ -313,12 +304,9 @@
 .feature-card::after {
   content: "";
   position: absolute;
-  width: 120px;
-  height: 120px;
-  right: -42px;
-  top: -42px;
-  border-radius: 999px;
-  background: rgba(237, 27, 47, 0.08);
+  inset: 0 0 auto;
+  height: 4px;
+  background: rgba(237, 27, 47, 0.22);
 }
 
 .feature-card:hover {
@@ -357,7 +345,7 @@
   z-index: 1;
   margin: 0 0 12px;
   font-size: 1.25rem;
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
 }
 
 .feature-card p {
@@ -414,7 +402,7 @@
   }
 
   .hero-copy h1 {
-    font-size: 3.35rem;
+    font-size: 3rem;
   }
 
   .landing-description {
@@ -431,11 +419,11 @@
 
   .schedule-card {
     padding: 22px;
-    border-radius: 26px;
+    border-radius: 16px;
   }
 
   .main-card::before {
-    border-radius: 26px;
+    border-radius: 16px;
   }
 
   .floating-card {

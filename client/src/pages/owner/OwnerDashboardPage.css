@@ -1,5 +1,7 @@
 .owner-dashboard {
-  padding: 32px;
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 32px 0;
 }
 
 .owner-dashboard-header {
@@ -19,23 +21,25 @@
 
 .owner-dashboard h1 {
   font-size: 32px;
+  font-family: var(--font-family-heading);
+  color: var(--color-secondary);
 }
 
 .owner-dashboard-header p {
   margin-top: 8px;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .create-meeting-button {
   padding: 10px 16px;
-  border-radius: 6px;
-  background: #111;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
   color: white;
   text-decoration: none;
 }
 
 .create-meeting-button:hover {
-  background: #333;
+  background: var(--color-primary-dark);
   color: white;
 }
 
@@ -47,14 +51,15 @@
 
 .dashboard-message {
   margin: 0 0 16px;
-  color: #b00020;
+  color: var(--color-danger);
 }
 
 .dashboard-panel {
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .dashboard-panel h2 {
@@ -73,7 +78,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 14px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgb(215 203 192 / 0.65);
 }
 
 .dashboard-list-item:last-child {
@@ -87,7 +92,8 @@
 .booking-status {
   display: inline-block;
   margin: 4px 0;
-  color: #111;
+  color: var(--color-primary-dark);
+  font-weight: var(--font-weight-semibold);
   text-transform: capitalize;
 }
 
@@ -120,17 +126,17 @@
 
 .booking-actions a {
   padding: 6px 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  color: #111;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-primary-dark);
   text-decoration: none;
 }
 
 .request-actions button {
   padding: 6px 10px;
-  border: 1px solid #111;
-  border-radius: 6px;
-  background: #111;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
   color: white;
   cursor: pointer;
 }
@@ -141,9 +147,9 @@
 }
 
 .request-actions .decline-button {
-  border-color: #ddd;
+  border-color: var(--color-border);
   background: white;
-  color: #111;
+  color: var(--color-text);
 }
 
 @media (max-width: 800px) {

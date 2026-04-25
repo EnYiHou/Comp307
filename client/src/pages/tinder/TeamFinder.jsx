@@ -1,36 +1,45 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../../features/auth/useAuth.js";
+import { useCallback, useEffect, useRef, useState } from "react";
 import api from "../../shared/api/api.js";
+import { useAuth } from "../../features/auth/useAuth.js";
 import "./TeamFinder.css";
 
 export default function TeamFinder() {
-    const { user } = useAuth();
     const [myTeams, setMyTeams] = useState([]);
     const [searchedTeams, setSearchedTeams] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
+    const [searching, setSearching] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [selectedTeam, setSelectedTeam] = useState(null);
+    const hasLoadedOnce = useRef(false);
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = useCallback(async () => {
+        if (!hasLoadedOnce.current) {
+            setLoading(true);
+        } else {
+            setSearching(true);
+        }
+
         try {
+            const trimmedSearch = searchQuery.trim();
             const [myRes, searchRes] = await Promise.all([
                 api.get("/teams"),
-                api.get(`/teams/search${searchQuery ? `?query=${searchQuery}` : ""}`)
+                api.get(`/teams/search${trimmedSearch ? `?query=${encodeURIComponent(trimmedSearch)}` : ""}`)
             ]);
             setMyTeams(myRes.data);
             setSearchedTeams(searchRes.data);
         } catch (error) {
             console.error(error);
         } finally {
+            hasLoadedOnce.current = true;
             setLoading(false);
+            setSearching(false);
         }
-    };
+    }, [searchQuery]);
 
     useEffect(() => {
         fetchData();
-    }, [searchQuery]);
+    }, [fetchData]);
 
     if (loading) {
         return <div className="no-teams">Loading teams...</div>;
@@ -63,6 +72,7 @@ export default function TeamFinder() {
                 <section className="team-finder-section">
                     <h2>Find Teams</h2>
                     <SearchBar value={searchQuery} onChange={setSearchQuery} />
+                    {searching && <p className="search-status">Searching...</p>}
                     <TeamsListBox 
                         teams={searchedTeams} 
                         onViewTeam={setSelectedTeam} 
@@ -307,7 +317,7 @@ function CreateTeamModal({ onClose, onRefresh }) {
             onRefresh();
             onClose();
         } catch (error) {
-            console.log("Failed to create team");
+            console.error("Failed to create team", error);
         }
     };
 

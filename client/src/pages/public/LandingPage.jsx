@@ -46,8 +46,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="owner-card">
-              <div className="owner-avatar">MC</div>
+            <div className="landing-owner-card">
+              <div className="landing-owner-avatar">MC</div>
               <div>
                 <strong>Prof. Vybihal</strong>
                 <p>Comp 307 · Web development</p>
