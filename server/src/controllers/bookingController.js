@@ -1,5 +1,90 @@
 import { Booking } from "../models/Booking.js";
 
+export const getOwnerBookingById = async (req, res, next) => {
+    try {
+        const { bookingId } = req.params;
+
+        const booking = await Booking.findOne({
+            _id: bookingId,
+            ownerId: req.user.id,
+        });
+
+        if (!booking) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        res.json({
+            success: true,
+            data: booking,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateOwnerBooking = async (req, res, next) => {
+    try {
+        const { bookingId } = req.params;
+        const {
+            title,
+            description,
+            startTime,
+            endTime,
+            visibility,
+            status,
+            capacity,
+        } = req.body;
+
+        if (!title || !startTime || !endTime) {
+            return res.status(400).json({
+                message: "Title, start time, and end time are required",
+            });
+        }
+
+        const parsedStartTime = new Date(startTime);
+        const parsedEndTime = new Date(endTime);
+
+        if (Number.isNaN(parsedStartTime.getTime()) || Number.isNaN(parsedEndTime.getTime())) {
+            return res.status(400).json({ message: "Invalid booking date" });
+        }
+
+        if (parsedEndTime <= parsedStartTime) {
+            return res.status(400).json({
+                message: "End time must be after start time",
+            });
+        }
+
+        const booking = await Booking.findOneAndUpdate(
+            {
+                _id: bookingId,
+                ownerId: req.user.id,
+            },
+            {
+                title,
+                description,
+                startTime: parsedStartTime,
+                endTime: parsedEndTime,
+                visibility,
+                status,
+                capacity,
+            },
+            { new: true, runValidators: true },
+        );
+
+        if (!booking) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        res.json({
+            success: true,
+            data: booking,
+            message: "Booking updated successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getBookingsByOwner = async (req, res, next) => {
     try {
         const { ownerId, userId } = req.query;

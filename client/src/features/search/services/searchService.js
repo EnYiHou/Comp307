@@ -18,3 +18,12 @@ export async function getOwners(searchTerm) {
     });
     return response.data;
 }
+
+export async function getMcGillOwners(searchTerm) {
+    const response = await api.get("/dashboard/searchMcGillOwners", {
+        params: {
+            q: searchTerm
+        }
+    });
+    return response.data;
+}

@@ -8,6 +8,7 @@ import SettingsPage from "../../pages/dashboard/SettingsPage";
 import UserDashboardPage from "../../pages/dashboard/UserDashboardPage";
 import BookingRequestsPage from "../../pages/owner/BookingRequestsPage";
 import CreateSlotPage from "../../pages/owner/CreateSlotPage";
+import EditBookingPage from "../../pages/owner/EditBookingPage";
 import GroupMeetingSetupPage from "../../pages/owner/GroupMeetingSetupPage";
 import InviteLinksPage from "../../pages/owner/InviteLinksPage";
 import ManageSlotsPage from "../../pages/owner/ManageSlotsPage";
@@ -58,6 +59,10 @@ export default function AppRouter() {
           <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
           <Route path="/owner/slots" element={<ManageSlotsPage />} />
           <Route path="/owner/slots/new" element={<CreateSlotPage />} />
+          <Route
+            path="/owner/bookings/:bookingId/edit"
+            element={<EditBookingPage />}
+          />
           <Route
             path="/owner/recurring-office-hours"
             element={<RecurringOfficeHoursPage />}

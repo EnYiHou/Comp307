@@ -3,19 +3,48 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../auth/useAuth.js";
 import "./owner.css";
 
-function BookingTime({ booking, onSelect }) {
-  const formattedTime = new Date(booking.startTime).toLocaleTimeString([], {
+function formatTime(dateValue) {
+  return new Date(dateValue).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function getSpotsAvailable(booking) {
+  return booking.capacity - (booking.participants?.length || 0);
+}
+
+function BookingSlotCard({ booking, isSelected, onSelect }) {
+  const spotsAvailable = getSpotsAvailable(booking);
 
   return (
-    <button type="button" onClick={() => onSelect(booking)}>
-      {formattedTime}
+    <button
+      className={`owner-booking-slot${isSelected ? " is-selected" : ""}`}
+      type="button"
+      onClick={() => onSelect(booking)}
+      aria-pressed={isSelected}
+    >
+      <span className="owner-booking-slot_title">{booking.title}</span>
+      {booking.description && (
+        <span className="owner-booking-slot_description">
+          {booking.description}
+        </span>
+      )}
+      <span className="owner-booking-slot_meta">
+        {formatTime(booking.startTime)} - {formatTime(booking.endTime)} ·{" "}
+        {spotsAvailable} {spotsAvailable === 1 ? "spot" : "spots"} available
+      </span>
     </button>
   );
 }
-function DateBookings({ bookings, selectedDate, onSelectDate, onSelectBooking }) {
+
+function DateBookings({
+  bookings,
+  selectedDate,
+  selectedBooking,
+  onSelectDate,
+  onSelectBooking,
+}) {
   const groupedByDate = bookings.reduce((acc, booking) => {
     const date = new Date(booking.startTime).toLocaleDateString();
     if (!acc[date]) {
@@ -25,27 +54,34 @@ function DateBookings({ bookings, selectedDate, onSelectDate, onSelectBooking })
     return acc;
   }, {});
 
+  if (bookings.length === 0) {
+    return <p className="owner-modal_empty">No available bookings.</p>;
+  }
+
   return (
-    <div>
+    <div className="owner-booking-list">
       {Object.entries(groupedByDate).map(([date, dateBookings]) => (
-        <div key={date}>
+        <div className="owner-booking-date" key={date}>
           <button
+            className="owner-booking-date-button"
             type="button"
             onClick={() => onSelectDate(selectedDate === date ? null : date)}
           >
             {date}
+            <span>{dateBookings.length} slots</span>
           </button>
 
           {selectedDate === date && (
-            <ul>
+            <div className="owner-booking-slots">
               {dateBookings.map((booking) => (
-                <BookingTime
+                <BookingSlotCard
                   key={booking._id}
                   booking={booking}
+                  isSelected={selectedBooking?._id === booking._id}
                   onSelect={onSelectBooking}
                 />
               ))}
-            </ul>
+            </div>
           )}
         </div>
       ))}
@@ -53,20 +89,62 @@ function DateBookings({ bookings, selectedDate, onSelectDate, onSelectBooking })
   );
 }
 
-export default function OwnerModal({ owner, onClose }) {
+export default function OwnerModal({
+  owner,
+  onClose,
+  onNotify,
+  onBookingSuccess,
+}) {
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [isBooking, setIsBooking] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchBookings = async () => {
-      const ownerBookings = await getOwnerBookings(owner._id, user?.id);
-      setBookings(ownerBookings);
+      try {
+        const ownerBookings = await getOwnerBookings(owner._id, user?.id);
+        if (isMounted) {
+          setBookings(Array.isArray(ownerBookings) ? ownerBookings : []);
+        }
+      } catch {
+        if (isMounted) {
+          setBookings([]);
+        }
+        onNotify?.("Failed to load available bookings.", "error");
+      }
     };
 
     fetchBookings();
-  }, [owner._id, user?.id]);
+    return () => {
+      isMounted = false;
+    };
+  }, [onNotify, owner._id, user?.id]);
+
+  const handleBookAppointment = async () => {
+    if (!selectedBooking || !user || isBooking) {
+      return;
+    }
+
+    setIsBooking(true);
+
+    try {
+      const response = await acceptBooking(selectedBooking._id, user.id);
+      onNotify?.(response.message || "Booking accepted successfully.", "success");
+      setSelectedBooking(null);
+      onBookingSuccess?.();
+      onClose();
+    } catch (error) {
+      onNotify?.(
+        error.response?.data?.message || "Failed to take booking.",
+        "error",
+      );
+      setIsBooking(false);
+    }
+  };
 
   return (
     <div className="owner-modal-backdrop" onClick={onClose}>
@@ -94,22 +172,19 @@ export default function OwnerModal({ owner, onClose }) {
           <DateBookings
             bookings={bookings}
             selectedDate={selectedDate}
+            selectedBooking={selectedBooking}
             onSelectDate={setSelectedDate}
             onSelectBooking={setSelectedBooking}
           />
         </div>
 
         <button
+          className="owner-modal_book-button"
           type="button"
-          onClick={async () => {
-            if (selectedBooking && user) {
-              await acceptBooking(selectedBooking._id, user.id);
-              setSelectedBooking(null);
-            }
-          }}
-          disabled={!selectedBooking || !user}
+          onClick={handleBookAppointment}
+          disabled={!selectedBooking || !user || isBooking}
         >
-          Book Appointment
+          {isBooking ? "Booking..." : "Book Selected Appointment"}
         </button>
       </section>
     </div>

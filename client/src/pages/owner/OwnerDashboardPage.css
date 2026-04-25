@@ -1,0 +1,168 @@
+.owner-dashboard {
+  padding: 32px;
+}
+
+.owner-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.owner-dashboard h1,
+.owner-dashboard h2,
+.owner-dashboard h3,
+.owner-dashboard p {
+  margin: 0;
+}
+
+.owner-dashboard h1 {
+  font-size: 32px;
+}
+
+.owner-dashboard-header p {
+  margin-top: 8px;
+  color: #666;
+}
+
+.create-meeting-button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #111;
+  color: white;
+  text-decoration: none;
+}
+
+.create-meeting-button:hover {
+  background: #333;
+  color: white;
+}
+
+.owner-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dashboard-message {
+  margin: 0 0 16px;
+  color: #b00020;
+}
+
+.dashboard-panel {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+}
+
+.dashboard-panel h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.dashboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.dashboard-list-item:last-child {
+  border-bottom: none;
+}
+
+.dashboard-list-item h3 {
+  font-size: 16px;
+}
+
+.booking-status {
+  display: inline-block;
+  margin: 4px 0;
+  color: #111;
+  text-transform: capitalize;
+}
+
+.dashboard-list-item p,
+.dashboard-list-item span {
+  color: #666;
+  font-size: 14px;
+}
+
+.empty-text {
+  margin: 0;
+  color: #666;
+}
+
+.dashboard-list-item span {
+  white-space: nowrap;
+}
+
+.request-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.booking-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.booking-actions a {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  color: #111;
+  text-decoration: none;
+}
+
+.request-actions button {
+  padding: 6px 10px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.request-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.request-actions .decline-button {
+  border-color: #ddd;
+  background: white;
+  color: #111;
+}
+
+@media (max-width: 800px) {
+  .owner-dashboard {
+    padding: 20px;
+  }
+
+  .owner-dashboard-header,
+  .dashboard-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .owner-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .request-actions,
+  .booking-actions {
+    flex-wrap: wrap;
+  }
+}

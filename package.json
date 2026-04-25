@@ -11,7 +11,8 @@
     "client": "npm run dev -w client",
     "server": "npm run dev -w server",
     "build": "npm run build -w client",
-    "seed:random": "npm run seed:random -w server"
+    "seed:random": "npm run seed:random -w server",
+    "seed:owner-bookings": "npm run seed:owner-bookings -w server --"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

@@ -1,0 +1,133 @@
+.request-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 45%);
+}
+
+.request-modal {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 20px;
+  border-radius: 8px;
+  background: white;
+}
+
+.request-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.request-modal-header h2 {
+  margin: 0;
+}
+
+.request-modal-header button,
+.request-form button {
+  padding: 8px 12px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.request-modal label,
+.request-form {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.request-modal input,
+.request-modal textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+}
+
+.teacher-search-results {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.teacher-search-results p {
+  margin: 0;
+  color: #666;
+}
+
+.teacher-search-results button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #111;
+  text-align: left;
+  cursor: pointer;
+}
+
+.teacher-search-results button:hover {
+  border-color: #111;
+}
+
+.teacher-search-results span {
+  color: #666;
+  font-size: 14px;
+}
+
+.request-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.request-selected-teacher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.request-selected-teacher p {
+  margin: 0;
+  color: #666;
+}
+
+.request-selected-teacher button {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #111;
+  cursor: pointer;
+}
+
+.request-form-message {
+  margin: 0;
+  color: #b00020;
+}
+
+.request-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .request-form-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -126,14 +126,15 @@ export default router
 
 
 
-router.get('/searchOwners', requireAuth, makeUserSearchHandler(["OWNER"]));
+router.get('/searchOwners', requireAuth, makeUserSearchHandler(["OWNER"], { availableOnly: true }));
+router.get('/searchMcGillOwners', requireAuth, makeUserSearchHandler(["OWNER"], { emailDomain: "mcgill.ca" }));
 router.get('/searchAll', requireAuth, makeUserSearchHandler(["USER", "OWNER"]));
 
-function makeUserSearchHandler(roles) {
+function makeUserSearchHandler(roles, options = {}) {
     return async function (req, res) {
         try {
             const query = (req.query.q || "").trim();
-            const users = await searchAllUsers(req.user.id, query, roles);
+            const users = await searchAllUsers(req.user.id, query, roles, options);
             return res.status(200).json(users);
         }
         catch (error) {
@@ -145,23 +146,38 @@ function makeUserSearchHandler(roles) {
     };
 }
 
-async function searchAllUsers(id, query, roles) {
+async function searchAllUsers(id, query, roles, options = {}) {
 
     const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(escapedQuery, "i");
-
-    const users = await User.find({
+    const userQuery = {
         role: { $in: roles },
         _id: { $ne: id },
         $or: [
             { name: regex },
-            { name: regex },
+            { email: regex },
         ],
-    })
+    };
+
+    if (options.availableOnly) {
+        const availableOwnerIds = await Booking.distinct("ownerId", {
+            visibility: "public",
+            status: "open",
+            startTime: { $gte: new Date() },
+            participants: { $ne: id },
+        });
+
+        userQuery._id = { $ne: id, $in: availableOwnerIds };
+    }
+
+    if (options.emailDomain) {
+        userQuery.email = new RegExp(`@${options.emailDomain.replace(".", "\\.")}$`, "i");
+    }
+
+    const users = await User.find(userQuery)
         .select("_id name email role")
         .sort({ name: 1 })
         .limit(10);
 
     return users;
 }
-

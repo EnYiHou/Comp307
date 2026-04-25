@@ -1,0 +1,27 @@
+.owners-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.owners-page-header h2 {
+  margin: 0;
+}
+
+.new-request-button {
+  padding: 8px 12px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+@media (max-width: 700px) {
+  .owners-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

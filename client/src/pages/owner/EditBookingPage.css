@@ -1,0 +1,68 @@
+.edit-booking-page {
+  padding: 32px;
+}
+
+.edit-booking-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.edit-booking-header h1,
+.edit-booking-header p {
+  margin: 0;
+}
+
+.edit-booking-header p {
+  margin-top: 8px;
+  color: #666;
+}
+
+.edit-booking-header a {
+  color: #111;
+  text-decoration: underline;
+}
+
+.edit-booking-message {
+  color: #b00020;
+}
+
+.edit-booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.edit-booking-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.edit-booking-form input,
+.edit-booking-form select,
+.edit-booking-form textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+}
+
+.edit-booking-form button {
+  width: fit-content;
+  padding: 10px 16px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: white;
+  cursor: pointer;
+}
+
+.edit-booking-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
