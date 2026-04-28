@@ -15,6 +15,12 @@ function getDefaultStart() {
   return toDateTimeInputValue(date);
 }
 
+function getNowMinString() {
+  const date = new Date();
+  date.setSeconds(0, 0);
+  return toDateTimeInputValue(date);
+}
+
 export default function NewMeetingRequestModal({
   initialTeacher = null,
   lockTeacher = false,
@@ -63,6 +69,13 @@ export default function NewMeetingRequestModal({
 
     try {
       const preferredStart = new Date(formData.preferredStart);
+
+      if (preferredStart <= new Date()) {
+        setMessage("Preferred start must be in the future.");
+        setSubmitting(false);
+        return;
+      }
+
       const preferredEnd = new Date(
         preferredStart.getTime() + Number(formData.durationHours) * 60 * 60 * 1000,
       );
@@ -112,6 +125,7 @@ export default function NewMeetingRequestModal({
                 setSelectedTeacher(null);
               }}
               placeholder="Type a name..."
+              maxLength={100}
             />
           </label>
         )}
@@ -152,6 +166,7 @@ export default function NewMeetingRequestModal({
                 name="topic"
                 value={formData.topic}
                 onChange={handleChange}
+                maxLength={100}
                 required
               />
             </label>
@@ -162,6 +177,7 @@ export default function NewMeetingRequestModal({
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
+                maxLength={500}
                 rows="4"
               />
             </label>
@@ -173,6 +189,7 @@ export default function NewMeetingRequestModal({
                   type="datetime-local"
                   name="preferredStart"
                   value={formData.preferredStart}
+                  min={getNowMinString()}
                   onChange={handleChange}
                   required
                 />

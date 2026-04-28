@@ -113,6 +113,7 @@ export default function EditBookingPage() {
             name="title"
             value={formData.title}
             onChange={handleChange}
+            maxLength={50}
             required
           />
         </label>
@@ -123,6 +124,7 @@ export default function EditBookingPage() {
             name="description"
             value={formData.description}
             onChange={handleChange}
+            maxLength={200}
             rows="4"
           />
         </label>

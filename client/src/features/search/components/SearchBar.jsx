@@ -27,6 +27,7 @@ export default function SearchBar({
       onChange={(e) => setInputValue(e.target.value)}
       placeholder={placeholder}
       className="search-bar"
+      maxLength={150}
     />
   );
 }

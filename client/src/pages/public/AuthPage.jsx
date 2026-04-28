@@ -63,13 +63,13 @@ export default function AuthPage() {
         {isSignup && (
           <>
             <label htmlFor="username">Username</label>
-            <input type="text" id="username" name="username" required />
+            <input type="text" id="username" name="username" maxLength={50} required />
           </>
         )}
         <label htmlFor="email">Email</label>
-        <input type="email" id="email" name="email" required />
+        <input type="email" id="email" name="email" maxLength={255} required />
         <label htmlFor="password">Password</label>
-        <input type="password" id="password" name="password" required />
+        <input type="password" id="password" name="password" maxLength={128} required />
         {isSignup && (
           <>
             <label htmlFor="confirm-password">Confirm Password</label>
@@ -77,6 +77,7 @@ export default function AuthPage() {
               type="password"
               id="confirm-password"
               name="confirm-password"
+              maxLength={128}
               required
             />
           </>

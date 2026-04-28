@@ -108,7 +108,11 @@ export default function OwnerModal({
       try {
         const ownerBookings = await getOwnerBookings(owner._id, user?.id);
         if (isMounted) {
-          setBookings(Array.isArray(ownerBookings) ? ownerBookings : []);
+          const now = new Date();
+          const futureBookings = Array.isArray(ownerBookings)
+            ? ownerBookings.filter((b) => new Date(b.startTime) > now)
+            : [];
+          setBookings(futureBookings);
         }
       } catch {
         if (isMounted) {

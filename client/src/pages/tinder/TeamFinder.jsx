@@ -242,6 +242,7 @@ function SearchBar({ value, onChange }) {
                 type="text" 
                 placeholder="Search by course (e.g. COMP 307)" 
                 value={value}
+                maxLength={100}
                 onChange={(e) => onChange(e.target.value)}
             />
         </div>
@@ -364,6 +365,7 @@ function CreateTeamModal({ onClose, onRefresh }) {
                         <input 
                             type="text" 
                             required 
+                            maxLength={50}
                             value={formData.name}
                             onChange={e => setFormData({...formData, name: e.target.value})}
                         />
@@ -373,6 +375,7 @@ function CreateTeamModal({ onClose, onRefresh }) {
                         <input 
                             type="text" 
                             required 
+                            maxLength={10}
                             placeholder="e.g. COMP 307"
                             value={formData.course}
                             onChange={e => setFormData({...formData, course: e.target.value})}
@@ -393,9 +396,11 @@ function CreateTeamModal({ onClose, onRefresh }) {
                         <label>Description</label>
                         <textarea 
                             required 
+                            maxLength={200}
                             rows="4"
                             value={formData.description}
                             onChange={e => setFormData({...formData, description: e.target.value})}
+                            style={{ resize: "none" }}
                         ></textarea>
                     </div>
                     <button type="submit" className="button">Create Team</button>

@@ -352,6 +352,7 @@ function BasicsStep({ formData, onChange }) {
           name="title"
           value={formData.title}
           onChange={onChange}
+          maxLength={50}
           placeholder="Office hours, project check-in, review session"
         />
       </label>
@@ -361,6 +362,7 @@ function BasicsStep({ formData, onChange }) {
           name="description"
           value={formData.description}
           onChange={onChange}
+          maxLength={500}
           rows="4"
           placeholder="Optional context students should see before booking."
         />
@@ -635,8 +637,15 @@ function ReviewItem({ label, value }) {
 }
 
 function HeatmapSelector({ formData, onRangeChange }) {
+  const todayStr = formatDate(new Date());
+
   function handleMonthDateClick(info) {
     const clickedDate = info.dateStr;
+
+    // Reject clicks on past dates
+    if (clickedDate < todayStr) {
+      return;
+    }
 
     if (formData.rangeEnd || !formData.rangeStart) {
       onRangeChange({
@@ -693,6 +702,7 @@ function HeatmapSelector({ formData, onRangeChange }) {
           center: "title",
           right: "",
         }}
+        validRange={{ start: todayStr }}
         dateClick={handleMonthDateClick}
         events={rangeEvents}
         height="auto"
@@ -709,11 +719,21 @@ function TwoPanelSelector({
   setActiveDate,
   recurrenceCount,
 }) {
+  const todayStr = formatDate(new Date());
+
   function handleMonthDateClick(info) {
+    // Reject clicks on past dates
+    if (info.dateStr < todayStr) {
+      return;
+    }
     setActiveDate(info.dateStr);
   }
 
   function handleDaySelect(info) {
+    // Reject selections that start in the past
+    if (info.startStr < new Date().toISOString()) {
+      return;
+    }
     const newSlot = {
       id: makeId(),
       start: info.startStr,
@@ -801,6 +821,7 @@ function TwoPanelSelector({
             center: "title",
             right: "",
           }}
+          validRange={{ start: todayStr }}
           dateClick={handleMonthDateClick}
           events={monthEvents}
           eventClick={handleMonthEventClick}
@@ -821,6 +842,7 @@ function TwoPanelSelector({
           initialView="timeGridDay"
           initialDate={activeDate}
           headerToolbar={false}
+          validRange={{ start: new Date().toISOString() }}
           selectable={true}
           selectMirror={false}
           select={handleDaySelect}
