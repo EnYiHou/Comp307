@@ -51,7 +51,11 @@ function BookingSlotCreation() {
   });
 
   const visibleSearchResults =
-    searchQuery.trim().length >= 3 ? searchResults : [];
+    searchQuery.trim().length >= 3
+      ? searchResults.filter(
+          (user) => !selectedUsers.some((selected) => selected._id === user._id),
+        )
+      : [];
 
   const showCalendarSlotSelector =
     formData.bookingMode === "slot" ||
@@ -753,11 +757,18 @@ function TwoPanelSelector({
   }
 
   const monthEvents = useMemo(() => {
-    const selectedSlotEvents = selectedSlots.map((slot) => ({
-      id: slot.id,
-      title: formatTimeRange(slot.start, slot.end),
-      start: slot.start,
-      end: slot.end,
+    // Group slots by date → one count badge per day
+    const countByDate = {};
+    for (const slot of selectedSlots) {
+      const date = getDateOnly(slot.start);
+      countByDate[date] = (countByDate[date] || 0) + 1;
+    }
+
+    const countEvents = Object.entries(countByDate).map(([date, count]) => ({
+      id: `count-${date}`,
+      title: `${count} ${count === 1 ? "slot" : "slots"}`,
+      start: date,
+      allDay: true,
     }));
 
     const recurringPreviewEvents = selectedSlots.flatMap((slot) =>
@@ -771,7 +782,7 @@ function TwoPanelSelector({
       })),
     );
 
-    return [...selectedSlotEvents, ...recurringPreviewEvents];
+    return [...countEvents, ...recurringPreviewEvents];
   }, [recurrenceCount, selectedSlots]);
 
   const dayEvents = useMemo(() => {
@@ -828,6 +839,9 @@ function TwoPanelSelector({
           height="auto"
           fixedWeekCount={false}
           dayMaxEvents={3}
+          dayCellClassNames={(arg) =>
+            arg.dateStr === activeDate ? ["is-active-date"] : []
+          }
         />
       </div>
 

@@ -244,7 +244,7 @@
 
 .availability-calendar-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr 300px;
   gap: var(--spacing-5);
 }
 
@@ -414,8 +414,34 @@
   transform: translateY(-1px);
 }
 
+.availability-calendar-card .fc-timegrid-event .fc-event-main {
+  padding: 1px 3px;
+}
+
+.availability-calendar-card .fc-timegrid-event .fc-event-time,
+.availability-calendar-card .fc-daygrid-event .fc-event-time {
+  display: none;
+}
+
+.availability-calendar-card .fc-timegrid-event .fc-event-title {
+  font-size: 0.68rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .availability-calendar-card .fc-highlight {
   background: rgb(237 27 47 / 0.16);
+}
+
+.availability-calendar-card .fc-daygrid-day.is-active-date {
+  background-color: rgb(237 27 47 / 0.13);
+}
+
+.availability-calendar-card .fc-daygrid-day.is-active-date .fc-daygrid-day-number {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
 }
 
 .availability-calendar-card .fc-view-harness {
