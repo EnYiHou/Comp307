@@ -504,7 +504,7 @@ function AccessStep({
         />
       </div>
 
-      {formData.bookingMode === "group" && (
+      {(formData.bookingMode === "group" || formData.visibility === "private") && (
         <div className="availability-subsection">
           <h4>Invite users</h4>
           <SearchBar

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+// Main: Ronald Zhang
+
 const teamSchema = new mongoose.Schema(
   {
     name: {

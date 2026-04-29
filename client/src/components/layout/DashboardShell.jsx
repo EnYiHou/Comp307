@@ -17,6 +17,7 @@ const links = [
     items: [
       { to: "/owner/dashboard", label: "Owner Dashboard" },
       { to: "/owner/slots/new", label: "Create Availability" },
+      { to: "/owner/invite-links", label: "Invite Links" },
     ],
   },
 ];

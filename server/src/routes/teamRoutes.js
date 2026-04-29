@@ -2,6 +2,8 @@ import express from "express";
 import Team from "../models/Team.js";
 import requireAuth from "../middleware/authMiddleware.js";
 
+// Main: Ronald Zhang
+
 const router = express.Router();
 
 // Get teams the user is in

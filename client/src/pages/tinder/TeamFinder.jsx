@@ -336,6 +336,7 @@ function JoinButton({ team, onRefresh }) {
     );
 }
 
+// AI generated this regex because I do not know my regexes
 const courseCodeRegex = /^[A-Za-z]{3,4} \d{3}$/;
 
 function CreateTeamModal({ onClose, onRefresh }) {
