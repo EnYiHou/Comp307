@@ -16,6 +16,9 @@ import {
 import "./BookingSlotCreation.css";
 import "./FullCalendarTheme.css";
 
+// Main: Bogdan
+// Extra Bugfixes: Ronald Zhang
+
 function makeId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }

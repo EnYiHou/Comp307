@@ -23,6 +23,8 @@ import OwnersDirectoryPage from "../../pages/dashboard/OwnersDirectoryPage";
 import ProtectedRoute from "./ProtectedRoute";
 import TeamFinder from "../../pages/tinder/TeamFinder";
 
+// Everyone added their own routes here
+
 export default function AppRouter() {
   return (
     <Routes>

@@ -1,5 +1,7 @@
 import "./owner.css";
 
+// Main:
+
 function getInitials(name = "") {
   return name
     .split(" ")

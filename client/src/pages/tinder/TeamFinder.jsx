@@ -5,6 +5,8 @@ import api from "../../shared/api/api.js";
 import { useAuth } from "../../features/auth/useAuth.js";
 import "./TeamFinder.css";
 
+// Main: Ronald Zhang
+
 export default function TeamFinder() {
     const [myTeams, setMyTeams] = useState([]);
     const [searchedTeams, setSearchedTeams] = useState([]);
@@ -334,6 +336,8 @@ function JoinButton({ team, onRefresh }) {
     );
 }
 
+const courseCodeRegex = /^[A-Za-z]{3,4} \d{3}$/;
+
 function CreateTeamModal({ onClose, onRefresh }) {
     const [formData, setFormData] = useState({
         name: "",
@@ -341,9 +345,17 @@ function CreateTeamModal({ onClose, onRefresh }) {
         description: "",
         size: 3
     });
+    const [courseError, setCourseError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!courseCodeRegex.test(formData.course.trim())) {
+            setCourseError("Course code must be 3–4 letters, a space, then 3 digits (e.g. COMP 307).");
+            return;
+        }
+        setCourseError("");
+
         try {
             await api.post("/teams", formData);
             console.log("Team created successfully!");
@@ -378,8 +390,16 @@ function CreateTeamModal({ onClose, onRefresh }) {
                             maxLength={10}
                             placeholder="e.g. COMP 307"
                             value={formData.course}
-                            onChange={e => setFormData({...formData, course: e.target.value})}
+                            onChange={e => {
+                                setFormData({...formData, course: e.target.value});
+                                setCourseError("");
+                            }}
                         />
+                        {courseError && (
+                            <span style={{ color: "var(--color-danger)", fontSize: "var(--font-size-sm)" }}>
+                                {courseError}
+                            </span>
+                        )}
                     </div>
                     <div className="form-group">
                         <label>Max Size</label>

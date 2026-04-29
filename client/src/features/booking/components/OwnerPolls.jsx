@@ -13,6 +13,8 @@ import {
 import "./OwnerPolls.css";
 import "./FullCalendarTheme.css";
 
+// Extra Bugfixes: Ronald Zhang
+
 function getHeatColor(voteCount) {
   const maxVoteCount = 5;
 

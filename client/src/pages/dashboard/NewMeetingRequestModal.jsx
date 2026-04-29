@@ -3,6 +3,8 @@ import api from "../../shared/api/api";
 import { getMcGillOwners } from "../../features/search/services/searchService";
 import "./NewMeetingRequestModal.css";
 
+// Extra fixes: Ronald Zhang
+
 function toDateTimeInputValue(date) {
   const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return offsetDate.toISOString().slice(0, 16);
