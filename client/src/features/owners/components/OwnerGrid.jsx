@@ -1,7 +1,7 @@
 import OwnerCard from "./OwnerCard";
 import "./owner.css";
 
-export default function OwnerGrid({ owners = [], onSelectOwner, onRequestOwner }) {
+export default function OwnerGrid({ owners = [] }) {
   if (owners.length === 0) {
     return <p>No appointment hosts found.</p>;
   }
@@ -9,12 +9,7 @@ export default function OwnerGrid({ owners = [], onSelectOwner, onRequestOwner }
   return (
     <div className="owner-grid">
       {owners.map((owner) => (
-        <OwnerCard
-          key={owner._id}
-          owner={owner}
-          onSelect={onSelectOwner}
-          onRequest={onRequestOwner}
-        />
+        <OwnerCard key={owner._id} owner={owner} />
       ))}
     </div>
   );

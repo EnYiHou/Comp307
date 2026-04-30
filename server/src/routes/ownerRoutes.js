@@ -55,4 +55,21 @@ router.get("/all-mcgill", requireAuth, async (req, res, next) => {
   }
 });
 
+router.get("/:ownerId", requireAuth, async (req, res, next) => {
+  try {
+    const owner = await User.findOne({
+      _id: req.params.ownerId,
+      role: "OWNER",
+    }).select("_id name email role");
+
+    if (!owner) {
+      return res.status(404).json({ message: "Owner not found" });
+    }
+
+    res.json({ success: true, data: owner });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

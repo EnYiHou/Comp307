@@ -90,11 +90,13 @@ function DateBookings({
   );
 }
 
-export default function OwnerModal({
+export default function OwnerPanel({
   owner,
   onClose,
+  onRequest,
   onNotify,
   onBookingSuccess,
+  inline = false,
 }) {
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState(null);
@@ -151,10 +153,9 @@ export default function OwnerModal({
     }
   };
 
-  return (
-    <div className="owner-modal-backdrop" onClick={onClose}>
+  const content = (
       <section
-        className="owner-modal"
+        className={inline ? "owner-modal owner-profile-card" : "owner-modal"}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="owner-modal_header">
@@ -162,7 +163,7 @@ export default function OwnerModal({
             className="owner-modal_close-button"
             onClick={onClose}
           >
-            X
+            {inline ? "Back" : "X"}
           </button>
         </div>
         <h2>{owner.name}</h2>
@@ -187,7 +188,21 @@ export default function OwnerModal({
         >
           {isBooking ? "Booking..." : "Book Selected Appointment"}
         </button>
+        {onRequest && (
+          <button className="owner-modal_book-button owner-modal_request-button" type="button" onClick={onRequest}>
+            Make Request
+          </button>
+        )}
       </section>
+  );
+
+  if (inline) {
+    return content;
+  }
+
+  return (
+    <div className="owner-modal-backdrop" onClick={onClose}>
+      {content}
     </div>
   );
 }

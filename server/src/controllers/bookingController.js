@@ -217,6 +217,10 @@ export const getBookingsByOwner = async (req, res, next) => {
             return res.status(400).json({ message: "Owner is required" });
         }
 
+        if (ownerId === req.user.id) {
+            return res.json({ success: true, data: [] });
+        }
+
         const bookings = await Booking.find({
             ownerId,
             visibility: "public",

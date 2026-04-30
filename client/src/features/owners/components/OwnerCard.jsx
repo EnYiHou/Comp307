@@ -1,4 +1,5 @@
 import "./owner.css";
+import { Link } from "react-router-dom";
 
 // Main:
 
@@ -12,7 +13,7 @@ function getInitials(name = "") {
     .toUpperCase();
 }
 
-export default function OwnerCard({ owner, onSelect, onRequest }) {
+export default function OwnerCard({ owner }) {
   return (
     <article className="owner-card">
       <div className="owner-card__avatar">{getInitials(owner.name)}</div>
@@ -23,20 +24,9 @@ export default function OwnerCard({ owner, onSelect, onRequest }) {
       </div>
 
       <div className="owner-card__actions">
-        <button
-          className="owner-card__action owner-card__action--secondary"
-          type="button"
-          onClick={() => onSelect(owner)}
-        >
-          View times
-        </button>
-        <button
-          className="owner-card__action owner-card__action--primary"
-          type="button"
-          onClick={() => onRequest(owner)}
-        >
-          Request time
-        </button>
+        <Link className="owner-card__action owner-card__action--primary" to={`/owners/${owner._id}`}>
+          Check Out
+        </Link>
       </div>
     </article>
   );

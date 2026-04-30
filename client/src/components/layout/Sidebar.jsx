@@ -5,7 +5,8 @@ import "./Sidebar.css";
 
 export default function Sidebar({ links }) {
   const [collapsed, setCollapsed] = useState(false);
-  const { logout } = useAuth();
+  const [copied, setCopied] = useState(false);
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -15,6 +16,12 @@ export default function Sidebar({ links }) {
     } catch (err) {
       console.error("Logout failed:", err);
     }
+  }
+
+  function copyOwnerLink() {
+    navigator.clipboard.writeText(`${window.location.origin}/owners/${user.id}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   }
 
   return (
@@ -48,9 +55,16 @@ export default function Sidebar({ links }) {
         ))}
       </nav>
 
-      <button className="sidebar-footer" type="button" onClick={handleLogout}>
-        <span className="label">Logout</span>
-      </button>
+      <div className="sidebar-bottom">
+        {user?.role === "OWNER" && (
+          <button className="sidebar-footer" type="button" onClick={copyOwnerLink}>
+            <span className="label">{copied ? "Copied" : "Copy Link"}</span>
+          </button>
+        )}
+        <button className="sidebar-footer" type="button" onClick={handleLogout}>
+          <span className="label">Logout</span>
+        </button>
+      </div>
     </aside>
   );
 }

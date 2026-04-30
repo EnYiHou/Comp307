@@ -20,6 +20,7 @@ import AuthPage from "../../pages/public/AuthPage";
 import InstructionsPage from "../../pages/public/InstructionsPage";
 import LandingPage from "../../pages/public/LandingPage";
 import OwnersDirectoryPage from "../../pages/dashboard/OwnersDirectoryPage";
+import OwnerProfilePage from "../../pages/dashboard/OwnerProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import TeamFinder from "../../pages/tinder/TeamFinder";
 
@@ -57,6 +58,7 @@ export default function AppRouter() {
             element={<RequestMeetingPage />}
           />
           <Route path="/owners" element={<OwnersDirectoryPage />} />
+          <Route path="/owners/:ownerId" element={<OwnerProfilePage />} />
           <Route path="/invite/:token" element={<InviteBookingPage />} />
 
           <Route path="/dashboard/settings" element={<SettingsPage />} />

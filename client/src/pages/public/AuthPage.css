@@ -34,9 +34,9 @@
 
 .auth-page_error {
   padding: var(--spacing-3);
-  border: 1px solid rgb(220 38 38 / 0.25);
+  border: 1px solid rgba(216, 38, 38, 0.25);
   border-radius: var(--radius-md);
-  background: rgb(220 38 38 / 0.08);
+  background: rgba(216, 37, 37, 0.08);
   color: var(--color-danger);
 }
 

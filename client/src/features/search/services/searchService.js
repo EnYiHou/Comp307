@@ -19,6 +19,11 @@ export async function getOwners(searchTerm) {
     return response.data.data;
 }
 
+export async function getOwner(ownerId) {
+    const response = await api.get(`/owners/${ownerId}`);
+    return response.data.data;
+}
+
 export async function getMcGillOwners(searchTerm) {
     const response = await api.get("/owners/all-mcgill", {
         params: {
