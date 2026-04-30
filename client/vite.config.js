@@ -8,4 +8,10 @@ export default defineConfig({
     port: 3001,
     strictPort: true,
   },
+  css: {
+    transformer: 'postcss',
+  },
+  build: {
+    cssMinify: 'esbuild',
+  },
 });
