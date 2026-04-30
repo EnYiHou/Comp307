@@ -1,16 +1,16 @@
 /* Bogdan Timercan 261166331 */
 
-.invite-panel {
+.dashboard-panel.invite-panel {
   min-height: 780px;
   max-height: none;
+  overflow: visible;
 }
 
 .invite-panel__body {
   min-height: 660px;
-  flex: 1;
   display: grid;
   grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .invite-list {
@@ -78,11 +78,10 @@
 
 .invite-details {
   min-width: 0;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: var(--spacing-5);
-  overflow: auto;
+  overflow: visible;
 }
 
 .invite-details__empty {
@@ -159,7 +158,7 @@
 }
 
 .invite-calendar-shell {
-  min-height: 0;
+  min-width: 0;
 }
 
 .invite-calendar {
