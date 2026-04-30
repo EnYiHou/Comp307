@@ -81,6 +81,22 @@
   max-width: 360px;
 }
 
+.availability-inline-header {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 360px));
+  gap: var(--spacing-4);
+}
+
+.availability-inline-header h4:last-child {
+  text-align: left;
+}
+
+.availability-inline-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 360px));
+  gap: var(--spacing-4);
+}
+
 .availability-choice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -144,7 +160,7 @@
 }
 
 .availability-subsection-compact {
-  max-width: 520px;
+  max-width: 760px;
 }
 
 .availability-search-results {
@@ -447,9 +463,15 @@
 
 @media (max-width: 980px) {
   .availability-fields,
+  .availability-inline-header,
+  .availability-inline-fields,
   .availability-choice-grid,
   .availability-calendar-grid {
     grid-template-columns: 1fr;
+  }
+
+  .availability-inline-header h4:last-child {
+    text-align: left;
   }
 }
 

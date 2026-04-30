@@ -66,7 +66,8 @@ function BookingSlotCreation() {
   const showHeatmapRangeSelector =
     formData.bookingMode === "group" && formData.pollMethod === "heatmap";
   const basicsReady =
-    Boolean(formData.title.trim()) && Number(formData.capacity) >= 1;
+    Boolean(formData.title.trim()) &&
+    (formData.bookingMode === "group" || Number(formData.capacity) >= 1);
   const inviteReady =
     formData.bookingMode !== "group" || selectedUsers.length > 0;
   const showInviteSection = basicsReady && formData.bookingMode === "group";
@@ -147,7 +148,7 @@ function BookingSlotCreation() {
     if (!formData.title.trim()) {
       return "Add a title before creating availability.";
     }
-    if (Number(formData.capacity) < 1) {
+    if (formData.bookingMode === "slot" && Number(formData.capacity) < 1) {
       return "Capacity must be at least 1.";
     }
     if (formData.bookingMode === "group" && selectedUsers.length === 0) {
@@ -305,16 +306,6 @@ function BookingFields({
             placeholder="Optional context students should see before booking."
           />
         </label>
-        <label className="availability-field">
-          <span>Capacity per time</span>
-          <input
-            type="number"
-            min="1"
-            name="capacity"
-            value={formData.capacity}
-            onChange={handleChange}
-          />
-        </label>
       </div>
 
       {basicsReady && (
@@ -337,31 +328,33 @@ function BookingFields({
             </div>
           </div>
 
-          <div className="availability-subsection">
-            <h4>Visibility</h4>
-            <div className="availability-choice-grid is-compact">
-              <ChoiceTile
-                title="Public"
-                description="Visible to students browsing Book Appointments."
-                active={formData.visibility === "public"}
-                onClick={() =>
-                  handleChange({
-                    target: { name: "visibility", value: "public" },
-                  })
-                }
-              />
-              <ChoiceTile
-                title="Private"
-                description="Only intended participants can use it."
-                active={formData.visibility === "private"}
-                onClick={() =>
-                  handleChange({
-                    target: { name: "visibility", value: "private" },
-                  })
-                }
-              />
+          {formData.bookingMode === "slot" && (
+            <div className="availability-subsection">
+              <h4>Visibility</h4>
+              <div className="availability-choice-grid is-compact">
+                <ChoiceTile
+                  title="Public"
+                  description="Visible to students browsing Book Appointments."
+                  active={formData.visibility === "public"}
+                  onClick={() =>
+                    handleChange({
+                      target: { name: "visibility", value: "public" },
+                    })
+                  }
+                />
+                <ChoiceTile
+                  title="Private"
+                  description="Only intended participants can use it."
+                  active={formData.visibility === "private"}
+                  onClick={() =>
+                    handleChange({
+                      target: { name: "visibility", value: "private" },
+                    })
+                  }
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {formData.bookingMode === "group" && (
             <div className="availability-subsection">
@@ -392,23 +385,40 @@ function BookingFields({
           )}
 
           <div className="availability-subsection availability-subsection-compact">
-            <h4>
-              {formData.bookingMode === "group" ? "Final Recurrence" : "Repeat"}
-            </h4>
-            <label className="availability-field availability-field-inline">
-              <span>
-                {formData.bookingMode === "group"
-                  ? "How many weekly meetings after final selection?"
-                  : "How many weekly occurrences?"}
-              </span>
-              <input
-                type="number"
-                min="1"
-                name="recurrenceCount"
-                value={formData.recurrenceCount}
-                onChange={handleChange}
-              />
-            </label>
+            <div className="availability-inline-header">
+              <h4>
+                {formData.bookingMode === "group" ? "Final Recurrence" : "Repeat"}
+              </h4>
+              {formData.bookingMode === "slot" && <h4>Capacity</h4>}
+            </div>
+            <div className="availability-inline-fields">
+              <label className="availability-field availability-field-inline">
+                <span>
+                  {formData.bookingMode === "group"
+                    ? "How many weekly meetings after final selection?"
+                    : "How many weekly occurrences?"}
+                </span>
+                <input
+                  type="number"
+                  min="1"
+                  name="recurrenceCount"
+                  value={formData.recurrenceCount}
+                  onChange={handleChange}
+                />
+              </label>
+              {formData.bookingMode === "slot" && (
+                <label className="availability-field availability-field-inline">
+                  <span>Capacity per time</span>
+                  <input
+                    type="number"
+                    min="1"
+                    name="capacity"
+                    value={formData.capacity}
+                    onChange={handleChange}
+                  />
+                </label>
+              )}
+            </div>
           </div>
         </div>
       )}
