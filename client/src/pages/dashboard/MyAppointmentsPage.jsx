@@ -84,17 +84,17 @@ export default function MyAppointmentsPage() {
         </div>
       </div>
 
-      {message && <p className="dashboard-panel__message">{message}</p>}
+      {message && <p className="dashboard-panel-message">{message}</p>}
       {notifyLink && (
-        <p className="dashboard-panel__message">
+        <p className="dashboard-panel-message">
           <a className="dashboard-action" href={notifyLink}>
             Notify owner by email
           </a>
         </p>
       )}
 
-      <section className="dashboard-panel dashboard-panel--wide">
-        <div className="dashboard-panel__header">
+      <section className="dashboard-panel dashboard-panel-wide">
+        <div className="dashboard-panel-head">
           <div>
             <h2>Booked Slots</h2>
             <p>{loading ? "Loading..." : `${appointments.length} total`}</p>
@@ -104,26 +104,26 @@ export default function MyAppointmentsPage() {
         {loading ? (
           <LoadingState label="Loading appointments..." variant="panel" />
         ) : appointments.length === 0 ? (
-          <p className="dashboard-panel__message">No appointments booked yet.</p>
+          <p className="dashboard-panel-message">No appointments booked yet.</p>
         ) : (
-          <div className="dashboard-panel__scroll">
+          <div className="dashboard-panel-scroll">
             <div className="dashboard-list">
               {appointments.map((appointment) => (
                 <article className="dashboard-row" key={appointment._id}>
-                  <div className="dashboard-row__time">
+                  <div className="dashboard-row-time">
                     {formatDateTime(appointment.startTime)}
                   </div>
-                  <div className="dashboard-row__main">
+                  <div className="dashboard-row-main">
                     <h3>{appointment.title}</h3>
                     {appointment.description && <p>{appointment.description}</p>}
-                    <div className="dashboard-row__meta">
+                    <div className="dashboard-row-meta">
                       <span className="dashboard-chip">
                         {appointment.ownerId?.name || "Unknown owner"}
                       </span>
                       <span className="dashboard-chip is-status">{appointment.status}</span>
                     </div>
                   </div>
-                  <div className="dashboard-row__actions">
+                  <div className="dashboard-row-actions">
                     {appointment.ownerId?.email && (
                       <a
                         className="dashboard-action"
@@ -137,7 +137,7 @@ export default function MyAppointmentsPage() {
                       </a>
                     )}
                     <button
-                      className="dashboard-action dashboard-action--danger"
+                      className="dashboard-action danger-action"
                       type="button"
                       disabled={deletingId === appointment._id}
                       onClick={() => deleteAppointment(appointment)}

@@ -8,7 +8,7 @@ import "./dashboard.css";
 
 function formatDateTime(value) {
   if (!value) {
-    return "No time selected";
+    return "No time picked yet";
   }
 
   return new Intl.DateTimeFormat(undefined, {
@@ -20,24 +20,26 @@ function formatDateTime(value) {
 }
 
 function DashboardPanel({ title, count, loading, error, emptyText, children }) {
+  const countText = count === 1 ? "1 item total" : `${count} items total`;
+
   return (
     <section className="dashboard-panel">
-      <div className="dashboard-panel__header">
+      <div className="dashboard-panel-head">
         <div>
           <h2>{title}</h2>
-          <p>{loading ? "Loading..." : `${count} total`}</p>
+          <p>{loading ? "Loading ..." : countText}</p>
         </div>
-        {!loading && <span className="dashboard-panel__count">{count}</span>}
+        {!loading && <span className="dashboard-panel-count">{count}</span>}
       </div>
 
       {error ? (
-        <p className="dashboard-panel__message is-error">{error}</p>
+        <p className="dashboard-panel-message is-error">{error}</p>
       ) : loading ? (
         <LoadingState label={`Loading ${title.toLowerCase()}...`} variant="panel" />
       ) : count === 0 ? (
-        <p className="dashboard-panel__message">{emptyText}</p>
+        <p className="dashboard-panel-message">{emptyText}</p>
       ) : (
-        <div className="dashboard-panel__scroll">{children}</div>
+        <div className="dashboard-panel-scroll">{children}</div>
       )}
     </section>
   );
@@ -142,7 +144,7 @@ function AppointmentSection() {
         count={appointments.length}
         loading={loading}
         error={error}
-        emptyText="No appointments booked yet. Start with Book Appointments to find an available time."
+        emptyText="No appointments booked yet - try Book Appointments when you are ready."
       >
         <div className="dashboard-list">
           {appointments.map((appointment) => (
@@ -161,7 +163,7 @@ function AppointmentSection() {
         count={requests.length}
         loading={loading}
         error={error}
-        emptyText="No custom meeting requests right now."
+        emptyText="No custom meeting requests right now, for now."
       >
         <div className="dashboard-list">
           {requests.map((request) => (
@@ -182,12 +184,12 @@ function AppointmentSection() {
 function UpcomingAppointment({ appointment, deleting, onDelete }) {
   return (
     <article className="dashboard-row">
-      <div className="dashboard-row__time">{formatDateTime(appointment.startTime)}</div>
+      <div className="dashboard-row-time">{formatDateTime(appointment.startTime)}</div>
 
-      <div className="dashboard-row__main">
+      <div className="dashboard-row-main">
         <h3>{appointment.title}</h3>
         {appointment.description && <p>{appointment.description}</p>}
-        <div className="dashboard-row__meta">
+        <div className="dashboard-row-meta">
           {appointment.ownerId?.name && (
             <span className="dashboard-chip">With {appointment.ownerId.name}</span>
           )}
@@ -200,14 +202,14 @@ function UpcomingAppointment({ appointment, deleting, onDelete }) {
         </div>
       </div>
 
-      <div className="dashboard-row__actions">
+      <div className="dashboard-row-actions">
         {appointment.ownerId?.email && (
           <a className="dashboard-action" href={`mailto:${appointment.ownerId.email}`}>
             Email
           </a>
         )}
         <button
-          className="dashboard-action dashboard-action--danger"
+          className="dashboard-action danger-action"
           type="button"
           disabled={deleting}
           onClick={() => onDelete(appointment._id)}
@@ -222,12 +224,12 @@ function UpcomingAppointment({ appointment, deleting, onDelete }) {
 function RequestCard({ request, cancelling, onCancel }) {
   return (
     <article className="dashboard-row">
-      <div className="dashboard-row__time">{formatDateTime(request.preferredStart)}</div>
+      <div className="dashboard-row-time">{formatDateTime(request.preferredStart)}</div>
 
-      <div className="dashboard-row__main">
+      <div className="dashboard-row-main">
         <h3>{request.topic}</h3>
         {request.message && <p>{request.message}</p>}
-        <div className="dashboard-row__meta">
+        <div className="dashboard-row-meta">
           {request.ownerId?.name && (
             <span className="dashboard-chip">With {request.ownerId.name}</span>
           )}
@@ -237,15 +239,15 @@ function RequestCard({ request, cancelling, onCancel }) {
         </div>
       </div>
 
-      <div className="dashboard-row__actions">
+      <div className="dashboard-row-actions">
         {request.ownerId?.email && (
           <a className="dashboard-action" href={`mailto:${request.ownerId.email}`}>
-            Email
+            email
           </a>
         )}
         {request.status === "PENDING" && (
           <button
-            className="dashboard-action dashboard-action--danger"
+            className="dashboard-action danger-action"
             type="button"
             disabled={cancelling}
             onClick={() => onCancel(request._id)}
@@ -266,8 +268,7 @@ export default function Dashboard() {
           <p className="dashboard-eyebrow">Student workspace</p>
           <h1>Dashboard</h1>
           <p>
-            Track appointments, custom requests, and group invite votes from one
-            compact view.
+            Track appointments, custom requests, and group invite votes from one place.
           </p>
         </div>
       </div>
@@ -275,9 +276,6 @@ export default function Dashboard() {
       <div className="dashboard-quick-actions" aria-label="Quick actions">
         <Link className="dashboard-quick-action" to="/dashboard-owners">
           Book Appointments
-        </Link>
-        <Link className="dashboard-quick-action" to="/tinder">
-          Tinder
         </Link>
       </div>
 

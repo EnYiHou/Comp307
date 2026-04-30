@@ -118,21 +118,21 @@ export default function UserInvites() {
   }
 
   return (
-    <section className="dashboard-panel dashboard-panel--wide invite-panel">
-      <div className="dashboard-panel__header">
+    <section className="dashboard-panel dashboard-panel-wide invite-panel">
+      <div className="dashboard-panel-head">
         <div>
           <h2>Invites</h2>
           <p>{loading ? "Loading..." : `${invites.length} total`}</p>
         </div>
-        {!loading && <span className="dashboard-panel__count">{invites.length}</span>}
+        {!loading && <span className="dashboard-panel-count">{invites.length}</span>}
       </div>
 
       {error ? (
-        <p className="dashboard-panel__message is-error">{error}</p>
+        <p className="dashboard-panel-message is-error">{error}</p>
       ) : loading ? (
         <LoadingState label="Loading invites..." variant="panel" />
       ) : invites.length === 0 ? (
-        <p className="dashboard-panel__message">No group meeting invites yet.</p>
+        <p className="dashboard-panel-message">No group meeting invites yet.</p>
       ) : (
         <div className="invite-panel__body">
           <InviteList

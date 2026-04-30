@@ -80,10 +80,10 @@ export default function InviteBookingPage() {
         </div>
       </div>
 
-      {message && <p className="dashboard-panel__message">{message}</p>}
+      {message && <p className="dashboard-panel-message">{message}</p>}
 
-      <section className="dashboard-panel dashboard-panel--wide">
-        <div className="dashboard-panel__header">
+      <section className="dashboard-panel dashboard-panel-wide">
+        <div className="dashboard-panel-head">
           <div>
             <h2>Available Slots</h2>
             <p>{invite?.bookings?.length || 0} open slots</p>
@@ -99,27 +99,27 @@ export default function InviteBookingPage() {
         </div>
 
         {!invite ? (
-          <p className="dashboard-panel__message">Invite not found.</p>
+          <p className="dashboard-panel-message">Invite not found.</p>
         ) : invite.bookings.length === 0 ? (
-          <p className="dashboard-panel__message">
+          <p className="dashboard-panel-message">
             This owner has no active public slots right now.
           </p>
         ) : (
-          <div className="dashboard-panel__scroll">
+          <div className="dashboard-panel-scroll">
             <div className="dashboard-list">
               {invite.bookings.map((slot) => (
                 <article className="dashboard-row" key={slot._id}>
-                  <div className="dashboard-row__time">{formatDateTime(slot.startTime)}</div>
-                  <div className="dashboard-row__main">
+                  <div className="dashboard-row-time">{formatDateTime(slot.startTime)}</div>
+                  <div className="dashboard-row-main">
                     <h3>{slot.title}</h3>
                     {slot.description && <p>{slot.description}</p>}
-                    <div className="dashboard-row__meta">
+                    <div className="dashboard-row-meta">
                       <span className="dashboard-chip">
                         {spotsAvailable(slot)} spots available
                       </span>
                     </div>
                   </div>
-                  <div className="dashboard-row__actions">
+                  <div className="dashboard-row-actions">
                     <button
                       className="dashboard-action"
                       type="button"

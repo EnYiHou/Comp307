@@ -11,7 +11,7 @@ export default function SettingsPage() {
         contact links.
       </p>
 
-      <div className="dashboard-panel__message">
+      <div className="dashboard-panel-message">
         <p>
           <strong>Name:</strong> {user?.name || "Unknown"}
         </p>

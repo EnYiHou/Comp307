@@ -8,7 +8,7 @@ import "./OwnerDashboardPage.css";
 
 function formatDateTime(dateValue) {
   if (!dateValue) {
-    return "No time selected";
+    return "No time picked yet";
   }
 
   return new Date(dateValue).toLocaleString([], {
@@ -93,23 +93,22 @@ export default function OwnerDashboardPage() {
 
   return (
     <section className="owner-dashboard">
-      <div className="owner-dashboard-hero">
+      <div className="owner-hero">
         <div>
-          <p className="owner-dashboard-eyebrow">Owner workspace</p>
+          <p className="owner-eyebrow">Owner workspace</p>
           <h1>Owner Dashboard</h1>
           <p>
-            Review student requests first, then keep an eye on upcoming booked
-            appointments.
+            Review student requests first, then keep an eye on upcoming bookings.
           </p>
         </div>
-        <Link className="owner-primary-action" to="/owner/slots/new">
+        <Link className="owner-main-action" to="/owner/slots/new">
           Create Availability
         </Link>
       </div>
 
-      {message && <p className="dashboard-message">{message}</p>}
+      {message && <p className="owner-message">{message}</p>}
 
-      <div className="owner-dashboard-summary" aria-label="Owner dashboard summary">
+      <div className="owner-summary" aria-label="Owner dashboard summary">
         <article>
           <span>{loading ? "-" : requests.length}</span>
           <p>Pending requests</p>
@@ -120,15 +119,15 @@ export default function OwnerDashboardPage() {
         </article>
         <article>
           <span>{loading ? "-" : bookings.length}</span>
-          <p>Upcoming bookings</p>
+          <p>Total upcoming</p>
         </article>
       </div>
 
-      <div className="owner-dashboard-grid">
-        <section className="owner-dashboard-panel owner-dashboard-panel--requests">
+      <div className="owner-main-grid">
+        <section className="owner-dashboard-panel owner-requests-panel">
           <PanelHeader
             title="Request Queue"
-            subtitle="Accept or decline custom meeting requests."
+            subtitle="Accept or decline custom meeting requests"
             count={requests.length}
             loading={loading}
           />
@@ -141,7 +140,7 @@ export default function OwnerDashboardPage() {
               message="New student requests will appear here for quick review."
             />
           ) : (
-            <div className="owner-request-list">
+            <div className="owner-requests-list">
               {requests.map((request) => (
                 <RequestRow
                   key={request._id}
@@ -154,7 +153,7 @@ export default function OwnerDashboardPage() {
           )}
         </section>
 
-        <aside className="owner-side-stack">
+        <aside className="owner-side">
           <section className="owner-dashboard-panel">
             <PanelHeader
               title="Upcoming Bookings"
@@ -172,7 +171,7 @@ export default function OwnerDashboardPage() {
                 action={<Link to="/owner/slots/new">Create Availability</Link>}
               />
             ) : (
-              <div className="owner-booking-list-compact">
+              <div className="owner-bookings-small">
                 {bookings.map((booking) => (
                   <BookingRow key={booking._id} booking={booking} />
                 ))}
@@ -190,7 +189,7 @@ export default function OwnerDashboardPage() {
 
 function PanelHeader({ title, subtitle, count, loading }) {
   return (
-    <div className="owner-dashboard-panel-header">
+    <div className="owner-panel-head">
       <div>
         <h2>{title}</h2>
         <p>{subtitle}</p>
@@ -202,7 +201,7 @@ function PanelHeader({ title, subtitle, count, loading }) {
 
 function EmptyState({ title, message, action }) {
   return (
-    <div className="owner-empty-state">
+    <div className="owner-empty">
       <h3>{title}</h3>
       <p>{message}</p>
       {action}
@@ -213,20 +212,20 @@ function EmptyState({ title, message, action }) {
 function RequestRow({ request, updating, onUpdate }) {
   return (
     <article className="owner-request-card">
-      <div className="owner-request-time">
+      <div className="request-time">
         <span>Preferred</span>
         <strong>{formatDateTime(request.preferredStart)}</strong>
       </div>
 
-      <div className="owner-request-main">
+      <div className="request-main">
         <div>
           <h3>{request.requesterId?.name || "Unknown requester"}</h3>
           <p>{request.topic}</p>
         </div>
-        {request.message && <p className="owner-request-message">{request.message}</p>}
+        {request.message && <p className="request-note">{request.message}</p>}
       </div>
 
-      <div className="owner-request-actions">
+      <div className="request-buttons">
         <button
           type="button"
           disabled={updating}
@@ -236,7 +235,7 @@ function RequestRow({ request, updating, onUpdate }) {
         </button>
         <button
           type="button"
-          className="decline-button"
+          className="no-button"
           disabled={updating}
           onClick={() => onUpdate(request._id, "DECLINED")}
         >
@@ -249,7 +248,7 @@ function RequestRow({ request, updating, onUpdate }) {
 
 function BookingRow({ booking }) {
   return (
-    <article className="owner-booking-card">
+    <article className="booking-card-small">
       <div>
         <span>{formatDateTime(booking.startTime)}</span>
         <h3>{booking.title}</h3>
