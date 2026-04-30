@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+/* Bogdan Timercan 261166331 */
+
 const bookingSchema = new mongoose.Schema(
 
     {
@@ -52,46 +54,6 @@ const bookingSchema = new mongoose.Schema(
     },
 );
 
-
-const bookingRequestSchema = new mongoose.Schema(
-    {
-        ownerId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
-        requesterId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
-        message: {
-            type: String,
-            trim: true,
-        },
-        status: {
-            type: String,
-            enum: ["pending", "accepted", "declined"],
-            default: "pending",
-        },
-        proposedTitle: {
-            type: String,
-            trim: true,
-        },
-        proposedDescription: {
-            type: String,
-            trim: true,
-        },
-        createdBookingId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Booking",
-            default: null,
-        },
-    },
-    {
-        timestamps: true,
-    },
-);
 
 const bookingPollsSchema = new mongoose.Schema(
     {
@@ -184,7 +146,6 @@ const bookingPollsSchema = new mongoose.Schema(
 );
 
 const Booking = mongoose.model("Booking", bookingSchema);
-const BookingRequest = mongoose.model("BookingRequest", bookingRequestSchema);
 const BookingPoll = mongoose.model("BookingPoll", bookingPollsSchema);
 
-export { Booking, BookingRequest, BookingPoll };
+export { Booking, BookingPoll };

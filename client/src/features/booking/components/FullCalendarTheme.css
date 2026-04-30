@@ -1,3 +1,5 @@
+/* Bogdan Timercan 261166331 */
+
 :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) {
   border: none;
   border-radius: 1.25rem;
@@ -24,35 +26,27 @@
   font-family: var(--font-family-sans);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-toolbar.fc-header-toolbar {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-toolbar.fc-header-toolbar {
   align-items: center;
   gap: var(--spacing-3);
   margin-bottom: var(--spacing-4);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-toolbar-chunk {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-toolbar-chunk {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
   flex-wrap: wrap;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-toolbar-title {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-toolbar-title {
   font-family: var(--font-family-heading);
   font-size: clamp(1.1rem, 1.2vw + 0.85rem, 1.45rem);
   line-height: 1.1;
   letter-spacing: 0.01em;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-button {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button {
   padding: 0.58rem 0.9rem;
   border: none;
   border-radius: 999px;
@@ -70,73 +64,43 @@
     color 160ms ease;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-button:hover,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-button-primary:not(:disabled).fc-button-active,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-button-primary:not(:disabled):active {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button:hover,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button-primary:not(:disabled).fc-button-active,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button-primary:not(:disabled):active {
   transform: translateY(-1px);
   background: var(--color-primary);
   color: var(--color-surface);
   box-shadow: 0 10px 20px rgb(237 27 47 / 0.22);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-button:disabled {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button:disabled {
   opacity: 0.55;
   box-shadow: inset 0 0 0 1px rgb(215 203 192 / 0.7);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-button:focus,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-button-primary:focus {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button:focus,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button-primary:focus {
   box-shadow:
     inset 0 0 0 1px rgb(215 203 192 / 0.8),
     0 0 0 4px rgb(237 27 47 / 0.12);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-scrollgrid,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-scrollgrid-section
-  > td,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-scrollgrid-section
-  > th {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-scrollgrid,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-scrollgrid-section>td,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-scrollgrid-section>th {
   border-color: transparent;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-theme-standard
-  td,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-theme-standard
-  th {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-theme-standard td,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-theme-standard th {
   border-color: rgb(215 203 192 / 0.42);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-col-header-cell {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-col-header-cell {
   background: linear-gradient(180deg, rgb(248 244 239 / 0.96), #fff);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-col-header-cell-cushion {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-col-header-cell-cushion {
   padding: 0.9rem 0.55rem;
   color: var(--color-muted);
   font-size: 0.76rem;
@@ -145,39 +109,27 @@
   text-transform: uppercase;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-slot-label-cushion,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-axis-cushion {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-slot-label-cushion,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-axis-cushion {
   color: var(--color-muted);
   font-size: 0.76rem;
   font-weight: var(--font-weight-semibold);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-day-frame {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-day-frame {
   min-height: 8.5rem;
   transition: background-color 160ms ease;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-day-top {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-day-top {
   padding: 0.35rem 0.4rem 0;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-day-events {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-day-events {
   margin: 0.25rem 0.4rem 0.5rem;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-day-number {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-day-number {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -192,56 +144,36 @@
     color 160ms ease;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-day:hover,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-col:hover,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-slot:hover {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-day:hover,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-col:hover,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-slot:hover {
   background: rgb(237 27 47 / 0.045);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-day:hover
-  .fc-daygrid-day-number {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-day:hover .fc-daygrid-day-number {
   background: rgb(237 27 47 / 0.1);
   color: var(--color-primary-dark);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-day-today
-  .fc-daygrid-day-number {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-day-today .fc-daygrid-day-number {
   background: rgb(237 27 47 / 0.14);
   color: var(--color-primary-dark);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-slot {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-slot {
   height: 2.9rem;
   transition: background-color 160ms ease;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-now-indicator-line {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-now-indicator-line {
   border-color: rgb(159 16 32 / 0.62);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-now-indicator-arrow {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-now-indicator-arrow {
   border-top-color: rgb(159 16 32 / 0.62);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-event {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-event {
   border: none;
   border-radius: 0.95rem;
   box-shadow:
@@ -254,9 +186,7 @@
     filter 160ms ease;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-event:hover {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-event:hover {
   transform: translateY(-2px);
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.18),
@@ -264,64 +194,41 @@
   filter: saturate(1.03);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-event-main {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-event-main {
   padding: 0.46rem 0.62rem;
   white-space: normal;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-event-time,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-event-title {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-event-time,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-event-title {
   white-space: normal;
   overflow: visible;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-event {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-event {
   margin-top: 0.3rem;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-event
-  .fc-event-main {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-event .fc-event-main {
   min-height: 3.1rem;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-event-harness {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-event-harness {
   margin-inline: 0.18rem;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-event
-  .fc-event-main-frame,
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-timegrid-event-short
-  .fc-event-main-frame {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-event .fc-event-main-frame,
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-event-short .fc-event-main-frame {
   gap: 0.18rem;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-highlight {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-highlight {
   background: rgb(237 27 47 / 0.14);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-daygrid-more-link {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-more-link {
   display: inline-flex;
   align-items: center;
   margin: 0.35rem 0.4rem 0.45rem;
@@ -333,25 +240,19 @@
   font-weight: var(--font-weight-semibold);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-popover {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-popover {
   border: none;
   border-radius: 1rem;
   box-shadow: 0 16px 36px rgb(31 31 31 / 0.18);
   overflow: hidden;
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-popover-header {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-popover-header {
   padding: 0.8rem 1rem;
   background: rgb(248 244 239 / 0.96);
 }
 
-:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-  .fc
-  .fc-popover-body {
+:is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-popover-body {
   padding: 0.45rem;
   background: var(--color-surface);
 }
@@ -414,42 +315,30 @@
 }
 
 @media (max-width: 700px) {
-  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-    .fc
-    .fc-toolbar.fc-header-toolbar {
+  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-toolbar.fc-header-toolbar {
     align-items: stretch;
     flex-direction: column;
   }
 
-  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-    .fc
-    .fc-toolbar-chunk {
+  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-toolbar-chunk {
     justify-content: center;
   }
 
-  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-    .fc
-    .fc-toolbar-title {
+  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-toolbar-title {
     font-size: var(--font-size-md);
     text-align: center;
   }
 
-  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-    .fc
-    .fc-button {
+  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-button {
     padding: 0.48rem 0.72rem;
     font-size: var(--font-size-xs);
   }
 
-  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-    .fc
-    .fc-daygrid-day-frame {
+  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-daygrid-day-frame {
     min-height: 6.75rem;
   }
 
-  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar)
-    .fc
-    .fc-timegrid-slot {
+  :is(.availability-calendar-card, .owner-poll-calendar, .invite-calendar) .fc .fc-timegrid-slot {
     height: 2.5rem;
   }
 

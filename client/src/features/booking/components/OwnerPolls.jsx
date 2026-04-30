@@ -13,6 +13,7 @@ import {
 import "./OwnerPolls.css";
 import "./FullCalendarTheme.css";
 
+// Bogdan Timercan 261166331
 // Extra Bugfixes: Ronald Zhang
 
 function getHeatColor(voteCount) {

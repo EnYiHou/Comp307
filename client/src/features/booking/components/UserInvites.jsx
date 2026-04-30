@@ -11,6 +11,8 @@ import "./FullCalendarTheme.css";
 const SLOT_DURATION_MINUTES = 30;
 const SLOT_DURATION_MS = SLOT_DURATION_MINUTES * 60 * 1000;
 
+// Bogdan Timercan 261166331
+
 function getSelectedSlotIds(invite) {
   return (invite?.candidateSlots ?? [])
     .filter((slot) => slot.selectedByCurrentUser)
@@ -52,8 +54,8 @@ export default function UserInvites() {
         if (isMounted) {
           const activeInvites = Array.isArray(response.data)
             ? response.data.filter(
-                (invite) => invite.status === "collectingVotes",
-              )
+              (invite) => invite.status === "collectingVotes",
+            )
             : [];
           setInvites(activeInvites);
         }
@@ -167,9 +169,8 @@ function InviteList({ invites, selectedInviteId, onSelectInvite }) {
 
         return (
           <button
-            className={`invite-list__item${isSelected ? " is-selected" : ""}${
-              hasVoted ? " is-voted" : ""
-            }`}
+            className={`invite-list__item${isSelected ? " is-selected" : ""}${hasVoted ? " is-voted" : ""
+              }`}
             key={invite._id}
             type="button"
             onClick={() => onSelectInvite(invite._id)}

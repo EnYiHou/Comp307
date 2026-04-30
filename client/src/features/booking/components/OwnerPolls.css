@@ -1,3 +1,5 @@
+/* Bogdan Timercan 261166331 */
+
 .owner-polls-panel {
   min-height: 560px;
   margin-top: var(--spacing-5);
@@ -138,7 +140,7 @@
   color: var(--color-muted);
 }
 
-.owner-poll-details__header > span {
+.owner-poll-details__header>span {
   flex: 0 0 auto;
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
@@ -303,6 +305,7 @@
 }
 
 @media (max-width: 700px) {
+
   .owner-poll-details,
   .owner-poll-list {
     padding: var(--spacing-4);

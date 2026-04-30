@@ -1,3 +1,5 @@
+/* Bogdan Timercan 261166331 */
+
 .availability-form {
   display: grid;
   gap: var(--spacing-5);
@@ -207,7 +209,7 @@
   color: var(--color-muted);
 }
 
-.selected-users > span {
+.selected-users>span {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -396,11 +398,7 @@
   padding: 1px 3px;
 }
 
-.availability-calendar-grid
-  .availability-calendar-card:last-child
-  .fc
-  .fc-timegrid-event
-  .fc-event-main {
+.availability-calendar-grid .availability-calendar-card:last-child .fc .fc-timegrid-event .fc-event-main {
   padding: 0.32rem 0.5rem;
 }
 
@@ -462,6 +460,7 @@
 }
 
 @media (max-width: 980px) {
+
   .availability-fields,
   .availability-inline-header,
   .availability-inline-fields,

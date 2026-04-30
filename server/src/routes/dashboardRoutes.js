@@ -1,7 +1,9 @@
 import express from 'express';
-import { Booking, BookingRequest, BookingPoll } from "../models/Booking.js";
+import { Booking, BookingPoll } from "../models/Booking.js";
 import User from "../models/User.js";
 import requireAuth, { requireRole } from "../middleware/authMiddleware.js";
+
+/* Bogdan Timercan 261166331 */
 
 const router = express.Router();
 

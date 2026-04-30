@@ -16,7 +16,7 @@ import {
 import "./BookingSlotCreation.css";
 import "./FullCalendarTheme.css";
 
-// Main: Bogdan
+// Main: Bogdan Timercan 261166331
 // Extra Bugfixes: Ronald Zhang
 
 function makeId() {
