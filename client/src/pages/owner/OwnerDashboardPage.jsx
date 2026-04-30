@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
 import OwnerPolls from "../../features/booking/components/OwnerPolls";
 import api from "../../shared/api/api";
@@ -101,9 +100,6 @@ export default function OwnerDashboardPage() {
             appointments.
           </p>
         </div>
-        <Link className="owner-primary-action" to="/owner/slots/new">
-          Create Availability
-        </Link>
       </div>
 
       {message && <p className="dashboard-message">{message}</p>}
@@ -168,7 +164,6 @@ export default function OwnerDashboardPage() {
               <EmptyState
                 title="No upcoming bookings"
                 message="Create availability so students can reserve a time."
-                action={<Link to="/owner/slots/new">Create Availability</Link>}
               />
             ) : (
               <div className="owner-booking-list-compact">
@@ -258,7 +253,6 @@ function BookingRow({ booking }) {
             : "No participants listed"}
         </p>
       </div>
-      <Link to={`/owner/bookings/${booking._id}/edit`}>Edit</Link>
     </article>
   );
 }
