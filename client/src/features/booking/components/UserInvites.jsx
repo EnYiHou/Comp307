@@ -5,7 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
-import { formatTimeRange } from "../utils/bookingCalendarUtils.js";
+import { formatTime } from "../utils/bookingCalendarUtils.js";
 import "./UserInvites.css";
 import "./FullCalendarTheme.css";
 
@@ -386,12 +386,14 @@ function HeatmapInvite({ invite, selectedSlotIds, onSetSlotSelection }) {
 
   function handleSelect(info) {
     setSlotsInRange(info.start, info.end);
+    info.view.calendar.unselect();
   }
 
   function handleDateClick(info) {
     const start = info.date;
     const end = new Date(start.getTime() + SLOT_DURATION_MS);
     setSlotsInRange(start, end);
+    info.view.calendar.unselect();
   }
 
   return (
@@ -445,7 +447,8 @@ function CalendarInvite({ invite, selectedSlotIds, onToggleSlotSelection }) {
   function renderEventContent(info) {
     return (
       <div className="invite-event">
-        <span>{formatTimeRange(info.event.start, info.event.end)}</span>
+        <span>{formatTime(info.event.start)}</span>
+        <span>{formatTime(info.event.end)}</span>
         <span>{info.event.extendedProps.voteCount} votes</span>
         {info.event.extendedProps.isSelected && <span>Selected</span>}
       </div>

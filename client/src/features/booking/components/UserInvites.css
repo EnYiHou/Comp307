@@ -1,9 +1,10 @@
 .invite-panel {
-  min-height: 560px;
+  min-height: 780px;
+  max-height: none;
 }
 
 .invite-panel__body {
-  min-height: 0;
+  min-height: 660px;
   flex: 1;
   display: grid;
   grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
@@ -201,7 +202,12 @@
   display: grid;
   gap: 0.1rem;
   overflow: hidden;
+  padding: 4px;
   font-size: var(--font-size-xs);
+}
+
+.invite-event span:nth-child(2) {
+  font-weight: var(--font-weight-bold);
 }
 
 .heatmap-calendar .fc-bg-event {
@@ -251,6 +257,7 @@
 }
 
 @media (max-width: 700px) {
+
   .invite-details,
   .invite-list {
     padding: var(--spacing-4);

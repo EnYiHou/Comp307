@@ -7,6 +7,7 @@ import useConfirmationDialog from "../../../components/confirmation/useConfirmat
 import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
 import {
+  formatTime,
   formatTimeRange,
   getDateOnly,
 } from "../utils/bookingCalendarUtils.js";
@@ -314,7 +315,7 @@ function PollCalendar({ poll, selectedFinalSlotId, onSelectFinalSlot }) {
         end: slot.endTime,
         backgroundColor: isFinal ? "#0f766e" : isHeatmap ? heatColor : undefined,
         borderColor: isFinal ? "#0f766e" : isHeatmap ? heatColor : undefined,
-        textColor: isFinal || isHeatmap ? "#ffffff" : undefined,
+        textColor: isFinal ? "#ffffff" : isHeatmap ? "#1f2937" : undefined,
         extendedProps: {
           voteCount: slot.voteCount ?? 0,
           isFinal,
@@ -324,9 +325,18 @@ function PollCalendar({ poll, selectedFinalSlotId, onSelectFinalSlot }) {
   }, [isHeatmap, poll.candidateSlots, selectedFinalSlotId]);
 
   function renderEventContent(info) {
+    if (isHeatmap) {
+      return (
+        <div className="owner-poll-event owner-poll-event--heatmap">
+          <span>{info.event.extendedProps.voteCount}</span>
+        </div>
+      );
+    }
+
     return (
       <div className="owner-poll-event">
-        <span>{formatTimeRange(info.event.start, info.event.end)}</span>
+        <span>{formatTime(info.event.start)}</span>
+        <span>{formatTime(info.event.end)}</span>
         <span>{info.event.extendedProps.voteCount} votes</span>
         {info.event.extendedProps.isFinal && <span>Final</span>}
       </div>
@@ -351,9 +361,9 @@ function PollCalendar({ poll, selectedFinalSlotId, onSelectFinalSlot }) {
         validRange={
           isHeatmap
             ? {
-                start: poll.rangeStart,
-                end: poll.rangeEnd,
-              }
+              start: poll.rangeStart,
+              end: poll.rangeEnd,
+            }
             : undefined
         }
         allDaySlot={false}
