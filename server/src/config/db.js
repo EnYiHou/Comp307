@@ -3,7 +3,9 @@ import { env } from "./env.js";
 
 export const connectDB = async () => {
   mongoose.set("strictQuery", true);
-  console.log("uri:", env.mongoUri);
+  if (!env.mongoUri) {
+    throw new Error("MONGODB_URI is missing. Add it to server/.env or the PM2 environment.");
+  }
   await mongoose.connect(env.mongoUri);
   return mongoose.connection;
 };

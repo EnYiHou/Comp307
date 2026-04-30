@@ -22,6 +22,7 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const clientDistPath = path.join(__dirname, "../../client/dist");
 
 const app = express();
 
@@ -40,7 +41,7 @@ app.use(express.json());
 app.use(cookieParser())
 app.use(morgan("dev"));
 
-app.use(express.static(path.join(__dirname, "../../client/dist")));
+app.use(express.static(clientDistPath));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -56,11 +57,10 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use("/api/teams", teamRoutes);
 
 app.get("{*path}", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
+  res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
 // Fallback error handler
 app.use(errorMiddleware);
 
-console.log("Static path:", path.join(__dirname, "../client/dist"));
 export default app;
