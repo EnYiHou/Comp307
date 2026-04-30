@@ -350,6 +350,29 @@ router.get('/getPolls', requireAuth, requireRole("OWNER"), async (req, res) => {
     }
 });
 
+router.delete("/polls/:pollId", requireAuth, requireRole("OWNER"), async (req, res, next) => {
+    try {
+        const poll = await BookingPoll.findOneAndDelete({
+            _id: req.params.pollId,
+            ownerId: req.user.id,
+        });
+
+        if (!poll) {
+            return res.status(404).json({
+                message: "Poll not found.",
+            });
+        }
+
+        res.json({
+            success: true,
+            data: poll,
+            message: "Poll deleted successfully.",
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.patch("/pollDecision/:pollId", requireAuth, requireRole("OWNER"), async (req, res) => {
     try {
         const userId = req.user.id;

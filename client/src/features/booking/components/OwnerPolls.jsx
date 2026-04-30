@@ -74,6 +74,8 @@ function OwnerPolls() {
   const [selectedPollId, setSelectedPollId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deletingPollId, setDeletingPollId] = useState("");
+  const { confirm, confirmationDialog } = useConfirmationDialog();
 
   useEffect(() => {
     let isMounted = true;
@@ -113,11 +115,42 @@ function OwnerPolls() {
     );
   }, [polls, selectedPollId]);
 
-  function removePoll(pollId) {
+  function removePoll(pollId, resetSelection = true) {
     setPolls((prev) =>
       prev.filter((poll) => String(poll._id) !== String(pollId)),
     );
-    setSelectedPollId("");
+    if (resetSelection) {
+      setSelectedPollId("");
+    } else {
+      setSelectedPollId((currentPollId) =>
+        String(currentPollId) === String(pollId) ? "" : currentPollId,
+      );
+    }
+  }
+
+  async function deletePoll(pollId) {
+    const confirmed = await confirm({
+      title: "Delete poll?",
+      message: "This permanently removes the group poll and its collected votes.",
+      confirmLabel: "Delete",
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingPollId(String(pollId));
+    setError("");
+
+    try {
+      await api.delete(`/dashboard/polls/${pollId}`);
+      removePoll(pollId, false);
+    } catch (caughtError) {
+      console.error("Failed to delete poll:", caughtError);
+      setError(caughtError.response?.data?.message || "Failed to delete poll.");
+    } finally {
+      setDeletingPollId("");
+    }
   }
 
   return (
@@ -143,40 +176,56 @@ function OwnerPolls() {
         <div className="owner-polls-body">
           <PollList
             polls={polls}
+            deletingPollId={deletingPollId}
             selectedPollId={selectedPoll?._id}
+            onDeletePoll={deletePoll}
             onSelectPoll={setSelectedPollId}
           />
           <PollDetails poll={selectedPoll} onFinalize={removePoll} />
         </div>
       )}
+      {confirmationDialog}
     </section>
   );
 }
 
-function PollList({ polls, selectedPollId, onSelectPoll }) {
+function PollList({ polls, deletingPollId, selectedPollId, onDeletePoll, onSelectPoll }) {
   return (
     <aside className="owner-poll-list">
       {polls.map((poll) => {
         const isSelected = String(poll._id) === String(selectedPollId);
+        const isDeleting = String(poll._id) === String(deletingPollId);
 
         return (
-          <button
+          <article
             className={`owner-poll-list__item${isSelected ? " is-selected" : ""}`}
             key={poll._id}
-            type="button"
-            onClick={() => onSelectPoll(poll._id)}
           >
-            <span className="owner-poll-list__status">
-              {getStatusLabel(poll.status)}
-            </span>
-            <span className="owner-poll-list__title">{poll.title}</span>
-            <span className="owner-poll-list__description">
-              {poll.description || "No description provided."}
-            </span>
-            <span className="owner-poll-list__meta">
-              {poll.candidateSlots?.length ?? 0} candidate times
-            </span>
-          </button>
+            <button
+              className="owner-poll-list__select"
+              type="button"
+              onClick={() => onSelectPoll(poll._id)}
+            >
+              <span className="owner-poll-list__status">
+                {getStatusLabel(poll.status)}
+              </span>
+              <span className="owner-poll-list__title">{poll.title}</span>
+              <span className="owner-poll-list__description">
+                {poll.description || "No description provided."}
+              </span>
+              <span className="owner-poll-list__meta">
+                {poll.candidateSlots?.length ?? 0} candidate times
+              </span>
+            </button>
+            <button
+              className="owner-poll-list__delete"
+              type="button"
+              disabled={isDeleting}
+              onClick={() => onDeletePoll(poll._id)}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </button>
+          </article>
         );
       })}
     </aside>
