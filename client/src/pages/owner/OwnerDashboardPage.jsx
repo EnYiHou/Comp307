@@ -31,6 +31,7 @@ export default function OwnerDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [updatingRequestId, setUpdatingRequestId] = useState(null);
+  const [bookingAction, setBookingAction] = useState(null);
   const { confirm, confirmationDialog } = useConfirmationDialog();
 
   const todayBookings = useMemo(() => getTodayBookings(bookings), [bookings]);
@@ -44,7 +45,7 @@ export default function OwnerDashboardPage() {
         api.get("/meeting-requests/owner", {
           params: { status: "PENDING" },
         }),
-        api.get("/meeting-requests/owner/upcoming"),
+        api.get("/bookings/owner/upcoming"),
       ]);
 
       setRequests(requestsResponse.data.data || []);
@@ -86,6 +87,64 @@ export default function OwnerDashboardPage() {
       );
     } finally {
       setUpdatingRequestId(null);
+    }
+  }
+
+  async function toggleBookingVisibility(booking) {
+    const nextVisibility = booking.visibility === "public" ? "private" : "public";
+
+    setBookingAction({ id: booking._id, type: "visibility" });
+    setMessage("");
+
+    try {
+      const response = await api.patch(`/bookings/${booking._id}`, {
+        title: booking.title,
+        description: booking.description || "",
+        startTime: booking.startTime,
+        endTime: booking.endTime,
+        visibility: nextVisibility,
+        status: booking.status,
+        capacity: booking.capacity || Math.max(booking.participants?.length || 0, 1),
+      });
+
+      setBookings((currentBookings) =>
+        currentBookings.map((currentBooking) =>
+          currentBooking._id === booking._id ? response.data.data : currentBooking,
+        ),
+      );
+    } catch (error) {
+      console.error("Booking visibility update error:", error);
+      setMessage(error.response?.data?.message || "Failed to update booking visibility.");
+    } finally {
+      setBookingAction(null);
+    }
+  }
+
+  async function deleteBooking(booking) {
+    const confirmed = await confirm({
+      title: "Delete booking?",
+      message: "This permanently removes the booking from your upcoming list.",
+      confirmLabel: "Delete",
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    setBookingAction({ id: booking._id, type: "delete" });
+    setMessage("");
+
+    try {
+      await api.delete(`/bookings/${booking._id}`);
+      setBookings((currentBookings) =>
+        currentBookings.filter((currentBooking) => currentBooking._id !== booking._id),
+      );
+      setMessage("Booking deleted.");
+    } catch (error) {
+      console.error("Booking delete error:", error);
+      setMessage(error.response?.data?.message || "Failed to delete booking.");
+    } finally {
+      setBookingAction(null);
     }
   }
 
@@ -168,7 +227,15 @@ export default function OwnerDashboardPage() {
             ) : (
               <div className="owner-booking-list-compact">
                 {bookings.map((booking) => (
-                  <BookingRow key={booking._id} booking={booking} />
+                  <BookingRow
+                    key={booking._id}
+                    booking={booking}
+                    actionType={
+                      bookingAction?.id === booking._id ? bookingAction.type : null
+                    }
+                    onDelete={deleteBooking}
+                    onToggleVisibility={toggleBookingVisibility}
+                  />
                 ))}
               </div>
             )}
@@ -241,17 +308,44 @@ function RequestRow({ request, updating, onUpdate }) {
   );
 }
 
-function BookingRow({ booking }) {
+function BookingRow({ booking, actionType, onDelete, onToggleVisibility }) {
+  const isPublic = booking.visibility === "public";
+  const isBusy = Boolean(actionType);
+
   return (
     <article className="owner-booking-card">
       <div>
-        <span>{formatDateTime(booking.startTime)}</span>
+        <span>
+          {formatDateTime(booking.startTime)} - {booking.visibility || "private"}
+        </span>
         <h3>{booking.title}</h3>
         <p>
           {booking.participants?.length
             ? booking.participants.map((participant) => participant.name).join(", ")
             : "No participants listed"}
         </p>
+      </div>
+      <div className="owner-booking-actions">
+        <button
+          type="button"
+          className={`secondary-button visibility-button ${
+            isPublic ? "is-public" : "is-private"
+          }`}
+          disabled={isBusy}
+          onClick={() => onToggleVisibility(booking)}
+        >
+          {actionType === "visibility"
+            ? "Saving..."
+            : `Make ${isPublic ? "private" : "public"}`}
+        </button>
+        <button
+          type="button"
+          className="delete-button"
+          disabled={isBusy}
+          onClick={() => onDelete(booking)}
+        >
+          {actionType === "delete" ? "Deleting..." : "Delete"}
+        </button>
       </div>
     </article>
   );
