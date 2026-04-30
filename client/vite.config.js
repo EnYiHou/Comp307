@@ -7,6 +7,12 @@ export default defineConfig({
   server: {
     port: 3001,
     strictPort: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
   },
   css: {
     transformer: 'postcss',
