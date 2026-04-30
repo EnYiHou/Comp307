@@ -1,6 +1,5 @@
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
-import LoadingState from "../../components/loading/LoadingState.jsx";
 import { useAuth } from "../../features/auth/useAuth.js";
 import "./AuthPage.css";
 
@@ -13,7 +12,7 @@ export default function AuthPage() {
   const [error, setError] = useState(null);
 
   if (loading) {
-    return <LoadingState label="Checking your session..." variant="page" size="large" />;
+    return <p>Checking your session...</p>;
   }
 
   if (user) {
@@ -63,13 +62,25 @@ export default function AuthPage() {
         {isSignup && (
           <>
             <label htmlFor="username">Username</label>
-            <input type="text" id="username" name="username" maxLength={50} required />
+            <input
+              type="text"
+              id="username"
+              name="username"
+              maxLength={50}
+              required
+            />
           </>
         )}
         <label htmlFor="email">Email</label>
         <input type="email" id="email" name="email" maxLength={255} required />
         <label htmlFor="password">Password</label>
-        <input type="password" id="password" name="password" maxLength={128} required />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          maxLength={128}
+          required
+        />
         {isSignup && (
           <>
             <label htmlFor="confirm-password">Confirm Password</label>

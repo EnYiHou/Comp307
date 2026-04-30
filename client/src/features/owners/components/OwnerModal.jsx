@@ -24,7 +24,6 @@ function BookingSlotCard({ booking, isSelected, onSelect }) {
       className={`owner-booking-slot${isSelected ? " is-selected" : ""}`}
       type="button"
       onClick={() => onSelect(booking)}
-      aria-pressed={isSelected}
     >
       <span className="owner-booking-slot_title">{booking.title}</span>
       {booking.description && (
@@ -156,21 +155,17 @@ export default function OwnerModal({
     <div className="owner-modal-backdrop" onClick={onClose}>
       <section
         className="owner-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="owner-modal-title"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="owner-modal_header">
           <button
             className="owner-modal_close-button"
-            aria-label="Close owner details"
             onClick={onClose}
           >
             X
           </button>
         </div>
-        <h2 id="owner-modal-title">{owner.name}</h2>
+        <h2>{owner.name}</h2>
         <p>{owner.email}</p>
 
         <div className="owner-modal_content">

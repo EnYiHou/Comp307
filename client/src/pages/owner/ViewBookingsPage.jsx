@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import { bookingMailto } from "../../shared/utils/mailto";
 import "./OwnerDashboardPage.css";
@@ -60,7 +59,7 @@ export default function ViewBookingsPage() {
         </div>
 
         {loading ? (
-          <LoadingState label="Loading bookings..." variant="panel" />
+          <p className="owner-empty-state">Loading bookings...</p>
         ) : bookedSlots.length === 0 ? (
           <div className="owner-empty-state">
             <h3>No booked slots yet</h3>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
-import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import "./OwnerDashboardPage.css";
 
@@ -138,7 +137,7 @@ export default function InviteLinksPage() {
         </div>
 
         {loading ? (
-          <LoadingState label="Loading invite links..." variant="panel" />
+          <p className="dashboard-message">Loading invite links...</p>
         ) : links.length === 0 ? (
           <div className="owner-empty-state">
             <h3>No invite links yet</h3>

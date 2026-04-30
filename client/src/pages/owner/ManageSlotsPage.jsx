@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
-import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import { bookingMailto } from "../../shared/utils/mailto";
 import "./OwnerDashboardPage.css";
@@ -149,7 +148,7 @@ export default function ManageSlotsPage() {
         </div>
 
         {loading ? (
-          <LoadingState label="Loading slots..." variant="panel" />
+          <p className="dashboard-message">Loading slots...</p>
         ) : slots.length === 0 ? (
           <div className="owner-empty-state">
             <h3>No slots yet</h3>

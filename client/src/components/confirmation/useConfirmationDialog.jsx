@@ -1,42 +1,39 @@
-import { useCallback, useMemo, useState } from "react";
+// EnYi Hou (261165635)
+
+import { useState } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function useConfirmationDialog() {
   const [dialog, setDialog] = useState(null);
 
-  const confirm = useCallback((options) => {
+  function confirm(options) {
     return new Promise((resolve) => {
       setDialog({
         ...options,
         resolve,
       });
     });
-  }, []);
+  }
 
-  const handleCancel = useCallback(() => {
+  function handleCancel() {
     dialog?.resolve(false);
     setDialog(null);
-  }, [dialog]);
+  }
 
-  const handleConfirm = useCallback(() => {
+  function handleConfirm() {
     dialog?.resolve(true);
     setDialog(null);
-  }, [dialog]);
+  }
 
-  const confirmationDialog = useMemo(
-    () => (
-      <ConfirmationDialog
-        cancelLabel={dialog?.cancelLabel}
-        confirmLabel={dialog?.confirmLabel}
-        message={dialog?.message}
-        open={Boolean(dialog)}
-        title={dialog?.title}
-        variant={dialog?.variant}
-        onCancel={handleCancel}
-        onConfirm={handleConfirm}
-      />
-    ),
-    [dialog, handleCancel, handleConfirm],
+  const confirmationDialog = dialog && (
+    <ConfirmationDialog
+      confirmLabel={dialog.confirmLabel}
+      message={dialog.message}
+      title={dialog.title}
+      variant={dialog.variant}
+      onCancel={handleCancel}
+      onConfirm={handleConfirm}
+    />
   );
 
   return { confirm, confirmationDialog };

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog.jsx";
-import LoadingState from "../../components/loading/LoadingState.jsx";
 import api from "../../shared/api/api.js";
 import { useAuth } from "../../features/auth/useAuth.js";
 import "./TeamFinder.css";
@@ -46,7 +45,7 @@ export default function TeamFinder() {
     }, [fetchData]);
 
     if (loading) {
-        return <LoadingState label="Loading teams..." variant="page" size="large" />;
+        return <p>Loading teams...</p>;
     }
 
 

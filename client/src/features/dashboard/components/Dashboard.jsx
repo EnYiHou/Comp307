@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useConfirmationDialog from "../../../components/confirmation/useConfirmationDialog";
-import LoadingState from "../../../components/loading/LoadingState.jsx";
 import UserInvites from "../../booking/components/UserInvites";
 import api from "../../../shared/api/api.js";
 import "./dashboard.css";
@@ -33,7 +32,7 @@ function DashboardPanel({ title, count, loading, error, emptyText, children }) {
       {error ? (
         <p className="dashboard-panel__message is-error">{error}</p>
       ) : loading ? (
-        <LoadingState label={`Loading ${title.toLowerCase()}...`} variant="panel" />
+        <p className="dashboard-panel__message">Loading {title.toLowerCase()}...</p>
       ) : count === 0 ? (
         <p className="dashboard-panel__message">{emptyText}</p>
       ) : (
@@ -272,7 +271,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="dashboard-quick-actions" aria-label="Quick actions">
+      <div className="dashboard-quick-actions">
         <Link className="dashboard-quick-action" to="/dashboard-owners">
           Book Appointments
         </Link>

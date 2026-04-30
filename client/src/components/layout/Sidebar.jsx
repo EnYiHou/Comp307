@@ -29,7 +29,7 @@ export default function Sidebar({ links }) {
         </button>
       </div>
 
-      <nav className="sidebar-nav" aria-label="Primary">
+      <nav className="sidebar-nav">
         {links.map((group) => (
           <div className="sidebar-group" key={group.label}>
             <p className="sidebar-group-label">{group.label}</p>

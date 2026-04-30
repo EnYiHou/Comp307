@@ -4,7 +4,6 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import useConfirmationDialog from "../../../components/confirmation/useConfirmationDialog";
-import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
 import {
   formatTime,
@@ -134,7 +133,7 @@ function OwnerPolls() {
       {error ? (
         <p className="owner-polls-message is-error">{error}</p>
       ) : loading ? (
-        <LoadingState label="Loading polls..." variant="panel" />
+        <p className="owner-polls-message">Loading polls...</p>
       ) : polls.length === 0 ? (
         <div className="owner-polls-empty">
           <h3>No active polls</h3>
@@ -156,7 +155,7 @@ function OwnerPolls() {
 
 function PollList({ polls, selectedPollId, onSelectPoll }) {
   return (
-    <aside className="owner-poll-list" aria-label="Owner group polls">
+    <aside className="owner-poll-list">
       {polls.map((poll) => {
         const isSelected = String(poll._id) === String(selectedPollId);
 
@@ -166,7 +165,6 @@ function PollList({ polls, selectedPollId, onSelectPoll }) {
             key={poll._id}
             type="button"
             onClick={() => onSelectPoll(poll._id)}
-            aria-pressed={isSelected}
           >
             <span className="owner-poll-list__status">
               {getStatusLabel(poll.status)}
@@ -277,7 +275,7 @@ function PollDecisionDetails({ poll, onFinalize }) {
       </div>
 
       {saveMessage && (
-        <p className="owner-polls-message is-error" role="status">
+        <p className="owner-polls-message is-error">
           {saveMessage}
         </p>
       )}

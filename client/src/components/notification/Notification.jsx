@@ -16,11 +16,7 @@ export default function Notification({ notification, onClose, duration = 3500 })
   }
 
   return (
-    <div
-      className={`notification notification--${notification.type || "info"}`}
-      role="status"
-      aria-live="polite"
-    >
+    <div className={`notification notification--${notification.type || "info"}`}>
       {notification.message}
     </div>
   );

@@ -30,11 +30,10 @@ export default function LandingPage() {
         <img
           className="landing-image"
           src="/images/booking-desk.jpg"
-          alt="A desk with a laptop calendar open for appointment planning"
         />
       </section>
 
-      <section className="landing-notes" aria-label="What BERK does">
+      <section className="landing-notes">
         <article>
           <h2>For students</h2>
           <p>Browse staff, book an available time, or request a custom meeting.</p>

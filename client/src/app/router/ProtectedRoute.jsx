@@ -1,13 +1,13 @@
+// EnYi Hou (261165635)
+
 import { Navigate, Outlet } from "react-router-dom";
-import LoadingState from "../../components/loading/LoadingState.jsx";
 import { useAuth } from "../../features/auth/useAuth.js";
 
-export default function ProtectedRoute({ allowedRoles, redirectTo = "/dashboard" }) {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingState label="Loading your workspace..." variant="page" size="large" />;
-  }
+export default function ProtectedRoute({
+  allowedRoles,
+  redirectTo = "/dashboard",
+}) {
+  const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/auth?mode=login" replace />;

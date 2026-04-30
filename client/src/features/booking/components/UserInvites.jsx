@@ -3,7 +3,6 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import LoadingState from "../../../components/loading/LoadingState.jsx";
 import api from "../../../shared/api/api.js";
 import { formatTime } from "../utils/bookingCalendarUtils.js";
 import "./UserInvites.css";
@@ -62,7 +61,9 @@ export default function UserInvites() {
       .catch((caughtError) => {
         console.error("Error: ", caughtError);
         if (isMounted) {
-          setError(caughtError.response?.data?.message || "Failed to load invites.");
+          setError(
+            caughtError.response?.data?.message || "Failed to load invites.",
+          );
         }
       })
       .finally(() => {
@@ -78,7 +79,9 @@ export default function UserInvites() {
 
   const selectedInvite = useMemo(() => {
     return (
-      invites.find((invite) => String(invite._id) === String(selectedInviteId)) ??
+      invites.find(
+        (invite) => String(invite._id) === String(selectedInviteId),
+      ) ??
       invites[0] ??
       null
     );
@@ -124,15 +127,19 @@ export default function UserInvites() {
           <h2>Invites</h2>
           <p>{loading ? "Loading..." : `${invites.length} total`}</p>
         </div>
-        {!loading && <span className="dashboard-panel__count">{invites.length}</span>}
+        {!loading && (
+          <span className="dashboard-panel__count">{invites.length}</span>
+        )}
       </div>
 
       {error ? (
         <p className="dashboard-panel__message is-error">{error}</p>
       ) : loading ? (
-        <LoadingState label="Loading invites..." variant="panel" />
+        <p className="dashboard-panel__message">Loading invites...</p>
       ) : invites.length === 0 ? (
-        <p className="dashboard-panel__message">No group meeting invites yet.</p>
+        <p className="dashboard-panel__message">
+          No group meeting invites yet.
+        </p>
       ) : (
         <div className="invite-panel__body">
           <InviteList
@@ -153,7 +160,7 @@ export default function UserInvites() {
 
 function InviteList({ invites, selectedInviteId, onSelectInvite }) {
   return (
-    <aside className="invite-list" aria-label="Meeting invites">
+    <aside className="invite-list">
       {invites.map((invite) => {
         const isSelected = String(invite._id) === String(selectedInviteId);
         const hasVoted = Boolean(invite.voteAny);
@@ -166,7 +173,6 @@ function InviteList({ invites, selectedInviteId, onSelectInvite }) {
             key={invite._id}
             type="button"
             onClick={() => onSelectInvite(invite._id)}
-            aria-pressed={isSelected}
           >
             <span className="invite-list__status">
               {hasVoted ? "Voted" : "Pending"}
@@ -275,7 +281,7 @@ function InviteDetails({ invite, onLocalChange }) {
       </div>
 
       {saveMessage && (
-        <p className={`invite-save-message is-${saveStatus}`} role="status">
+        <p className={`invite-save-message is-${saveStatus}`}>
           {saveMessage}
         </p>
       )}

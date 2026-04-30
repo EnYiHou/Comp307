@@ -104,13 +104,10 @@ export default function NewMeetingRequestModal({
     <div className="request-modal-backdrop" onClick={onClose}>
       <div
         className="request-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="request-modal-title"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="request-modal-header">
-          <h2 id="request-modal-title">Request a Time</h2>
+          <h2>Request a Time</h2>
           <button type="button" onClick={onClose}>
             Close
           </button>

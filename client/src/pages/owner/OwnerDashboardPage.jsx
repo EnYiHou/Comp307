@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
-import LoadingState from "../../components/loading/LoadingState";
 import OwnerPolls from "../../features/booking/components/OwnerPolls";
 import api from "../../shared/api/api";
 import "./OwnerDashboardPage.css";
@@ -109,7 +108,7 @@ export default function OwnerDashboardPage() {
 
       {message && <p className="dashboard-message">{message}</p>}
 
-      <div className="owner-dashboard-summary" aria-label="Owner dashboard summary">
+      <div className="owner-dashboard-summary">
         <article>
           <span>{loading ? "-" : requests.length}</span>
           <p>Pending requests</p>
@@ -134,7 +133,7 @@ export default function OwnerDashboardPage() {
           />
 
           {loading ? (
-            <LoadingState label="Loading requests..." variant="panel" />
+            <p className="dashboard-message">Loading requests...</p>
           ) : requests.length === 0 ? (
             <EmptyState
               title="No pending requests"
@@ -164,7 +163,7 @@ export default function OwnerDashboardPage() {
             />
 
             {loading ? (
-              <LoadingState label="Loading bookings..." variant="panel" />
+              <p className="dashboard-message">Loading bookings...</p>
             ) : bookings.length === 0 ? (
               <EmptyState
                 title="No upcoming bookings"

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import useConfirmationDialog from "../../components/confirmation/useConfirmationDialog";
-import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import { bookingMailto } from "../../shared/utils/mailto";
 import "../../features/dashboard/components/dashboard.css";
@@ -102,7 +101,7 @@ export default function MyAppointmentsPage() {
         </div>
 
         {loading ? (
-          <LoadingState label="Loading appointments..." variant="panel" />
+          <p className="dashboard-panel__message">Loading appointments...</p>
         ) : appointments.length === 0 ? (
           <p className="dashboard-panel__message">No appointments booked yet.</p>
         ) : (

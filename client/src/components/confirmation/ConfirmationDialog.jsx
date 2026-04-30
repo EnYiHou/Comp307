@@ -1,46 +1,23 @@
-import { useEffect } from "react";
+// EnYi Hou (261165635)
+
 import "./ConfirmationDialog.css";
 
 export default function ConfirmationDialog({
-  open,
   title,
   message,
   confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
   variant = "danger",
   onCancel,
   onConfirm,
 }) {
-  useEffect(() => {
-    if (!open) {
-      return undefined;
-    }
-
-    function handleKeyDown(event) {
-      if (event.key === "Escape") {
-        onCancel();
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onCancel, open]);
-
-  if (!open) {
-    return null;
-  }
-
   return (
     <div className="confirmation-dialog-backdrop" onClick={onCancel}>
       <div
-        aria-labelledby="confirmation-dialog-title"
-        aria-modal="true"
         className="confirmation-dialog"
-        role="dialog"
         onClick={(event) => event.stopPropagation()}
       >
         <div>
-          <h2 id="confirmation-dialog-title">{title}</h2>
+          <h2>{title}</h2>
           {message && <p>{message}</p>}
         </div>
 
@@ -50,7 +27,7 @@ export default function ConfirmationDialog({
             type="button"
             onClick={onCancel}
           >
-            {cancelLabel}
+            Cancel
           </button>
           <button
             className={`confirmation-dialog__button confirmation-dialog__button--${variant}`}

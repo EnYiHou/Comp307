@@ -5,7 +5,6 @@ import OwnerGrid from "../../features/owners/components/OwnerGrid";
 import OwnerModal from "../../features/owners/components/OwnerModal";
 import Notification from "../../components/notification/Notification";
 import NewMeetingRequestModal from "./NewMeetingRequestModal";
-import LoadingState from "../../components/loading/LoadingState";
 import "./OwnersDirectoryPage.css";
 
 export default function OwnersDirectoryPage() {
@@ -90,7 +89,7 @@ export default function OwnersDirectoryPage() {
         <p className="appointments-empty is-error">{error}</p>
       ) : loading ? (
         <div className="appointments-loading">
-          <LoadingState label="Loading appointment hosts..." variant="panel" />
+          <p>Loading appointment hosts...</p>
         </div>
       ) : owners.length === 0 ? (
         <p className="appointments-empty">No appointment hosts found.</p>

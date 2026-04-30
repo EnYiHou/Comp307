@@ -1,3 +1,6 @@
+// EnYi Hou (261165635)
+
+
 import "./Footer.css";
 
 export default function Footer() {

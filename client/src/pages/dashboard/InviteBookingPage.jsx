@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import { acceptBooking } from "../../features/booking/bookingService";
 import { bookingMailto } from "../../shared/utils/mailto";
@@ -62,10 +61,6 @@ export default function InviteBookingPage() {
     } finally {
       setBookingId("");
     }
-  }
-
-  if (loading) {
-    return <LoadingState label="Loading invite..." variant="page" size="large" />;
   }
 
   return (

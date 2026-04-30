@@ -18,7 +18,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.2.1",
+    "inherits": "^2.0.4",
     "jsonwebtoken": "^9.0.0",
+    "once": "^1.4.0",
     "mongoose": "^7.3.4",
     "morgan": "^1.10.1"
   },

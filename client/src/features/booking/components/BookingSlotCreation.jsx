@@ -245,12 +245,12 @@ function BookingSlotCreation() {
       )}
 
       {validationMessage && (
-        <p className="availability-feedback is-error" role="alert">
+        <p className="availability-feedback is-error">
           {validationMessage}
         </p>
       )}
       {submitState.message && submitState.status !== "success" && (
-        <p className={`availability-feedback is-${submitState.status}`} role="status">
+        <p className={`availability-feedback is-${submitState.status}`}>
           {submitState.message}
         </p>
       )}
@@ -422,7 +422,6 @@ function ChoiceTile({ title, description, active, onClick }) {
       type="button"
       className={`availability-choice${active ? " is-active" : ""}`}
       onClick={onClick}
-      aria-pressed={active}
     >
       <span>{title}</span>
       <p>{description}</p>

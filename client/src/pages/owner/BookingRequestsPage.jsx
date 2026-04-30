@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import { buildMailto } from "../../shared/utils/mailto";
 import "./OwnerDashboardPage.css";
@@ -77,7 +76,7 @@ export default function BookingRequestsPage() {
         </div>
 
         {loading ? (
-          <LoadingState label="Loading requests..." variant="panel" />
+          <p className="dashboard-message">Loading requests...</p>
         ) : requests.length === 0 ? (
           <div className="owner-empty-state">
             <h3>No pending requests</h3>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import LoadingState from "../../components/loading/LoadingState";
 import api from "../../shared/api/api";
 import "./EditBookingPage.css";
 
@@ -86,13 +85,6 @@ export default function EditBookingPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <section className="edit-booking-page">
-        <LoadingState label="Loading booking..." variant="page" size="large" />
-      </section>
-    );
-  }
 
   return (
     <section className="edit-booking-page">
