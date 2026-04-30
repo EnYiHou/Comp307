@@ -40,7 +40,7 @@ export default function LandingPage() {
         </article>
         <article>
           <h2>For staff</h2>
-          <p>Create appointment slots, manage bookings, and share invite links.</p>
+          <p>Create appointment slots, manage bookings, and share your profile link.</p>
         </article>
         <article>
           <h2>For groups</h2>

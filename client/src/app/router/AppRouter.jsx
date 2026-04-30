@@ -3,7 +3,6 @@ import DashboardShell from "../../components/layout/DashboardShell";
 import PublicShell from "../../components/layout/PublicShell";
 import MyAppointmentsPage from "../../pages/dashboard/MyAppointmentsPage";
 import BookAppointmentPage from "../../pages/dashboard/BookAppointmentPage";
-import InviteBookingPage from "../../pages/dashboard/InviteBookingPage";
 import RequestMeetingPage from "../../pages/dashboard/RequestMeetingPage";
 import SettingsPage from "../../pages/dashboard/SettingsPage";
 import UserDashboardPage from "../../pages/dashboard/UserDashboardPage";
@@ -11,7 +10,6 @@ import BookingRequestsPage from "../../pages/owner/BookingRequestsPage";
 import CreateSlotPage from "../../pages/owner/CreateSlotPage";
 import EditBookingPage from "../../pages/owner/EditBookingPage";
 import GroupMeetingSetupPage from "../../pages/owner/GroupMeetingSetupPage";
-import InviteLinksPage from "../../pages/owner/InviteLinksPage";
 import ManageSlotsPage from "../../pages/owner/ManageSlotsPage";
 import OwnerDashboardPage from "../../pages/owner/OwnerDashboardPage";
 import RecurringOfficeHoursPage from "../../pages/owner/RecurringOfficeHoursPage";
@@ -59,12 +57,14 @@ export default function AppRouter() {
           />
           <Route path="/owners" element={<OwnersDirectoryPage />} />
           <Route path="/owners/:ownerId" element={<OwnerProfilePage />} />
-          <Route path="/invite/:token" element={<InviteBookingPage />} />
 
           <Route path="/dashboard/settings" element={<SettingsPage />} />
           <Route
             element={
-              <ProtectedRoute allowedRoles={["OWNER"]} redirectTo="/dashboard" />
+              <ProtectedRoute
+                allowedRoles={["OWNER"]}
+                redirectTo="/dashboard"
+              />
             }
           >
             <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
@@ -84,7 +84,6 @@ export default function AppRouter() {
               element={<GroupMeetingSetupPage />}
             />
             <Route path="/owner/bookings" element={<ViewBookingsPage />} />
-            <Route path="/owner/invite-links" element={<InviteLinksPage />} />
           </Route>
 
           <Route path="/tinder" element={<TeamFinder />} />

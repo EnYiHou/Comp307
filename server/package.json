@@ -6,9 +6,7 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "seed:random": "node src/scripts/seedRandomData.js",
-    "seed:owner-bookings": "python3 src/scripts/seed_random_owner_bookings.py"
+    "start": "node src/server.js"
   },
   "author": "",
   "license": "ISC",

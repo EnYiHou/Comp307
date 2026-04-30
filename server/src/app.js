@@ -9,7 +9,6 @@ import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import calendarRoutes from "./routes/calendarRoutes.js";
 import groupMeetingRoutes from "./routes/groupMeetingRoutes.js";
-import inviteRoutes from "./routes/inviteRoutes.js";
 import meetingRequestRoutes from "./routes/meetingRequestRoutes.js";
 import ownerRoutes from "./routes/ownerRoutes.js";
 import slotRoutes from "./routes/slotRoutes.js";
@@ -49,7 +48,6 @@ app.use("/api/owners", ownerRoutes);
 app.use("/api/slots", slotRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/meeting-requests", meetingRequestRoutes);
-app.use("/api/invites", inviteRoutes);
 app.use("/api/group-meetings", groupMeetingRoutes);
 app.use("/api/calendar", calendarRoutes);
 

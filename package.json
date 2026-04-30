@@ -10,9 +10,7 @@
     "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
     "client": "npm run dev -w client",
     "server": "npm run dev -w server",
-    "build": "npm run build -w client",
-    "seed:random": "npm run seed:random -w server",
-    "seed:owner-bookings": "npm run seed:owner-bookings -w server --"
+    "build": "npm run build -w client"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.7.0",

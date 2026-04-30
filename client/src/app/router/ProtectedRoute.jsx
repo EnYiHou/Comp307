@@ -7,7 +7,11 @@ export default function ProtectedRoute({
   allowedRoles,
   redirectTo = "/dashboard",
 }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <p>Checking your session...</p>;
+  }
 
   if (!user) {
     return <Navigate to="/auth?mode=login" replace />;
