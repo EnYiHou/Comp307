@@ -1,4 +1,7 @@
+// EnYi Hou (261165635)
+
 import mongoose from "mongoose";
+
 
 const userSchema = new mongoose.Schema(
   {

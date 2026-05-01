@@ -4,6 +4,7 @@ import { getMcGillOwners } from "../../features/search/services/searchService";
 import "./NewMeetingRequestModal.css";
 
 // Extra fixes: Ronald Zhang
+// EnYi Hou (261165635)
 
 function toDateTimeInputValue(date) {
   const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);

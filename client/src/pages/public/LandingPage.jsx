@@ -1,3 +1,5 @@
+// EnYi Hou (261165635)
+
 import { Link } from "react-router-dom";
 import "./LandingPage.css";
 

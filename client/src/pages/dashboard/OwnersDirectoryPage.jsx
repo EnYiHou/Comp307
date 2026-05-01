@@ -1,3 +1,5 @@
+// EnYi Hou (261165635)
+
 import { useEffect, useState } from "react";
 import SearchBar from "../../features/search/components/SearchBar";
 import { getOwners } from "../../features/search/services/searchService";

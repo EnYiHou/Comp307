@@ -1,10 +1,11 @@
+// EnYi Hou (261165635)
+
 import { Navigate, Route, Routes } from "react-router-dom";
 import DashboardShell from "../../components/layout/DashboardShell";
 import PublicShell from "../../components/layout/PublicShell";
 import BookAppointmentPage from "../../pages/dashboard/BookAppointmentPage";
 import UserDashboardPage from "../../pages/dashboard/UserDashboardPage";
 import CreateSlotPage from "../../pages/owner/CreateSlotPage";
-import GroupMeetingSetupPage from "../../pages/owner/GroupMeetingSetupPage";
 import OwnerDashboardPage from "../../pages/owner/OwnerDashboardPage";
 import AuthPage from "../../pages/public/AuthPage";
 import LandingPage from "../../pages/public/LandingPage";
@@ -13,7 +14,6 @@ import OwnerProfilePage from "../../pages/dashboard/OwnerProfilePage";
 import ProtectedRoute from "./ProtectedRoute";
 import TeamFinder from "../../pages/tinder/TeamFinder";
 
-// Everyone added their own routes here
 
 export default function AppRouter() {
   return (
@@ -50,10 +50,7 @@ export default function AppRouter() {
           >
             <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
             <Route path="/owner/slots/new" element={<CreateSlotPage />} />
-            <Route
-              path="/owner/group-meetings/new"
-              element={<GroupMeetingSetupPage />}
-            />
+
           </Route>
 
           <Route path="/tinder" element={<TeamFinder />} />

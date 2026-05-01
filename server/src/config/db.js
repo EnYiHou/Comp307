@@ -1,3 +1,5 @@
+// EnYi Hou (261165635)
+
 import mongoose from "mongoose";
 import { env } from "./env.js";
 

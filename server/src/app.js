@@ -3,7 +3,6 @@ import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
-import errorMiddleware from "./middleware/errorMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import meetingRequestRoutes from "./routes/meetingRequestRoutes.js";
@@ -52,7 +51,5 @@ app.get("{*path}", (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
-// Fallback error handler
-app.use(errorMiddleware);
 
 export default app;

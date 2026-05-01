@@ -1,3 +1,6 @@
+// EnYi Hou (261165635)
+// Kevin Xu
+
 import express from "express";
 import requireAuth, { requireRole } from "../middleware/authMiddleware.js";
 import { Booking } from "../models/Booking.js";

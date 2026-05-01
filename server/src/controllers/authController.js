@@ -1,3 +1,5 @@
+// EnYi Hou (261165635)
+
 import { loginUser, registerUser } from "../services/authService.js";
 
 const cookieOptions = {

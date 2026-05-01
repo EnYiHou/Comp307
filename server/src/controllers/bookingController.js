@@ -1,3 +1,5 @@
+// partially modified by EnYi Hou (261165635)
+
 import { Booking } from "../models/Booking.js";
 
 function parseBookingDates(startTime, endTime) {

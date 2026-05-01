@@ -1,3 +1,5 @@
+// EnYi Hou (261165635)
+
 import { useEffect, useState } from "react";
 
 export default function SearchBar({

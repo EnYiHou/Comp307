@@ -1,6 +1,7 @@
+// EnYi Hou (261165635)
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Notification from "../../components/notification/Notification";
 import OwnerPanel from "../../features/owners/components/OwnerPanel";
 import { getOwner } from "../../features/search/services/searchService";
 import NewMeetingRequestModal from "./NewMeetingRequestModal";
@@ -11,16 +12,11 @@ export default function OwnerProfilePage() {
   const navigate = useNavigate();
   const [owner, setOwner] = useState(null);
   const [requestOwner, setRequestOwner] = useState(null);
-  const [notification, setNotification] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     getOwner(ownerId).then(setOwner).catch(() => setError("Owner not found."));
   }, [ownerId]);
-
-  const notify = (message, type = "info") => {
-    setNotification({ id: Date.now(), message, type });
-  };
 
   return (
     <section className="appointments-page owner-profile-page">
@@ -31,7 +27,6 @@ export default function OwnerProfilePage() {
           inline
           owner={owner}
           onClose={() => navigate("/owners")}
-          onNotify={notify}
           onRequest={() => setRequestOwner(owner)}
         />
       ) : (
@@ -45,10 +40,8 @@ export default function OwnerProfilePage() {
           initialTeacher={requestOwner}
           lockTeacher
           onClose={() => setRequestOwner(null)}
-          onSuccess={notify}
         />
       )}
-      <Notification notification={notification} onClose={() => setNotification(null)} />
     </section>
   );
 }

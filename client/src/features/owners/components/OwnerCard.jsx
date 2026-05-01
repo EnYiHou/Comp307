@@ -1,7 +1,8 @@
+// EnYi Hou (261165635)
+
 import "./owner.css";
 import { Link } from "react-router-dom";
 
-// Main:
 
 function getInitials(name = "") {
   return name

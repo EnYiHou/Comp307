@@ -1,3 +1,5 @@
+// EnYi Hou (261165635)
+
 import express from "express";
 import requireAuth from "../middleware/authMiddleware.js";
 import User from "../models/User.js";
@@ -16,8 +18,8 @@ router.get("/", requireAuth, async (req, res, next) => {
       email: /@mcgill\.ca$/i,
       ...(query
         ? {
-            $or: [{ name: regex }, { email: regex }],
-          }
+          $or: [{ name: regex }, { email: regex }],
+        }
         : {}),
     })
       .select("_id name email role")
@@ -41,8 +43,8 @@ router.get("/all-mcgill", requireAuth, async (req, res, next) => {
       email: /@mcgill\.ca$/i,
       ...(query
         ? {
-            $or: [{ name: regex }, { email: regex }],
-          }
+          $or: [{ name: regex }, { email: regex }],
+        }
         : {}),
     })
       .select("_id name email role")

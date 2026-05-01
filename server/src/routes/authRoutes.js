@@ -1,3 +1,4 @@
+// EnYi Hou (261165635)
 import express from "express";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { login, logout, me, register } from "../controllers/authController.js";

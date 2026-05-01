@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 import User from "../models/User.js";
 
-// Main: Enyi Hou
+// EnYi Hou (261165635)
 // Extra Bugfixes: Ronald Zhang
 
 export default async function authMiddleware(req, res, next) {
