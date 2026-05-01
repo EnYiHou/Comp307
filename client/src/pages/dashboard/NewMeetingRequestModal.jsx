@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import api from "../../shared/api/api";
-import { getMcGillOwners } from "../../features/search/services/searchService";
 import "./NewMeetingRequestModal.css";
 
 // Extra fixes: Ronald Zhang
@@ -26,13 +25,9 @@ function getNowMinString() {
 
 export default function NewMeetingRequestModal({
   initialTeacher = null,
-  lockTeacher = false,
   onClose,
   onSuccess,
 }) {
-  const [teacherSearch, setTeacherSearch] = useState("");
-  const [teachers, setTeachers] = useState([]);
-  const [selectedTeacher, setSelectedTeacher] = useState(initialTeacher);
   const [formData, setFormData] = useState({
     topic: "",
     message: "",
@@ -41,21 +36,6 @@ export default function NewMeetingRequestModal({
   });
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  const loadTeachers = useCallback(async () => {
-    try {
-      const data = await getMcGillOwners(teacherSearch);
-      setTeachers(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Appointment host search error:", error);
-      setTeachers([]);
-    }
-  }, [teacherSearch]);
-
-  useEffect(() => {
-    const timeout = setTimeout(loadTeachers, 300);
-    return () => clearTimeout(timeout);
-  }, [loadTeachers]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -85,7 +65,7 @@ export default function NewMeetingRequestModal({
 
       await api.post("/meeting-requests", {
         ...formData,
-        ownerId: selectedTeacher._id,
+        ownerId: initialTeacher._id,
         preferredStart: preferredStart.toISOString(),
         preferredEnd: preferredEnd.toISOString(),
       });
@@ -114,108 +94,66 @@ export default function NewMeetingRequestModal({
           </button>
         </div>
 
-        {!selectedTeacher && (
+        <form className="request-form" onSubmit={handleSubmit}>
+          <div className="request-selected-teacher">
+            <p>Requesting {initialTeacher.name}</p>
+          </div>
+
           <label>
-            Search appointment host
+            Topic
             <input
-              type="search"
-              value={teacherSearch}
-              onChange={(event) => {
-                setTeacherSearch(event.target.value);
-                setSelectedTeacher(null);
-              }}
-              placeholder="Type a name..."
+              name="topic"
+              value={formData.topic}
+              onChange={handleChange}
               maxLength={100}
+              required
             />
           </label>
-        )}
 
-        {!selectedTeacher && (
-          <div className="teacher-search-results">
-            {teachers.length === 0 ? (
-              <p>No appointment hosts found.</p>
-            ) : (
-              teachers.map((teacher) => (
-                <button
-                  type="button"
-                  key={teacher._id}
-                  onClick={() => setSelectedTeacher(teacher)}
-                >
-                  <strong>{teacher.name}</strong>
-                  <span>{teacher.email}</span>
-                </button>
-              ))
-            )}
-          </div>
-        )}
+          <label>
+            Message
+            <textarea
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              maxLength={500}
+              rows="4"
+            />
+          </label>
 
-        {selectedTeacher && (
-          <form className="request-form" onSubmit={handleSubmit}>
-            <div className="request-selected-teacher">
-              <p>Requesting {selectedTeacher.name}</p>
-              {!lockTeacher && (
-                <button type="button" onClick={() => setSelectedTeacher(null)}>
-                  Change
-                </button>
-              )}
-            </div>
-
+          <div className="request-form-row">
             <label>
-              Topic
+              Preferred start
               <input
-                name="topic"
-                value={formData.topic}
+                type="datetime-local"
+                name="preferredStart"
+                value={formData.preferredStart}
+                min={getNowMinString()}
                 onChange={handleChange}
-                maxLength={100}
                 required
               />
             </label>
 
             <label>
-              Message
-              <textarea
-                name="message"
-                value={formData.message}
+              Hours
+              <input
+                type="number"
+                min="0.5"
+                step="0.5"
+                name="durationHours"
+                value={formData.durationHours}
                 onChange={handleChange}
-                maxLength={500}
-                rows="4"
+                required
               />
             </label>
+          </div>
 
-            <div className="request-form-row">
-              <label>
-                Preferred start
-                <input
-                  type="datetime-local"
-                  name="preferredStart"
-                  value={formData.preferredStart}
-                  min={getNowMinString()}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
+          {message && <p className="request-form-message">{message}</p>}
 
-              <label>
-                Hours
-                <input
-                  type="number"
-                  min="0.5"
-                  step="0.5"
-                  name="durationHours"
-                  value={formData.durationHours}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
-
-            {message && <p className="request-form-message">{message}</p>}
-
-            <button type="submit" disabled={submitting}>
-              {submitting ? "Sending..." : "Send request"}
-            </button>
-          </form>
-        )}
+          <button type="submit" disabled={submitting}>
+            {submitting ? "Sending..." : "Send request"}
+          </button>
+        </form>
       </div>
     </div>
   );
