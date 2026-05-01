@@ -1,4 +1,3 @@
-
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
@@ -18,6 +17,9 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientDistPath = path.join(__dirname, "../../client/dist");
+
+// Main: Enyi Hou
+// Fixes for Mcgill server: Ronald Zhang
 
 const app = express();
 
