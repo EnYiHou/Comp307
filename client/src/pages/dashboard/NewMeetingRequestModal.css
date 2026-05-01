@@ -61,39 +61,6 @@
   background: white;
 }
 
-.teacher-search-results {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.teacher-search-results p {
-  margin: 0;
-  color: var(--color-muted);
-}
-
-.teacher-search-results button {
-  display: grid;
-  gap: 2px;
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: white;
-  color: var(--color-text);
-  text-align: left;
-  cursor: pointer;
-}
-
-.teacher-search-results button:hover {
-  border-color: var(--color-primary);
-}
-
-.teacher-search-results span {
-  color: var(--color-muted);
-  font-size: 14px;
-}
-
 .request-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -110,15 +77,6 @@
 .request-selected-teacher p {
   margin: 0;
   color: var(--color-muted);
-}
-
-.request-selected-teacher button {
-  padding: 6px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: white;
-  color: var(--color-text);
-  cursor: pointer;
 }
 
 .request-form-message {

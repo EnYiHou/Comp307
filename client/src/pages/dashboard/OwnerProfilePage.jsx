@@ -37,8 +37,7 @@ export default function OwnerProfilePage() {
 
       {requestOwner && (
         <NewMeetingRequestModal
-          initialTeacher={requestOwner}
-          lockTeacher
+          teacher={requestOwner}
           onClose={() => setRequestOwner(null)}
         />
       )}

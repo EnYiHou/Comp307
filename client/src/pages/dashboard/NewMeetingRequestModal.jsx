@@ -24,7 +24,7 @@ function getNowMinString() {
 }
 
 export default function NewMeetingRequestModal({
-  initialTeacher = null,
+  teacher,
   onClose,
   onSuccess,
 }) {
@@ -65,7 +65,7 @@ export default function NewMeetingRequestModal({
 
       await api.post("/meeting-requests", {
         ...formData,
-        ownerId: initialTeacher._id,
+        ownerId: teacher._id,
         preferredStart: preferredStart.toISOString(),
         preferredEnd: preferredEnd.toISOString(),
       });
@@ -96,7 +96,7 @@ export default function NewMeetingRequestModal({
 
         <form className="request-form" onSubmit={handleSubmit}>
           <div className="request-selected-teacher">
-            <p>Requesting {initialTeacher.name}</p>
+            <p>Requesting {teacher.name}</p>
           </div>
 
           <label>
