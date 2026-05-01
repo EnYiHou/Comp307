@@ -1,4 +1,5 @@
 // EnYi Hou (261165635)
+// Kevin Xu
 
 import "./ConfirmationDialog.css";
 

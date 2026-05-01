@@ -1,3 +1,5 @@
+// Bogdan Timercan
+
 import BookingSlotCreation from "../../features/booking/components/BookingSlotCreation";
 
 export default function CreateSlotPage() {
