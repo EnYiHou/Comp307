@@ -262,11 +262,14 @@
   display: grid;
   gap: 0.18rem;
   overflow: visible;
+  padding: 4px;
   font-size: 0.79rem;
   line-height: 1.32;
 }
 
 .owner-poll-event span:first-child,
+.owner-poll-event span:nth-child(2),
+.invite-event span:nth-child(2),
 .invite-event span:first-child {
   font-weight: var(--font-weight-bold);
 }
